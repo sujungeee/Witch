@@ -5,6 +5,7 @@ import lombok.Getter;
 
 @Getter
 public class WitchError {
+
   private final String errorCode;
   private final String errorMessage;
 
@@ -12,7 +13,14 @@ public class WitchError {
     this.errorCode = errorCode;
     this.errorMessage = errorMessage;
   }
+
   public static WitchError of(ErrorCode errorCode) {
     return new WitchError(errorCode.getErrorCode(), errorCode.getErrorMessage());
   }
+
+  public static WitchError of(ErrorCode errorCode, String errorMessageToAdd) {
+    return new WitchError(errorCode.getErrorCode(),
+        errorCode.getErrorMessage() + "(" + errorMessageToAdd + ")");
+  }
+
 }

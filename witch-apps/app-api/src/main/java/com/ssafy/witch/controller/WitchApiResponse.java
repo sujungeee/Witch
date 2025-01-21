@@ -25,8 +25,12 @@ public class WitchApiResponse<T> {
     return new WitchApiResponse<>(true, null);
   }
 
-  public static  WitchApiResponse<WitchError> failure(ErrorCode errorCode) {
+  public static WitchApiResponse<WitchError> failure(ErrorCode errorCode) {
     return new WitchApiResponse<>(false, WitchError.of(errorCode));
+  }
+
+  public static WitchApiResponse<WitchError> failure(ErrorCode errorCode, String errorMessage) {
+    return new WitchApiResponse<>(false, WitchError.of(errorCode, errorMessage));
   }
 
 }

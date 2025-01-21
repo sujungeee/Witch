@@ -4,8 +4,11 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.ssafy.witch.R
 import com.ssafy.witch.databinding.ActivityMainBinding
+import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment
 
+
+private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
     private val mainBinding : ActivityMainBinding by lazy{
@@ -15,11 +18,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        setContentView(mainBinding.root)
+
+        mainBinding.mainABn.selectedItemId = R.id.bn_home
 
         supportFragmentManager.beginTransaction()
             .replace(R.id.main_flayout, HomeFragment())
             .commit()
+
 
         mainBinding.mainABn.setOnItemSelectedListener { item ->
             when(item.itemId){
@@ -37,6 +43,7 @@ class MainActivity : AppCompatActivity() {
                 }
                 else -> false
             }
+
         }
         mainBinding.mainABn.setOnItemReselectedListener { item ->
             if(mainBinding.mainABn.selectedItemId != item.itemId){
@@ -54,7 +61,7 @@ class MainActivity : AppCompatActivity() {
         val transaction = supportFragmentManager.beginTransaction()
         when(index){
             1 -> transaction.replace(R.id.main_flayout, HomeFragment())
-//            2 -> transaction.replace(R.id.main_flayout, //Todo 모임)
+            2 -> transaction.replace(R.id.main_flayout, GroupListFragment())
 //            3 -> transaction.replace(R.id.main_flayout, //Todo 마이페이지)
 //            4 -> transaction.add(R.id.main_flayout, //Todo)
 //                .addToBackStack(null)

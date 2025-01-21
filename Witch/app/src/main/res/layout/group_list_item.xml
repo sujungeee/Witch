@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:padding="20dp"
+    android:layout_width="match_parent"
+    android:layout_height="140dp">
+
+    <ImageView
+        android:id="@+id/group_li_iv_group_img"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:clipToOutline="true"
+        android:background="@drawable/circle_shape"
+        android:src="@drawable/ic_launcher_background"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:id="@+id/group_li_tv_group_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="D211"
+        android:textColor="@color/witch_white"
+        android:textSize="20dp"
+        android:layout_marginStart="10dp"
+        app:layout_constraintStart_toEndOf="@+id/group_li_iv_group_img"
+        app:layout_constraintTop_toTopOf="@+id/group_li_iv_group_img" />
+
+    <TextView
+        android:id="@+id/group_li_tv_group_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="함께한 지 200일"
+        android:textSize="10dp"
+        android:textColor="@color/witch_green"
+        app:layout_constraintBottom_toBottomOf="@+id/group_li_iv_group_img"
+        app:layout_constraintStart_toStartOf="@+id/group_li_tv_group_name"
+        app:layout_constraintTop_toBottomOf="@+id/group_li_tv_group_name" />
+
+
+    <TextView
+        android:id="@+id/tv1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="모임장 "
+        android:textSize="12dp"
+        android:fontFamily="@font/pretendard_regular"
+        android:textColor="@color/witch_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/group_li_iv_group_master"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="남수정"
+        android:textSize="12dp"
+        android:fontFamily="@font/pretendard_regular"
+        android:textColor="@color/witch_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv1" />
+
+    <TextView
+        android:id="@+id/tv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pretendard_regular"
+        android:text=" | 인원수: "
+        android:textSize="12dp"
+        android:textColor="@color/witch_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/group_li_iv_group_master" />
+
+    <TextView
+        android:id="@+id/group_li_iv_group_population"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/pretendard_regular"
+        android:text="8"
+        android:textSize="12dp"
+        android:textColor="@color/witch_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/tv" />
+
+
+    <ImageButton
+        android:layout_width="100dp"
+        android:background="@drawable/green_btn"
+        android:layout_height="wrap_content"
+        android:src="@drawable/baseline_arrow_forward_24"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" >
+    </ImageButton>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

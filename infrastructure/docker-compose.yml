@@ -12,3 +12,11 @@ services:
       - ./db/mysql/data:/var/lib/mysql
       - ./db/mysql/init:/docker-entrypoint-initdb.d
     platform: linux/amd64
+  redis:
+    image: redis:alpine
+    container_name: witch-redis
+    restart: always
+    command: redis-server
+    hostname: redis
+    ports:
+      - '6379:6379'

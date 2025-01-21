@@ -40,6 +40,7 @@ android {
     dataBinding {
         enable= true
     }
+    buildToolsVersion = "34.0.0"
 }
 
 dependencies {
@@ -67,5 +68,8 @@ dependencies {
 
     // https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
+
+    implementation("com.prolificinteractive:material-calendarview:1.4.3")
+
 
 }

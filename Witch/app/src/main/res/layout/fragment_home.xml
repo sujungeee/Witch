@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.home.HomeFragment">
+
+    <TextView
+        android:layout_marginStart="30dp"
+        android:layout_marginTop="50dp"
+        android:id="@+id/home_fg_tv_username"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="김덕윤"
+        android:textColor="@color/witch_green"
+        android:textSize="24dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="님,"
+        android:textSize="24dp"
+        android:textColor="@color/witch_white"
+        app:layout_constraintBottom_toBottomOf="@+id/home_fg_tv_username"
+        app:layout_constraintStart_toEndOf="@+id/home_fg_tv_username" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="오늘의 약속을 확인해보세요"
+        android:textColor="@color/witch_white"
+        android:textSize="20dp"
+        app:layout_constraintStart_toStartOf="@+id/home_fg_tv_username"
+        app:layout_constraintTop_toBottomOf="@+id/home_fg_tv_username" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

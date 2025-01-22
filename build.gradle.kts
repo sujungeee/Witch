@@ -74,7 +74,6 @@ configureByLabels("java") {
         annotationProcessor("org.mapstruct:mapstruct-processor")
 
         testImplementation("org.springframework.boot:spring-boot-starter-test")
-        testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
         testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter")
         testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
@@ -105,11 +104,17 @@ configureByLabels("library") {
     }
 }
 
-configureByLabels("asciidoctor") {
+configureByLabels("restdocs") {
     apply(plugin = "org.asciidoctor.jvm.convert")
 
+    dependencies {
+        val testImplementation by configurations
+
+        testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    }
+
     tasks.named<org.asciidoctor.gradle.jvm.AsciidoctorTask>("asciidoctor") {
-        sourceDir(file("src/docs"))
+        sourceDir(file("src/main/resources/docs"))
         outputs.dir(file("build/docs"))
         attributes(
             mapOf(
@@ -117,10 +122,6 @@ configureByLabels("asciidoctor") {
             )
         )
     }
-}
-
-configureByLabels("restdocs") {
-    apply(plugin = "com.epages.restdocs-api-spec")
 }
 
 configureByLabels("querydsl") {

@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".ui.group.GroupListFragment">
 
 
     <TextView
@@ -29,7 +29,6 @@
         app:layout_constraintBottom_toBottomOf="@+id/home_fg_tv_username"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/home_fg_tv_username" />
-
 
 
     <androidx.recyclerview.widget.RecyclerView

@@ -71,5 +71,8 @@ dependencies {
 
     implementation("com.prolificinteractive:material-calendarview:1.4.3")
 
+    // 구글 map api(사용)
+    implementation ("com.google.android.gms:play-services-maps:18.0.2")
+    implementation ("com.google.android.gms:play-services-location:20.0.0")
 
 }

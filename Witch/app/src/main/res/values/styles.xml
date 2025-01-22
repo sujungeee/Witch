@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- CalendarView 스타일 -->
+    <style name="CustomCalendarView" parent="Widget.Material3.MaterialCalendar">
+        <!-- 배경색 -->
+        <item name="android:background">@color/witch_black</item>
+        <item name="android:weekDayTextAppearance">@style/CustomWeekDayText</item>
+        <item name="android:dateTextAppearance">@style/CustomDateText</item>
+        <item name="android:datePickerMode">spinner</item> <!-- API 24 이상에서만 효과 -->
+        <item name="android:headerTextColor">#FF0000</item> <!-- 화살표 색상 -->
+        <item name="android:selectedDateVerticalBar">@color/witch_green</item> <!-- 선택된 날짜 세로 막대 -->
+    </style>
+
+    <!-- 요일 텍스트 스타일 -->
+    <style name="CustomWeekDayText" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/witch_white</item>
+    </style>
+
+    <!-- 날짜 텍스트 스타일 -->
+    <style name="CustomDateTextWhite" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/witch_white</item>
+    </style>
+    <!-- 날짜 텍스트 스타일 -->
+    <style name="CustomDateTextGray" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/witch_gray</item>
+    </style>
+
+    <style name="CustomHearText" parent="TextAppearance.AppCompat.Medium">
+        <item name="android:textColor">@color/witch_white</item>
+    </style>
+</resources>

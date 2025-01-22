@@ -2,6 +2,7 @@ import com.linecorp.support.project.multi.recipe.configureByLabels
 
 plugins {
     id("java")
+    id("jacoco")
     id("io.spring.dependency-management") version Versions.springDependencyManagementPlugin apply false
     id("org.springframework.boot") version Versions.springBoot apply false
     id("io.freefair.lombok") version Versions.lombokPlugin apply false
@@ -24,6 +25,47 @@ allprojects {
 
 subprojects {
     apply(plugin = "idea")
+    apply(plugin = "jacoco")    // Java 플러그인 적용
+
+    // JaCoCo 버전 설정
+    jacoco {
+        toolVersion = "0.8.11"  // JaCoCo 최신 안정 버전 사용
+    }
+
+    // 테스트 설정
+    tasks.withType<Test> {
+        finalizedBy(tasks.withType<JacocoReport>())  // 테스트 후 JaCoCo 리포트 생성
+        finalizedBy(jacocoRootReport)
+    }
+
+    // 각 모듈의 JaCoCo 리포트 설정
+    tasks.withType<JacocoReport> {
+        reports {
+            xml.required.set(true)  // XML 리포트 생성
+            csv.required.set(false) // CSV 리포트 비활성화
+            html.required.set(true) // HTML 리포트 생성
+        }
+    }
+}
+
+val jacocoRootReport = tasks.register<JacocoReport>("jacocoRootReport") {
+    description = "Generates an aggregate report from all subprojects"
+    group = "verification"
+
+    // 서브프로젝트들의 소스 디렉토리와 클래스 파일 수집
+    subprojects.forEach { subproject ->
+        subproject.plugins.withType<JacocoPlugin> {
+            executionData.from(fileTree(subproject.buildDir.absolutePath).include("/jacoco/*.exec"))
+            sourceDirectories.from(subproject.files("src/main/java"))
+            classDirectories.from(subproject.files("build/classes/java/main"))
+        }
+    }
+
+    reports {
+        xml.required.set(true)
+        csv.required.set(false)
+        html.required.set(true)
+    }
 }
 
 configureByLabels("java") {

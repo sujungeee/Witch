@@ -12,7 +12,7 @@ import com.ssafy.witch.databinding.FragmentGroupListBinding
 import com.ssafy.witch.databinding.FragmentHomeBinding
 import java.util.Calendar
 
-class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupListBinding::bind, R.layout.fragment_home) {
+class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupListBinding::bind, R.layout.fragment_group_list) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

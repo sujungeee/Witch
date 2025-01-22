@@ -14,14 +14,6 @@ dependencies {
     implementation("org.springframework.data:spring-data-commons")
 
     implementation("org.flywaydb:flyway-core")
-
-    integrationImplementation("org.springframework.boot:spring-boot-starter-test")
-    integrationImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
-    integrationImplementation("io.rest-assured:spring-mock-mvc")
-
-    integrationImplementation("com.epages:restdocs-api-spec-mockmvc")
-
-    testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 
 val appMainClassName = "com.ssafy.witch.WitchApiApplication"

@@ -11,6 +11,4 @@ dependencies {
 
     runtimeOnly("com.mysql:mysql-connector-j")
     runtimeOnly(project(":witch-cores:core-service"))
-
-    integrationImplementation("org.springframework.boot:spring-boot-starter-test")
 }

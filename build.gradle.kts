@@ -26,11 +26,6 @@ subprojects {
     apply(plugin = "idea")
 }
 
-dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
-}
-
 configureByLabels("java") {
     apply(plugin = "org.gradle.java")
     apply(plugin = "io.spring.dependency-management")
@@ -49,26 +44,12 @@ configureByLabels("java") {
     the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:${Versions.springBoot}")
-            mavenBom("com.google.guava:guava-bom:${Versions.guava}")
         }
 
         dependencies {
-            dependency("org.apache.commons:commons-lang3:${Versions.apacheCommonsLang}")
-            dependency("org.apache.commons:commons-collections4:${Versions.apacheCommonsCollections}")
             dependency("com.navercorp.fixturemonkey:fixture-monkey-starter:${Versions.fixtureMonkey}")
             dependency("org.mapstruct:mapstruct:${Versions.mapstruct}")
             dependency("org.mapstruct:mapstruct-processor:${Versions.mapstruct}")
-            dependency("com.fasterxml.jackson.core:jackson-databind:${Versions.jacksonCore}")
-
-            dependency("org.junit.jupiter:junit-jupiter-api:${Versions.junit}")
-            dependency("org.junit.jupiter:junit-jupiter-params:${Versions.junit}")
-            dependency("org.junit.jupiter:junit-jupiter-engine:${Versions.junit}")
-            dependency("org.assertj:assertj-core:${Versions.assertjCore}")
-            dependency("org.mockito:mockito-junit-jupiter:${Versions.mockitoCore}")
-
-            dependency("com.epages:restdocs-api-spec:${Versions.restdocsApiSpec}")
-            dependency("com.epages:restdocs-api-spec-mockmvc:${Versions.restdocsApiSpec}")
-            dependency("com.epages:restdocs-api-spec-restassured:${Versions.restdocsApiSpec}")
 
             dependencySet("io.jsonwebtoken:${Versions.jwt}") {
                 entry("jjwt-api")
@@ -88,26 +69,17 @@ configureByLabels("java") {
         val integrationImplementation by configurations
         val integrationRuntimeOnly by configurations
 
-        implementation("com.google.guava:guava")
-
-        implementation("org.apache.commons:commons-lang3")
-        implementation("org.apache.commons:commons-collections4")
         implementation("org.mapstruct:mapstruct")
 
         annotationProcessor("org.mapstruct:mapstruct-processor")
 
-        testImplementation("org.junit.jupiter:junit-jupiter-api")
-        testImplementation("org.assertj:assertj-core")
-        testImplementation("org.junit.jupiter:junit-jupiter-params")
-        testImplementation("org.mockito:mockito-core")
-        testImplementation("org.mockito:mockito-junit-jupiter")
+        testImplementation("org.springframework.boot:spring-boot-starter-test")
         testImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter")
-        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
-        integrationImplementation("org.junit.jupiter:junit-jupiter-api")
-        integrationImplementation("org.junit.jupiter:junit-jupiter-params")
-        integrationImplementation("org.assertj:assertj-core")
-        integrationRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
+        integrationImplementation("org.springframework.boot:spring-boot-starter-test")
+        integrationImplementation("com.navercorp.fixturemonkey:fixture-monkey-starter")
+        integrationRuntimeOnly("org.junit.platform:junit-platform-launcher")
     }
 }
 
@@ -132,11 +104,17 @@ configureByLabels("library") {
     }
 }
 
-configureByLabels("asciidoctor") {
+configureByLabels("restdocs") {
     apply(plugin = "org.asciidoctor.jvm.convert")
 
+    dependencies {
+        val testImplementation by configurations
+
+        testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
+    }
+
     tasks.named<org.asciidoctor.gradle.jvm.AsciidoctorTask>("asciidoctor") {
-        sourceDir(file("src/docs"))
+        sourceDir(file("src/main/resources/docs"))
         outputs.dir(file("build/docs"))
         attributes(
             mapOf(
@@ -144,10 +122,6 @@ configureByLabels("asciidoctor") {
             )
         )
     }
-}
-
-configureByLabels("restdocs") {
-    apply(plugin = "com.epages.restdocs-api-spec")
 }
 
 configureByLabels("querydsl") {

@@ -10,12 +10,17 @@ import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentProfileEditBinding
 import com.ssafy.witch.databinding.FragmentPwdEditBinding
 import com.ssafy.witch.databinding.FragmentSettingBinding
+import com.ssafy.witch.ui.MainActivity
 
 
-class SettingFragment : BaseFragment<FragmentPwdEditBinding>(FragmentPwdEditBinding::bind, R.layout.fragment_pwd_edit) {
+class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBinding::bind, R.layout.fragment_setting) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        binding.settingFgLlChangePwd.setOnClickListener {
+            (requireActivity() as MainActivity).supportFragmentManager.beginTransaction().replace(R.id.main_flayout, PwdEditFragment()).addToBackStack("").commit()
+        }
 
 
     }

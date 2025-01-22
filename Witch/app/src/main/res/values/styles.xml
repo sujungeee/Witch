@@ -5,9 +5,8 @@
         <!-- 배경색 -->
         <item name="android:background">@color/witch_black</item>
         <item name="android:weekDayTextAppearance">@style/CustomWeekDayText</item>
-        <item name="android:dateTextAppearance">@style/CustomDateText</item>
+        <item name="android:dateTextAppearance">@style/CustomDateTextWhite</item>
         <item name="android:datePickerMode">spinner</item> <!-- API 24 이상에서만 효과 -->
-        <item name="android:headerTextColor">#FF0000</item> <!-- 화살표 색상 -->
         <item name="android:selectedDateVerticalBar">@color/witch_green</item> <!-- 선택된 날짜 세로 막대 -->
     </style>
 

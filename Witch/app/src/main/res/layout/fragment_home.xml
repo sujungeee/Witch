@@ -50,20 +50,9 @@
         app:mcv_arrowColor="@color/white"
         app:layout_constraintTop_toBottomOf="@+id/textView2"
         app:mcv_selectionColor="@color/witch_green"
-        app:mcv_weekDayTextAppearance="@style/CustomDateText"
-        app:mcv_headerTextAppearance="@style/CustomDateText"
+        app:mcv_weekDayTextAppearance="@style/CustomDateTextWhite"
+        app:mcv_headerTextAppearance="@style/CustomDateTextWhite"
          />
-<!--    <CalendarView-->
-<!--        android:id="@+id/home_fg_cv_calendar"-->
-<!--        android:layout_margin="20dp"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        style="@style/CustomCalendarView"-->
-<!--        app:layout_constraintEnd_toEndOf="parent"-->
-<!--        app:layout_constraintStart_toStartOf="parent"-->
-<!--        app:mcv_showOtherDates="all"-->
-<!--        app:layout_constraintTop_toBottomOf="@+id/textView2"-->
-<!--        app:mcv_selectionColor="@color/witch_green" />-->
 
 
     <TextView

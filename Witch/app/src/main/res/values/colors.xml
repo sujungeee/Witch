@@ -6,4 +6,6 @@
     <color name="witch_green">#FF52FF46</color>
     <color name="witch_white">#FFF9F9F9</color>
     <color name="witch_gray">#FFA0A0A0</color>
+    <color name="witch_dark_gray">#FF363636</color>
+
 </resources>

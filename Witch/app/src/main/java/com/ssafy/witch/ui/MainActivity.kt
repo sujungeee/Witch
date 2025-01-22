@@ -6,6 +6,7 @@ import com.ssafy.witch.R
 import com.ssafy.witch.databinding.ActivityMainBinding
 import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment
+import com.ssafy.witch.ui.map.MapFragment
 
 
 private const val TAG = "MainActivity"
@@ -63,9 +64,10 @@ class MainActivity : AppCompatActivity() {
             1 -> transaction.replace(R.id.main_flayout, HomeFragment())
             2 -> transaction.replace(R.id.main_flayout, GroupListFragment())
 //            3 -> transaction.replace(R.id.main_flayout, //Todo 마이페이지)
-//            4 -> transaction.add(R.id.main_flayout, //Todo)
-//                .addToBackStack(null)
+            4 -> transaction.replace(R.id.main_flayout, MapFragment())
 //            5 -> transaction.add(R.id.main_flayout, //Todo)
+//                .addToBackStack(null)
+//            6 -> transaction.add(R.id.main_flayout, //Todo)
 //                .addToBackStack(null)
         }
         transaction.commit()

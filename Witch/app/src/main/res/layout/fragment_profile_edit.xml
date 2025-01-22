@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.group.GroupEditFragment">
+    tools:context=".ui.mypage.ProfileEditFragment">
 
     <TextView
         android:id="@+id/tv"
@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="30dp"
         android:layout_marginTop="50dp"
-        android:text="모임 정보 수정"
+        android:text="프로필 수정"
         android:textColor="@color/witch_white"
         android:textSize="26dp"
         app:layout_constraintStart_toStartOf="parent"
@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="모임의 이름을 지어주세요."
+        android:text="변경할 닉네임을 작성해주세요."
         android:textColor="@color/witch_green"
         android:textSize="16dp"
         app:layout_constraintStart_toStartOf="@+id/tv"
@@ -32,7 +32,7 @@
 
 
     <EditText
-        android:id="@+id/group_edit_fg_et_group_name"
+        android:id="@+id/profile_edit_fg_et_nickname"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="30dp"
@@ -50,14 +50,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dp"
-        android:text="모임의 프로필 사진을 등록해주세요."
+        android:text="프로필 사진을 등록해주세요."
         android:textColor="@color/witch_green"
         android:textSize="16dp"
-        app:layout_constraintStart_toStartOf="@+id/group_edit_fg_et_group_name"
-        app:layout_constraintTop_toBottomOf="@+id/group_edit_fg_et_group_name" />
+        app:layout_constraintStart_toStartOf="@+id/profile_edit_fg_et_nickname"
+        app:layout_constraintTop_toBottomOf="@+id/profile_edit_fg_et_nickname" />
 
     <ImageView
-        android:id="@+id/group_edit_fg_iv_group_image"
+        android:id="@+id/profile_edit_fg_iv_profile_image"
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="10dp"
@@ -69,41 +69,42 @@
         app:layout_constraintTop_toBottomOf="@+id/textView3" />
 
 
-    <Button
-        android:id="@+id/group_edit_fg_btn_image_upload"
+    <TextView
+        android:id="@+id/profile_edit_fg_btn_image_upload"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:text="등록"
-        android:textColor="@color/witch_black"
-        android:backgroundTint="@color/witch_green"
+        android:gravity="center"
+        android:background="@drawable/green_btn_long"
         android:layout_margin="20dp"
-        app:layout_constraintEnd_toStartOf="@+id/group_edit_fg_btn_image_delete"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:clickable="true"
+        app:layout_constraintEnd_toStartOf="@+id/profile_edit_fg_btn_image_delete"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/group_edit_fg_iv_group_image" />
+        app:layout_constraintTop_toBottomOf="@+id/profile_edit_fg_iv_profile_image" />
 
 
-    <Button
-        android:id="@+id/group_edit_fg_btn_image_delete"
+    <TextView
+        android:id="@+id/profile_edit_fg_btn_image_delete"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         android:text="삭제"
         android:layout_marginEnd="20dp"
-        android:textColor="@color/witch_black"
-        android:backgroundTint="@color/witch_green"
+        android:gravity="center"
+        android:clickable="true"
+        android:background="@drawable/green_btn_long"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/group_edit_fg_btn_image_upload"
-        app:layout_constraintTop_toTopOf="@+id/group_edit_fg_btn_image_upload" />
+        app:layout_constraintStart_toEndOf="@+id/profile_edit_fg_btn_image_upload"
+        app:layout_constraintTop_toTopOf="@+id/profile_edit_fg_btn_image_upload" />
 
-    <Button
-        android:id="@+id/group_edit_fg_btn_group_create"
+    <TextView
+        android:id="@+id/profile_edit_fg_btn_profile_change"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:text="모임 등록"
+        android:text="프로필 변경"
         android:gravity="center"
         android:layout_margin="10dp"
-        android:textColor="@color/witch_black"
-        android:backgroundTint="@color/witch_green"
+        android:clickable="true"
+        android:background="@drawable/green_btn_long"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

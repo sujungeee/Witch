@@ -32,7 +32,7 @@
     <EditText
         android:id="@+id/pwd_edit_fg_et_origin_pwd"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:layout_margin="20dp"
         android:background="@drawable/box_style"
         app:layout_constraintTop_toBottomOf="@+id/textView7" />
@@ -51,7 +51,7 @@
     <EditText
         android:id="@+id/pwd_edit_fg_et_new_pwd"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:layout_margin="20dp"
         android:background="@drawable/box_style"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
@@ -70,7 +70,7 @@
     <EditText
         android:id="@+id/pwd_edit_fg_et_new_pwd_twice"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
+        android:layout_height="30dp"
         android:layout_margin="20dp"
         android:background="@drawable/box_style"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />

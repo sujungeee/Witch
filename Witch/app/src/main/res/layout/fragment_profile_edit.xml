@@ -96,15 +96,15 @@
         app:layout_constraintStart_toEndOf="@+id/profile_edit_fg_btn_image_upload"
         app:layout_constraintTop_toTopOf="@+id/profile_edit_fg_btn_image_upload" />
 
-    <TextView
+    <Button
         android:id="@+id/profile_edit_fg_btn_profile_change"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="프로필 변경"
         android:gravity="center"
         android:layout_margin="10dp"
-        android:clickable="true"
-        android:background="@drawable/green_btn_long"
+        android:textColor="@color/witch_black"
+        android:backgroundTint="@color/witch_green"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

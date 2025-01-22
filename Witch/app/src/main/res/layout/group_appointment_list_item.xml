@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+
+    android:id="@+id/group_appointment_list_item"
+    android:layout_width="match_parent"
+    android:layout_height="100dp">
+
+    <TextView
+        android:id="@+id/textView5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="12:00 PM"
+        android:textSize="12dp"
+        android:layout_marginBottom="20dp"
+        android:textColor="@color/witch_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="2025.01.24"
+        android:textSize="12dp"
+        android:textColor="@color/witch_gray"
+        app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5" />
+
+    <View
+        android:id="@+id/view2"
+        android:layout_width="5dp"
+        android:layout_height="70dp"
+        android:background="@color/witch_green"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.335"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView7"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="아이디어 회의입니다."
+        android:textColor="@color/witch_white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/view2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="my"
+        android:textColor="@color/witch_green"
+        app:layout_constraintBottom_toTopOf="@+id/textView7"
+        app:layout_constraintStart_toStartOf="@+id/textView7" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

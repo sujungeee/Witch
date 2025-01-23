@@ -1,14 +1,13 @@
-package com.ssafy.witch.exception.user;
+package com.ssafy.witch.exception;
 
-import com.ssafy.witch.exception.ErrorCode;
 import lombok.Getter;
 
 @Getter
-public class UserException extends RuntimeException {
+public class BusinessException extends RuntimeException {
 
   private final ErrorCode errorCode;
 
-  public UserException(ErrorCode errorCode) {
+  public BusinessException(ErrorCode errorCode) {
     this.errorCode = errorCode;
   }
 

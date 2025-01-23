@@ -75,4 +75,6 @@ dependencies {
     implementation ("com.google.android.gms:play-services-maps:18.0.2")
     implementation ("com.google.android.gms:play-services-location:20.0.0")
 
+    // 움직이는 애니메이션 - 로티
+    implementation ("com.airbnb.android:lottie:5.0.3")
 }

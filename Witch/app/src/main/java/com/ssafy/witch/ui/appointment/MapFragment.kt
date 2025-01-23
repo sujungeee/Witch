@@ -22,8 +22,6 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.databinding.DialogArrivalSuccess1Binding
-import com.ssafy.witch.databinding.DialogArrivalSuccess2Binding
 import com.ssafy.witch.databinding.FragmentMapBinding
 
 class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),

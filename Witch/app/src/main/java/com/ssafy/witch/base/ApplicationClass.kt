@@ -34,6 +34,7 @@ class ApplicationClass : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        //shared preference 초기화
 //        sharedPreferences = SharedPreferencesUtil(applicationContext)
 
         // 레트로핏 인스턴스 생성

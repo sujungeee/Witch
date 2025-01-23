@@ -4,7 +4,23 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="a9837a62-4250-451d-a1c3-f1c1471a59a0" name="Changes" comment="" />
+    <list default="true" id="a9837a62-4250-451d-a1c3-f1c1471a59a0" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/assets/fly_witch.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/login/JoinFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/login/LoginFragment.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/LoginActivity.kt" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/res/layout/activity_login.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/res/layout/fragment_join.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/res/layout/fragment_login.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/.idea/deploymentTargetSelector.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/base/ApplicationClass.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/base/ApplicationClass.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/res/values/strings.xml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -32,9 +48,9 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "aos",
+    "git-widget-placeholder": "origin/aos",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/git/S12P11D211/Witch"
+    "last_opened_file_path": "C:/Users/SSAFY/Documents/SSAFY/03_Smartstore_network_jetpack_starter"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

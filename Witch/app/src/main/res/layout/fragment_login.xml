@@ -61,7 +61,7 @@
             android:layout_height="42dp"
             android:background="@drawable/box_style"
             android:textSize="14sp"
-            android:text="이메일을 입력해주세요."
+            android:hint="이메일을 입력해주세요."
             android:paddingStart="16dp"
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"

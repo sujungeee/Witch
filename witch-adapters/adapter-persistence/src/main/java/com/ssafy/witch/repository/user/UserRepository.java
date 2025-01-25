@@ -15,4 +15,9 @@ public class UserRepository implements ValidateUserPort {
     return userJpaRepository.existsByEmail(email);
   }
 
+  @Override
+  public boolean isNicknameDuplicated(String nickname) {
+    return userJpaRepository.existsByNickname(nickname);
+  }
+
 }

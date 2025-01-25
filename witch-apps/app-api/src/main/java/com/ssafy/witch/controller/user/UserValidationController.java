@@ -19,4 +19,10 @@ public class UserValidationController {
     return WitchApiResponse.success();
   }
 
+  @GetMapping("/users/nickname/is-unique")
+  public WitchApiResponse<Void> checkNicknameUnique(@RequestParam String nickname) {
+    validateUserUseCase.checkUserNicknameDuplication(nickname);
+    return WitchApiResponse.success();
+  }
+
 }

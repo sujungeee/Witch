@@ -1,15 +1,17 @@
 import com.linecorp.support.project.multi.recipe.configureByLabels
+import io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension
+import org.asciidoctor.gradle.jvm.AsciidoctorTask
+import org.springframework.boot.gradle.tasks.bundling.BootJar
 
 plugins {
+    id("com.linecorp.build-recipe-plugin") version Versions.lineRecipePlugin
     id("java")
     id("jacoco")
     id("io.spring.dependency-management") version Versions.springDependencyManagementPlugin apply false
     id("org.springframework.boot") version Versions.springBoot apply false
     id("io.freefair.lombok") version Versions.lombokPlugin apply false
     id("com.coditory.integration-test") version Versions.integrationTestPlugin apply false
-    id("com.epages.restdocs-api-spec") version Versions.restdocsApiSpec apply false
     id("org.asciidoctor.jvm.convert") version Versions.asciidoctorPlugin apply false
-    id("com.linecorp.build-recipe-plugin") version Versions.lineRecipePlugin
 }
 
 allprojects {
@@ -18,8 +20,6 @@ allprojects {
 
     repositories {
         mavenCentral()
-        maven { url = uri("https://maven.restlet.com") }
-        maven { url = uri("https://jitpack.io") }
     }
 }
 
@@ -30,6 +30,26 @@ subprojects {
     // JaCoCo 버전 설정
     jacoco {
         toolVersion = "0.8.11"  // JaCoCo 최신 안정 버전 사용
+    }
+
+    val jacocoRootReport = tasks.register<JacocoReport>("jacocoRootReport") {
+        description = "Generates an aggregate report from all subprojects"
+        group = "verification"
+
+        // 서브프로젝트들의 소스 디렉토리와 클래스 파일 수집
+        subprojects.forEach { subproject ->
+            subproject.plugins.withType<JacocoPlugin> {
+                executionData.from(fileTree(subproject.layout.buildDirectory).include("/jacoco/*.exec"))
+                sourceDirectories.from(subproject.files("src/main/java"))
+                classDirectories.from(subproject.files("build/classes/java/main"))
+            }
+        }
+
+        reports {
+            xml.required.set(true)
+            csv.required.set(false)
+            html.required.set(true)
+        }
     }
 
     // 테스트 설정
@@ -48,25 +68,6 @@ subprojects {
     }
 }
 
-val jacocoRootReport = tasks.register<JacocoReport>("jacocoRootReport") {
-    description = "Generates an aggregate report from all subprojects"
-    group = "verification"
-
-    // 서브프로젝트들의 소스 디렉토리와 클래스 파일 수집
-    subprojects.forEach { subproject ->
-        subproject.plugins.withType<JacocoPlugin> {
-            executionData.from(fileTree(subproject.layout.buildDirectory).include("/jacoco/*.exec"))
-            sourceDirectories.from(subproject.files("src/main/java"))
-            classDirectories.from(subproject.files("build/classes/java/main"))
-        }
-    }
-
-    reports {
-        xml.required.set(true)
-        csv.required.set(false)
-        html.required.set(true)
-    }
-}
 
 configureByLabels("java") {
     apply(plugin = "org.gradle.java")
@@ -83,7 +84,7 @@ configureByLabels("java") {
         useJUnitPlatform()
     }
 
-    the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
+    the<DependencyManagementExtension>().apply {
         imports {
             mavenBom("org.springframework.boot:spring-boot-dependencies:${Versions.springBoot}")
         }
@@ -132,7 +133,7 @@ configureByLabels("boot") {
         enabled = false
     }
 
-    tasks.getByName<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
+    tasks.getByName<BootJar>("bootJar") {
         enabled = true
         archiveClassifier.set("boot")
     }
@@ -151,23 +152,41 @@ configureByLabels("restdocs") {
 
     dependencies {
         val testImplementation by configurations
+        val asciidoctorExt by configurations.creating
 
+        asciidoctorExt("org.springframework.restdocs:spring-restdocs-asciidoctor")
         testImplementation("org.springframework.restdocs:spring-restdocs-mockmvc")
     }
 
-    tasks.named<org.asciidoctor.gradle.jvm.AsciidoctorTask>("asciidoctor") {
-        sourceDir(file("src/main/resources/docs"))
+    val snippetsDir = file("build/generated-snippets")
+
+    tasks.named<Test>("test") {
+        outputs.dir(snippetsDir)
+        finalizedBy("asciidoctor")
+    }
+
+    tasks.register<Copy>("copyDocument") {
+        dependsOn("asciidoctor")
+        from(file("build/docs/asciidoc"))
+        into(file("src/main/resources/static/docs"))
+    }
+
+    tasks.named<AsciidoctorTask>("asciidoctor") {
+        configurations("asciidoctorExt")
         outputs.dir(file("build/docs"))
-        attributes(
-            mapOf(
-                "snippets" to file("build/generated-snippets")
-            )
-        )
+
+        baseDirFollowsSourceFile()
+
+        sources(delegateClosureOf<PatternSet> {
+            include("index.adoc")
+        })
+
+        finalizedBy("copyDocument")
     }
 }
 
 configureByLabels("querydsl") {
-    the<io.spring.gradle.dependencymanagement.dsl.DependencyManagementExtension>().apply {
+    the<DependencyManagementExtension>().apply {
         imports {
             mavenBom("com.querydsl:querydsl-bom:${Versions.querydsl}")
         }

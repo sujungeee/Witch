@@ -19,8 +19,8 @@ import org.mockito.BDDMockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@WebMvcTest(UserController.class)
-class UserControllerTest extends RestDocsTestSupport {
+@WebMvcTest(UserValidationController.class)
+class UserValidationControllerTest extends RestDocsTestSupport {
 
   @MockBean
   private ValidateUserUseCase validateUserUseCase;

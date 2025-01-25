@@ -12,6 +12,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ssafy.witch.exception.ErrorCode;
 import com.ssafy.witch.exception.user.UserEmailDuplicatedException;
+import com.ssafy.witch.exception.user.UserNicknameDuplicatedException;
 import com.ssafy.witch.support.docs.RestDocsTestSupport;
 import com.ssafy.witch.user.ValidateUserUseCase;
 import org.junit.jupiter.api.Test;
@@ -19,8 +20,8 @@ import org.mockito.BDDMockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
-@WebMvcTest(UserController.class)
-class UserControllerTest extends RestDocsTestSupport {
+@WebMvcTest(UserValidationController.class)
+class UserValidationControllerTest extends RestDocsTestSupport {
 
   @MockBean
   private ValidateUserUseCase validateUserUseCase;
@@ -57,6 +58,43 @@ class UserControllerTest extends RestDocsTestSupport {
     mvc.perform(get("/users/email/is-unique")
             .param("email", email))
         .andExpect(jsonPath("data.errorCode").value(ErrorCode.EMAIL_ALREADY_IN_USE.getErrorCode()))
+        .andExpect(status().isBadRequest())
+        .andDo(restDocs.document());
+  }
+
+  @Test
+  void validate_nickname_duplication_200() throws Exception {
+
+    String nickname = "sameNick";
+
+    mvc.perform(get("/users/nickname/is-unique")
+            .param("nickname", nickname))
+        .andExpect(status().isOk())
+        .andDo(restDocs.document(
+            queryParameters(
+                parameterWithName("nickname")
+                    .description("unique함을 검증할 닉네임")
+            ),
+            responseFields(
+                fieldWithPath("success")
+                    .type(BOOLEAN)
+                    .description("성공 여부")
+            )
+        ));
+  }
+
+  @Test
+  void validate_nickname_duplication_400() throws Exception {
+
+    String nickname = "sameNick";
+
+    BDDMockito.doThrow(new UserNicknameDuplicatedException())
+        .when(validateUserUseCase).checkUserNicknameDuplication(any());
+
+    mvc.perform(get("/users/nickname/is-unique")
+            .param("nickname", nickname))
+        .andExpect(
+            jsonPath("data.errorCode").value(ErrorCode.NICKNAME_ALREADY_IN_USE.getErrorCode()))
         .andExpect(status().isBadRequest())
         .andDo(restDocs.document());
   }

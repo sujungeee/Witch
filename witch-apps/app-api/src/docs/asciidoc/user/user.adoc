@@ -2,3 +2,4 @@
 
 include::api/check-email-duplication.adoc[]
 include::api/check-nickname-duplication.adoc[]
+include::api/generate_user_email_verification_code.adoc[]

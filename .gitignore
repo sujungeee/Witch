@@ -243,7 +243,7 @@ ehthumbs_vista.db
 # Dump file
 *.stackdump
 
-# Folder config file
+# Folder com.ssafy.witch.config file
 [Dd]esktop.ini
 
 # Recycle Bin used on file shares
@@ -264,7 +264,7 @@ $RECYCLE.BIN/
 **/build/
 !src/**/build/
 
-# Ignore Gradle GUI config
+# Ignore Gradle GUI com.ssafy.witch.config
 gradle-app.setting
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)

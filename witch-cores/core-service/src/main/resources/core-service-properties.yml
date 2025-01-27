@@ -1,0 +1,4 @@
+witch:
+  email:
+    verification-code:
+      expire-minute: 15

@@ -3,3 +3,5 @@ spring:
     import:
       - resource:adapter-persistence-properties.yml
       - resource:adapter-redis-properties.yml
+      - resource:adapter-mail-properties.yml
+      - resource:core-service-properties.yml

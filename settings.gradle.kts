@@ -17,6 +17,9 @@ include("witch-apps:app-api")
 
 include("witch-adapters:adapter-persistence")
 include("witch-adapters:adapter-redis")
+include("witch-adapters:adapter-mail")
+include("witch-adapters:adapter-generator")
+include("witch-adapters:adapter-event")
 
 include("witch-cores:core-domain")
 include("witch-cores:core-port")

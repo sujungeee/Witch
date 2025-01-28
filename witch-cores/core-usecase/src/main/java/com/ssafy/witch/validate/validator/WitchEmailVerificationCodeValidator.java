@@ -7,11 +7,11 @@ public class WitchEmailVerificationCodeValidator extends
 
   @Override
   protected String getRegex() {
-    return "^\\d{6}$";
+    return ValidationRule.EMAIL_VERIFICATION_CODE.getRegex();
   }
 
   @Override
   protected String getErrorMessage() {
-    return "이메일 인증 코드는 6자리 숫자여야 합니다";
+    return ValidationRule.EMAIL_VERIFICATION_CODE.getErrorMessage();
   }
 }

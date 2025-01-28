@@ -6,11 +6,11 @@ public class WitchNicknameValidator extends RegexValidator<WitchNickname, String
 
   @Override
   protected String getRegex() {
-    return "^[a-zA-Z0-9가-힣]{2,8}$";
+    return ValidationRule.NICKNAME.getRegex();
   }
 
   @Override
   protected String getErrorMessage() {
-    return "닉네임은 영문 or 숫자 or 한글의 2-8자의 문자열이어야 합니다";
+    return ValidationRule.NICKNAME.getErrorMessage();
   }
 }

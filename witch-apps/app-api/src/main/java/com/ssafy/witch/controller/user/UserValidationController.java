@@ -1,6 +1,6 @@
 package com.ssafy.witch.controller.user;
 
-import com.ssafy.witch.controller.WitchApiResponse;
+import com.ssafy.witch.response.WitchApiResponse;
 import com.ssafy.witch.user.ValidateUserUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

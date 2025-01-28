@@ -1,9 +1,9 @@
 package com.ssafy.witch.controller.user;
 
-import com.ssafy.witch.controller.WitchApiResponse;
 import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
 import com.ssafy.witch.controller.user.request.ConfirmUserEmailVerificationCodeRequest;
 import com.ssafy.witch.controller.user.request.UserEmailVerificationCodeRequest;
+import com.ssafy.witch.response.WitchApiResponse;
 import com.ssafy.witch.user.VerifyUserEmailUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

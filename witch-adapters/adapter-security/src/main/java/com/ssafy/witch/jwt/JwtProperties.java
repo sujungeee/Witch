@@ -11,11 +11,14 @@ public class JwtProperties {
   @Value("${witch.jwt.properties.secret}")
   private String secret;
 
-  @Value("${witch.jwt.properties.access-token-expiration-seconds}")
+  @Value("${witch.jwt.properties.access-token.expiration-seconds}")
   private Long accessTokenExpirationSeconds;
 
-  @Value("${witch.jwt.properties.refresh-token-expiration-seconds}")
+  @Value("${witch.jwt.properties.refresh-token.expiration-seconds}")
   private Long refreshTokenExpirationSeconds;
+
+  @Value("${witch.jwt.properties.refresh-token.renew-available-seconds}")
+  private String refreshTokenRenewAvailableSeconds;
 
   @Value("${witch.jwt.properties.token-type}")
   private String tokenType;

@@ -13,5 +13,5 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-impl")
     implementation("io.jsonwebtoken:jjwt-jackson")
 
-    testImplementation("org.springframework:spring-web")
+    testImplementation(project(":witch-tests"))
 }

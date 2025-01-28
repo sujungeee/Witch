@@ -28,3 +28,5 @@ include("witch-cores:core-service")
 include("witch-cores:core-usecase")
 
 include("witch-commons")
+
+include("witch-tests")

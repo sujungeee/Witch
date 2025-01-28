@@ -1,11 +1,5 @@
 package com.ssafy.witch.support.docs;
 
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyHeaders;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.modifyUris;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessRequest;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.preprocessResponse;
-import static org.springframework.restdocs.operation.preprocess.Preprocessors.prettyPrint;
-
 import com.fasterxml.jackson.core.PrettyPrinter;
 import com.fasterxml.jackson.core.util.DefaultIndenter;
 import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
@@ -17,6 +11,7 @@ import org.springframework.restdocs.mockmvc.MockMvcRestDocumentation;
 import org.springframework.restdocs.mockmvc.RestDocumentationResultHandler;
 import org.springframework.restdocs.operation.preprocess.ContentModifyingOperationPreprocessor;
 import org.springframework.restdocs.operation.preprocess.OperationPreprocessor;
+import org.springframework.restdocs.operation.preprocess.Preprocessors;
 
 @TestConfiguration
 public class RestDocsConfiguration {
@@ -25,17 +20,17 @@ public class RestDocsConfiguration {
   public RestDocumentationResultHandler restDocumentationResultHandler() {
     return MockMvcRestDocumentation.document(
         "{class-name}/{method-name}",  // 문서 이름 설정
-        preprocessRequest(  // 공통 헤더 설정
-            modifyUris()
+        Preprocessors.preprocessRequest(  // 공통 헤더 설정
+            Preprocessors.modifyUris()
                 .scheme("https")
                 .host("ssafy.com")
                 .removePort(),
-            modifyHeaders()
+            Preprocessors.modifyHeaders()
                 .remove("Content-Length")
                 .remove("Host"),
-            prettyPrint()),  // pretty json 적용
-        preprocessResponse(  // 공통 헤더 설정
-            modifyHeaders()
+            Preprocessors.prettyPrint()),  // pretty json 적용
+        Preprocessors.preprocessResponse(  // 공통 헤더 설정
+            Preprocessors.modifyHeaders()
                 .remove("Content-Length")
                 .remove("Content-Type")
                 .remove("X-Content-Type-Options")

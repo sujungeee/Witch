@@ -19,6 +19,9 @@ dependencies {
     implementation("org.springframework.data:spring-data-commons")
 
     implementation("org.flywaydb:flyway-core")
+
+    testImplementation(project(":witch-tests"))
+    testImplementation(project(":witch-adapters:adapter-security"))
 }
 
 val appMainClassName = "com.ssafy.witch.WitchApiApplication"

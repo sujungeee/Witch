@@ -14,7 +14,7 @@ public class VerifyUserEmailService implements VerifyUserEmailUseCase {
   private final ValidateUserUseCase validateUserUseCase;
 
   private final EmailVerificationCodeGeneratorPort emailVerificationCodeGeneratorPort;
-  private final EmailVerificationCodeStorePort emailVerificationCodeStorePort;
+  private final EmailVerificationCodeCachePort emailVerificationCodeCachePort;
   private final EmailVerificationGeneratedEventPort emailVerificationGeneratedEventPort;
 
 
@@ -33,7 +33,7 @@ public class VerifyUserEmailService implements VerifyUserEmailUseCase {
     emailVerificationGeneratedEventPort.publish(
         EmailVerificationCodeGeneratedEvent.of(email, code));
 
-    emailVerificationCodeStorePort.upsert(email, code,
+    emailVerificationCodeCachePort.upsert(email, code,
         Duration.ofMinutes(emailVerificationCodeExpireMinute));
   }
 }

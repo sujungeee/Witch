@@ -2,7 +2,7 @@ package com.ssafy.witch.user;
 
 import java.time.Duration;
 
-public interface EmailVerificationCodeStorePort {
+public interface EmailVerificationCodeCachePort {
 
   void upsert(String email, EmailVerificationCode code, Duration expireDuration);
 

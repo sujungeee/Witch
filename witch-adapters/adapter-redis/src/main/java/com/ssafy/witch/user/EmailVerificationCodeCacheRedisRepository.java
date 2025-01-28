@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class EmailVerificationCodeStoreRedisRepository implements EmailVerificationCodeStorePort {
+public class EmailVerificationCodeCacheRedisRepository implements EmailVerificationCodeCachePort {
 
   private static final String KEY_PREFIX = "emailVerificationCode:";
 

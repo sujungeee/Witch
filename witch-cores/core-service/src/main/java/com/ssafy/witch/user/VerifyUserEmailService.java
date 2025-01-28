@@ -58,7 +58,7 @@ public class VerifyUserEmailService implements VerifyUserEmailUseCase {
     }
 
     emailVerificationCodeCachePort.remove(email);
-    verifiedEmailCachePort.save(email, code, Duration.ofMinutes(verifiedEmailExpireMinute);
+    verifiedEmailCachePort.upsert(email, code, Duration.ofMinutes(verifiedEmailExpireMinute));
   }
 
   private boolean isEmailVerificationCodeValid(String email, EmailVerificationCode code) {

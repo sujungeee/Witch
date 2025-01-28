@@ -15,7 +15,7 @@ public class VerifiedEmailRedisRepository implements VerifiedEmailCachePort {
   private final StringRedisTemplate redisTemplate;
 
   @Override
-  public void save(String email, EmailVerificationCode code, Duration expireDuration) {
+  public void upsert(String email, EmailVerificationCode code, Duration expireDuration) {
     ValueOperations<String, String> ops = redisTemplate.opsForValue();
     ops.set(KEY_PREFIX + email, code.getCode(), expireDuration);
   }

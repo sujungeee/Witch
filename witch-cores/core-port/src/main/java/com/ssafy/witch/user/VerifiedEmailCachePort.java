@@ -4,7 +4,7 @@ import java.time.Duration;
 
 public interface VerifiedEmailCachePort {
 
-  void save(String email, EmailVerificationCode code, Duration expireDuration);
+  void upsert(String email, EmailVerificationCode code, Duration expireDuration);
 
   EmailVerificationCode get(String email);
 

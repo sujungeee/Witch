@@ -5,6 +5,7 @@ dependencies {
 
     implementation("org.springframework.boot:spring-boot-starter-logging")
     implementation("org.springframework:spring-context")
+    implementation("org.springframework:spring-tx")
     implementation("org.springframework.boot:spring-boot-starter-security")
 
     implementation("io.jsonwebtoken:jjwt-api")

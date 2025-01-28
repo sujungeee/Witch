@@ -1,11 +1,13 @@
 dependencies {
     implementation(project(":witch-cores:core-usecase"))
     implementation(project(":witch-commons"))
+
     runtimeOnly(project(":witch-adapters:adapter-persistence"))
     runtimeOnly(project(":witch-adapters:adapter-redis"))
     runtimeOnly(project(":witch-adapters:adapter-generator"))
     runtimeOnly(project(":witch-adapters:adapter-mail"))
     runtimeOnly(project(":witch-adapters:adapter-event"))
+    runtimeOnly(project(":witch-adapters:adapter-security"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")

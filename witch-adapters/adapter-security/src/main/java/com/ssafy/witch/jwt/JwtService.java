@@ -1,6 +1,5 @@
 package com.ssafy.witch.jwt;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 import com.ssafy.witch.exception.auth.InvalidAccessTokenException;
@@ -14,6 +13,7 @@ import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -64,9 +64,9 @@ public class JwtService {
 
     Date expiration = claims.getExpiration();
     long remainingMillis = expiration.getTime() - System.currentTimeMillis();
-    long remainingHours = MILLISECONDS.toHours(remainingMillis);
 
-    if (remainingHours > 48) {
+    if (remainingMillis > TimeUnit.SECONDS.toMillis(
+        jwtProperties.getRefreshTokenExpirationSeconds())) {
       throw new RefreshTokenNotRenewableException();
     }
 

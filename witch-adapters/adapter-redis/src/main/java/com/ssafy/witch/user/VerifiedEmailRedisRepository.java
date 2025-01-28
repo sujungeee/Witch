@@ -8,9 +8,9 @@ import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class EmailVerificationCodeStoreRedisRepository implements EmailVerificationCodeStorePort {
+public class VerifiedEmailRedisRepository implements VerifiedEmailCachePort {
 
-  private static final String KEY_PREFIX = "emailVerificationCode:";
+  private static final String KEY_PREFIX = "verifiedEmail:";
 
   private final StringRedisTemplate redisTemplate;
 
@@ -23,8 +23,7 @@ public class EmailVerificationCodeStoreRedisRepository implements EmailVerificat
   @Override
   public EmailVerificationCode get(String email) {
     ValueOperations<String, String> ops = redisTemplate.opsForValue();
-    String code = ops.get(KEY_PREFIX + email);
-    return EmailVerificationCode.of(code);
+    return EmailVerificationCode.of(ops.get(KEY_PREFIX + email));
   }
 
   @Override

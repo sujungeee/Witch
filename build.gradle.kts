@@ -161,6 +161,9 @@ configureByLabels("restdocs") {
     val snippetsDir = file("build/generated-snippets")
 
     tasks.named<Test>("test") {
+        doFirst {
+            delete(snippetsDir)
+        }
         outputs.dir(snippetsDir)
         finalizedBy("asciidoctor")
     }

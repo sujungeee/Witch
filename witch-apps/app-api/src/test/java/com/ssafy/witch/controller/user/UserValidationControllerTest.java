@@ -98,4 +98,5 @@ class UserValidationControllerTest extends RestDocsTestSupport {
         .andExpect(status().isBadRequest())
         .andDo(restDocs.document());
   }
+
 }

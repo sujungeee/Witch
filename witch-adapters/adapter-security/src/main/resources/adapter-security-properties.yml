@@ -1,3 +1,9 @@
 witch:
   docs:
     enabled: true
+  jwt:
+    properties:
+      secret: ${JWT_SECRET}
+      access-token-expiration-seconds: 1800
+      refresh-token-expiration-seconds: 604800
+      token-type: Bearer

@@ -14,7 +14,7 @@ public class SignupUserCommand extends SelfValidating<SignupUserCommand> {
   private final String email;
 
   @WitchPassword
-  private final String rawPassword;
+  private final String password;
 
   @WitchNickname
   private final String nickname;
@@ -22,10 +22,10 @@ public class SignupUserCommand extends SelfValidating<SignupUserCommand> {
   @WitchEmailVerificationCode
   private final String emailVerificationCode;
 
-  public SignupUserCommand(String email, String rawPassword, String nickname,
+  public SignupUserCommand(String email, String password, String nickname,
       String emailVerificationCode) {
     this.email = email;
-    this.rawPassword = rawPassword;
+    this.password = password;
     this.nickname = nickname;
     this.emailVerificationCode = emailVerificationCode;
 

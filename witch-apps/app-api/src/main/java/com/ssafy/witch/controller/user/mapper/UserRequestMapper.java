@@ -2,7 +2,9 @@ package com.ssafy.witch.controller.user.mapper;
 
 import com.ssafy.witch.controller.user.request.ConfirmUserEmailVerificationCodeRequest;
 import com.ssafy.witch.controller.user.request.UserEmailVerificationCodeRequest;
+import com.ssafy.witch.controller.user.request.UserSignupRequest;
 import com.ssafy.witch.user.command.CreateUserEmailVerificationCodeCommand;
+import com.ssafy.witch.user.command.SignupUserCommand;
 import com.ssafy.witch.user.command.VerifyUserEmailVerificationCodeCommand;
 import org.mapstruct.Mapper;
 
@@ -12,4 +14,6 @@ public interface UserRequestMapper {
   CreateUserEmailVerificationCodeCommand toCommand(UserEmailVerificationCodeRequest request);
 
   VerifyUserEmailVerificationCodeCommand toCommand(ConfirmUserEmailVerificationCodeRequest request);
+
+  SignupUserCommand toCommand(UserSignupRequest request);
 }

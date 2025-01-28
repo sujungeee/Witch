@@ -57,7 +57,7 @@ public class JwtService {
         Duration.ofSeconds(jwtProperties.getRefreshTokenExpirationSeconds())
     );
 
-    return TokenResponse.renew(
+    return TokenResponse.create(
         jwtProperties.getTokenType(),
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds(),
@@ -111,7 +111,7 @@ public class JwtService {
         Duration.ofSeconds(jwtProperties.getRefreshTokenExpirationSeconds())
     );
 
-    return TokenResponse.renew(
+    return TokenResponse.create(
         jwtProperties.getTokenType(),
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds(),

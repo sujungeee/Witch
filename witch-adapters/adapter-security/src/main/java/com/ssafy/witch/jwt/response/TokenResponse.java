@@ -30,7 +30,8 @@ public class TokenResponse {
     return new TokenResponse(tokenType, accessToken, accessTokenExpiresIn, null, null);
   }
 
-  public static TokenResponse renew(String tokenType, String accessToken, Long accessTokenExpiresIn,
+  public static TokenResponse create(String tokenType, String accessToken,
+      Long accessTokenExpiresIn,
       String refreshToken, Long refreshTokenExpiresIn) {
     return new TokenResponse(tokenType, accessToken, accessTokenExpiresIn, refreshToken,
         refreshTokenExpiresIn);

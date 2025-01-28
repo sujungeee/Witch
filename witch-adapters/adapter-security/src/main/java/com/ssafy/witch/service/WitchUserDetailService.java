@@ -23,6 +23,7 @@ public class WitchUserDetailService implements UserDetailsService {
     return builder()
         .username(user.getEmail())
         .password(user.getPassword())
+        .roles("USER")
         .build();
   }
 }

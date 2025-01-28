@@ -19,7 +19,13 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable);
 
     http.authorizeHttpRequests(auth -> {
-      auth.anyRequest().permitAll();
+      auth
+          .requestMatchers(HttpMethod.GET, "/users/email/is-unique").permitAll()
+          .requestMatchers(HttpMethod.GET, "/users/nickname/is-unique").permitAll()
+          .requestMatchers(HttpMethod.POST, "/users/email-verification-code").permitAll()
+          .requestMatchers(HttpMethod.POST, "/users/email-verification-code/confirm").permitAll()
+          .requestMatchers(HttpMethod.POST, "/users").permitAll()
+          .anyRequest().authenticated();
     });
 
     return http.build();

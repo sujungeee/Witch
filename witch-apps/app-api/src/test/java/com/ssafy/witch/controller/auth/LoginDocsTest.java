@@ -1,8 +1,5 @@
 package com.ssafy.witch.controller.auth;
 
-import static com.ssafy.witch.support.docs.RestDocsUtils.constraints;
-import static com.ssafy.witch.validate.validator.ValidationRule.EMAIL;
-import static com.ssafy.witch.validate.validator.ValidationRule.PASSWORD;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -98,12 +95,10 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
             requestFields(
                 fieldWithPath("email")
                     .type(STRING)
-                    .description("사용자 이메일")
-                    .attributes(constraints(EMAIL.getErrorMessage())),
+                    .description("사용자 이메일"),
                 fieldWithPath("password")
                     .type(STRING)
                     .description("사용자 패스워드")
-                    .attributes(constraints(PASSWORD.getErrorMessage()))
             ),
             responseFields(
                 fieldWithPath("success")

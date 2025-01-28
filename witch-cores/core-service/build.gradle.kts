@@ -10,7 +10,4 @@ dependencies {
 
     implementation("org.springframework.security:spring-security-core")
 
-    implementation("io.jsonwebtoken:jjwt-api")
-    implementation("io.jsonwebtoken:jjwt-impl")
-    implementation("io.jsonwebtoken:jjwt-jackson")
 }

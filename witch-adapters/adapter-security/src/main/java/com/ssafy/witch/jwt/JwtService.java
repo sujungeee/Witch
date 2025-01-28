@@ -27,7 +27,7 @@ public class JwtService {
   private static final String REFRESH_TOKEN_SUBJECT = "refresh-token";
 
   private static final String EMAIL_CLAIM = "email";
-  private static final String ROLES_CLAIM = "roles";
+  private static final String ROLE_CLAIM = "role";
 
   private final RefreshTokenCachePort refreshTokenCachePort;
   private final JwtProperties jwtProperties;
@@ -46,11 +46,31 @@ public class JwtService {
   }
 
   @Transactional
+  public TokenResponse create(String email, String role) {
+    String newAccessToken = createAccessToken(email, role);
+    String newRefreshToken = createRefreshToken(email, role);
+
+    refreshTokenCachePort.upsert(
+        email,
+        newRefreshToken,
+        Duration.ofSeconds(jwtProperties.getRefreshTokenExpirationSeconds())
+    );
+
+    return TokenResponse.renew(
+        jwtProperties.getTokenType(),
+        newAccessToken,
+        jwtProperties.getAccessTokenExpirationSeconds(),
+        newRefreshToken,
+        jwtProperties.getRefreshTokenExpirationSeconds()
+    );
+  }
+
+  @Transactional
   public TokenResponse reissue(String refreshToken) {
     Claims claims = validateRefreshToken(refreshToken);
     String email = claims.get(EMAIL_CLAIM, String.class);
 
-    String newAccessToken = createAccessToken(email, claims.get(ROLES_CLAIM, String.class));
+    String newAccessToken = createAccessToken(email, claims.get(ROLE_CLAIM, String.class));
 
     return TokenResponse.refresh(
         jwtProperties.getTokenType(),
@@ -71,10 +91,10 @@ public class JwtService {
     }
 
     String email = claims.get(EMAIL_CLAIM, String.class);
-    String roles = claims.get(ROLES_CLAIM, String.class);
+    String role = claims.get(ROLE_CLAIM, String.class);
 
-    String newAccessToken = createAccessToken(email, roles);
-    String newRefreshToken = createRefreshToken(email, roles);
+    String newAccessToken = createAccessToken(email, role);
+    String newRefreshToken = createRefreshToken(email, role);
 
     refreshTokenCachePort.upsert(
         email,
@@ -111,31 +131,31 @@ public class JwtService {
     return claims;
   }
 
-  private String createAccessToken(String email, String roles) {
+  private String createAccessToken(String email, String role) {
     return buildToken(
         email,
-        roles,
+        role,
         ACCESS_TOKEN_SUBJECT,
         jwtProperties.getAccessTokenExpirationSeconds()
     );
   }
 
-  private String createRefreshToken(String email, String roles) {
+  private String createRefreshToken(String email, String role) {
     return buildToken(
         email,
-        roles,
+        role,
         REFRESH_TOKEN_SUBJECT,
         jwtProperties.getRefreshTokenExpirationSeconds()
     );
   }
 
-  private String buildToken(String email, String roles, String subject, Long expirationSeconds) {
+  private String buildToken(String email, String role, String subject, Long expirationSeconds) {
     SecretKey key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
 
     return Jwts.builder()
         .subject(subject)
         .claim(EMAIL_CLAIM, email)
-        .claim(ROLES_CLAIM, roles)
+        .claim(ROLE_CLAIM, role)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(
             new Date(System.currentTimeMillis() + SECONDS.toMillis(expirationSeconds)))

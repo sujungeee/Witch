@@ -9,6 +9,7 @@ import com.ssafy.witch.jwt.response.TokenResponse;
 import com.ssafy.witch.port.RefreshTokenCachePort;
 import com.ssafy.witch.user.WitchUserDetails;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import java.nio.charset.StandardCharsets;
@@ -20,6 +21,7 @@ import javax.crypto.SecretKey;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Service
@@ -48,6 +50,9 @@ public class JwtService {
 
   private Claims validateAccessToken(String accessToken) {
     SecretKey key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+    if (!StringUtils.hasText(accessToken)) {
+      throw new InvalidAccessTokenException();
+    }
 
     try {
       return Jwts.parser()
@@ -55,7 +60,7 @@ public class JwtService {
           .build()
           .parseSignedClaims(accessToken)
           .getPayload();
-    } catch (RuntimeException e) {
+    } catch (JwtException e) {
       throw new InvalidAccessTokenException();
     }
   }
@@ -138,22 +143,33 @@ public class JwtService {
 
   // 공통 리프레시 토큰 검증 로직
   private Claims validateRefreshToken(String refreshToken) {
-    SecretKey key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
-    Claims claims = Jwts.parser()
-        .verifyWith(key)
-        .build()
-        .parseSignedClaims(refreshToken)
-        .getPayload();
-
-    String email = parseEmailFrom(claims);
-    String cachedToken = refreshTokenCachePort.get(email)
-        .orElseThrow(InvalidRefreshTokenException::new);
-
-    if (!cachedToken.equals(refreshToken)) {
+    if (!StringUtils.hasText(refreshToken)) {
       throw new InvalidRefreshTokenException();
     }
 
-    return claims;
+    SecretKey key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
+
+    try {
+      Claims claims = Jwts.parser()
+          .verifyWith(key)
+          .build()
+          .parseSignedClaims(refreshToken)
+          .getPayload();
+
+      String email = parseEmailFrom(claims);
+      String cachedToken = refreshTokenCachePort.get(email)
+          .orElseThrow(InvalidRefreshTokenException::new);
+
+      if (!refreshToken.equals(cachedToken)) {
+        throw new InvalidRefreshTokenException();
+      }
+
+      return claims;
+
+    } catch (JwtException e) {
+      throw new InvalidRefreshTokenException();
+    }
+
   }
 
   private String createAccessToken(String email, List<String> roles) {

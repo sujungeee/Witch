@@ -93,7 +93,7 @@ public class JwtService {
 
     String newAccessToken = createAccessToken(email, roles);
 
-    return TokenResponse.refresh(
+    return TokenResponse.reissue(
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds());
   }

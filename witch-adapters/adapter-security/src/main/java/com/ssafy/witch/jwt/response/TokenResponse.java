@@ -25,7 +25,7 @@ public class TokenResponse {
   private Long refreshTokenExpiresIn;
 
 
-  public static TokenResponse refresh(String accessToken,
+  public static TokenResponse reissue(String accessToken,
       Long accessTokenExpiresIn) {
     return new TokenResponse(accessToken, accessTokenExpiresIn, null, null);
   }

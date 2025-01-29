@@ -3,6 +3,7 @@ package com.ssafy.witch.filter;
 import com.ssafy.witch.exception.auth.InvalidAccessTokenException;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.user.WitchUserDetails;
+import com.ssafy.witch.utils.TokenExtractUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,7 +35,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
       FilterChain filterChain) throws ServletException, IOException {
-    String accessToken = extractAccessToken(request);
+    String accessToken = TokenExtractUtils.extractAccessTokenFromHeader(request);
 
     if (!StringUtils.hasText(accessToken)) {
       filterChain.doFilter(request, response);
@@ -50,15 +51,5 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     }
 
     filterChain.doFilter(request, response);
-  }
-
-  private String extractAccessToken(HttpServletRequest request) {
-    String refreshTokenWithType = request.getHeader(ACCESS_TOKEN_HEADER_NAME);
-
-    if (!StringUtils.hasText(refreshTokenWithType) ||
-        !refreshTokenWithType.startsWith(JwtConst.TOKEN_TYPE + " ")) {
-      return null;
-    }
-    return refreshTokenWithType.substring(JwtConst.TOKEN_TYPE.length() + 1);
   }
 }

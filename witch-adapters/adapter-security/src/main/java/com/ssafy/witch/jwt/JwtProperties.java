@@ -20,7 +20,4 @@ public class JwtProperties {
   @Value("${witch.jwt.properties.refresh-token.renew-available-seconds}")
   private String refreshTokenRenewAvailableSeconds;
 
-  @Value("${witch.jwt.properties.token-type}")
-  private String tokenType;
-
 }

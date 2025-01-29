@@ -4,13 +4,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import util.JwtConst;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class TokenResponse {
 
-  @JsonInclude(JsonInclude.Include.NON_NULL)
-  private String tokenType;
+  private final String tokenType = JwtConst.TOKEN_TYPE;
 
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private String accessToken;
@@ -25,15 +25,15 @@ public class TokenResponse {
   private Long refreshTokenExpiresIn;
 
 
-  public static TokenResponse refresh(String tokenType, String accessToken,
+  public static TokenResponse refresh(String accessToken,
       Long accessTokenExpiresIn) {
-    return new TokenResponse(tokenType, accessToken, accessTokenExpiresIn, null, null);
+    return new TokenResponse(accessToken, accessTokenExpiresIn, null, null);
   }
 
-  public static TokenResponse create(String tokenType, String accessToken,
+  public static TokenResponse create(String accessToken,
       Long accessTokenExpiresIn,
       String refreshToken, Long refreshTokenExpiresIn) {
-    return new TokenResponse(tokenType, accessToken, accessTokenExpiresIn, refreshToken,
+    return new TokenResponse(accessToken, accessTokenExpiresIn, refreshToken,
         refreshTokenExpiresIn);
   }
 }

@@ -7,6 +7,7 @@ import com.ssafy.witch.exception.auth.InvalidRefreshTokenException;
 import com.ssafy.witch.exception.auth.RefreshTokenNotRenewableException;
 import com.ssafy.witch.jwt.response.TokenResponse;
 import com.ssafy.witch.port.RefreshTokenCachePort;
+import com.ssafy.witch.user.WitchUserDetails;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -33,14 +34,27 @@ public class JwtService {
   private final RefreshTokenCachePort refreshTokenCachePort;
   private final JwtProperties jwtProperties;
 
-  public void validateAccessToken(String accessToken) {
+  public WitchUserDetails resolveAccessToken(String accessToken) {
+    Claims claims = validateAccessToken(accessToken);
+
+    String email = parseEmailFrom(claims);
+    List<String> roles = parseRolesFrom(claims);
+
+    return WitchUserDetails.builder()
+        .email(email)
+        .roles(roles)
+        .build();
+  }
+
+  private Claims validateAccessToken(String accessToken) {
     SecretKey key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
 
     try {
-      Jwts.parser()
+      return Jwts.parser()
           .verifyWith(key)
           .build()
-          .parseSignedClaims(accessToken);
+          .parseSignedClaims(accessToken)
+          .getPayload();
     } catch (RuntimeException e) {
       throw new InvalidAccessTokenException();
     }
@@ -58,7 +72,6 @@ public class JwtService {
     );
 
     return TokenResponse.create(
-        jwtProperties.getTokenType(),
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds(),
         newRefreshToken,
@@ -70,18 +83,25 @@ public class JwtService {
   public TokenResponse reissue(String refreshToken) {
     Claims claims = validateRefreshToken(refreshToken);
 
-    String email = claims.get(EMAIL_CLAIM, String.class);
-    List<String> roles = ((List<?>) claims.get(ROLES_CLAIM))
-        .stream()
-        .map(Object::toString)
-        .toList();
+    String email = parseEmailFrom(claims);
+    List<String> roles = parseRolesFrom(claims);
 
     String newAccessToken = createAccessToken(email, roles);
 
     return TokenResponse.refresh(
-        jwtProperties.getTokenType(),
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds());
+  }
+
+  private List<String> parseRolesFrom(Claims claims) {
+    return ((List<?>) claims.get(ROLES_CLAIM))
+        .stream()
+        .map(Object::toString)
+        .toList();
+  }
+
+  private String parseEmailFrom(Claims claims) {
+    return claims.get(EMAIL_CLAIM, String.class);
   }
 
   @Transactional
@@ -96,11 +116,8 @@ public class JwtService {
       throw new RefreshTokenNotRenewableException();
     }
 
-    String email = claims.get(EMAIL_CLAIM, String.class);
-    List<String> roles = ((List<?>) claims.get(ROLES_CLAIM))
-        .stream()
-        .map(Object::toString)
-        .toList();
+    String email = parseEmailFrom(claims);
+    List<String> roles = parseRolesFrom(claims);
 
     String newAccessToken = createAccessToken(email, roles);
     String newRefreshToken = createRefreshToken(email, roles);
@@ -112,7 +129,6 @@ public class JwtService {
     );
 
     return TokenResponse.create(
-        jwtProperties.getTokenType(),
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds(),
         newRefreshToken,
@@ -129,7 +145,7 @@ public class JwtService {
         .parseSignedClaims(refreshToken)
         .getPayload();
 
-    String email = claims.get(EMAIL_CLAIM, String.class);
+    String email = parseEmailFrom(claims);
     String cachedToken = refreshTokenCachePort.get(email)
         .orElseThrow(InvalidRefreshTokenException::new);
 

@@ -1,7 +1,9 @@
 package com.ssafy.witch.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.witch.entrypoint.JwtAuthenticationEntryPoint;
 import com.ssafy.witch.filter.JsonLoginProcessingFilter;
+import com.ssafy.witch.filter.JwtAuthenticationProcessingFilter;
 import com.ssafy.witch.handler.ErrorResponseAuthenticationFailureHandler;
 import com.ssafy.witch.handler.JwtAuthenticationSuccessHandler;
 import com.ssafy.witch.jwt.JwtService;
@@ -15,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -50,7 +53,12 @@ public class SecurityConfig {
           .anyRequest().authenticated();
     });
 
+    http.exceptionHandling(exceptionHandling ->
+        exceptionHandling.authenticationEntryPoint(authenticationEntryPoint()));
+
     http.addFilterAt(jsonLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(jwtAuthenticationProcessingFilter(),
+        UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
@@ -81,5 +89,15 @@ public class SecurityConfig {
   @Bean
   public AuthenticationManager authenticationManager() throws Exception {
     return authenticationConfiguration.getAuthenticationManager();
+  }
+
+  @Bean
+  AuthenticationEntryPoint authenticationEntryPoint() {
+    return new JwtAuthenticationEntryPoint(objectMapper);
+  }
+
+  @Bean
+  JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
+    return new JwtAuthenticationProcessingFilter(jwtService);
   }
 }

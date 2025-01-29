@@ -19,10 +19,11 @@ public enum ErrorCode {
   MISSING_REQUIRED_PARAMETER("WCH1008", "필수 파라미터가 존재하지 않습니다."),
 
   // 인증/인가
-  INVALID_ACCESS_TOKEN("WCH2000", "access token이 유효하지 않습니다."),
-  INVALID_REFRESH_TOKEN("WCH2001", "refresh token이 유효하지 않습니다."),
-  REFRESH_TOKEN_NOT_UPDATABLE("WCH2002", "refresh token이 갱신 가능한 상태가 아닙니다."),
-  INCORRECT_PASSWORD("WCH2003", "비밀번호가 올바르지 않습니다."),
+  UNAUTHORIZED("WCH2000", "사용자 인증에 실패했습니다."),
+  INVALID_ACCESS_TOKEN("WCH2001", "access token이 유효하지 않습니다."),
+  INVALID_REFRESH_TOKEN("WCH2002", "refresh token이 유효하지 않습니다."),
+  REFRESH_TOKEN_NOT_UPDATABLE("WCH2003", "refresh token이 갱신 가능한 상태가 아닙니다."),
+  INCORRECT_PASSWORD("WCH2004", "비밀번호가 올바르지 않습니다."),
 
   // 사용자
   EMAIL_ALREADY_IN_USE("WCH3000", "이미 사용 중인 이메일입니다."),
@@ -42,8 +43,7 @@ public enum ErrorCode {
   APPOINTMENT_TIME_IN_PAST("WCH5001", "약속 시간은 현재 시간 이전일 수 없습니다."),
   CONFLICTING_APPOINTMENT_TIME("WCH5002", "기존 약속과 시간이 겹칩니다."),
   UNAUTHORIZED_APPOINTMENT_ACCESS("WCH5003", "해당 약속에 대한 권한이 없습니다."),
-  NON_EXISTENT_APPOINTMENT("WCH5006", "존재하지 않는 약속에 대한 요청입니다."),
-  ;
+  NON_EXISTENT_APPOINTMENT("WCH5006", "존재하지 않는 약속에 대한 요청입니다.");
 
   private final String errorCode;
   private final String errorMessage;

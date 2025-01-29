@@ -24,16 +24,18 @@ public class TokenResponse {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private Long refreshTokenExpiresIn;
 
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private Long refreshTokenRenewAvailableSeconds;
 
   public static TokenResponse reissue(String accessToken,
       Long accessTokenExpiresIn) {
-    return new TokenResponse(accessToken, accessTokenExpiresIn, null, null);
+    return new TokenResponse(accessToken, accessTokenExpiresIn, null, null, null);
   }
 
   public static TokenResponse create(String accessToken,
       Long accessTokenExpiresIn,
-      String refreshToken, Long refreshTokenExpiresIn) {
+      String refreshToken, Long refreshTokenExpiresIn, Long refreshTokenRenewAvailableSeconds) {
     return new TokenResponse(accessToken, accessTokenExpiresIn, refreshToken,
-        refreshTokenExpiresIn);
+        refreshTokenExpiresIn, refreshTokenRenewAvailableSeconds);
   }
 }

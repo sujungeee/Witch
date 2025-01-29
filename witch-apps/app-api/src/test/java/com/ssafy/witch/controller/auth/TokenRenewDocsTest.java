@@ -1,7 +1,8 @@
 package com.ssafy.witch.controller.auth;
 
-import static org.mockito.BDDMockito.any;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
@@ -15,10 +16,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ssafy.witch.config.PasswordEncoderConfig;
 import com.ssafy.witch.config.SecurityConfig;
+import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.exception.auth.InvalidRefreshTokenException;
+import com.ssafy.witch.exception.auth.RefreshTokenNotRenewableException;
 import com.ssafy.witch.jwt.JwtProperties;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.jwt.response.TokenResponse;
 import com.ssafy.witch.support.docs.SecurityRestDocsTestSupport;
+import java.util.HashMap;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,9 +32,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 
@@ -42,9 +45,11 @@ import org.springframework.stereotype.Controller;
     {
         SecurityConfig.class,
         PasswordEncoderConfig.class,
+        JwtProperties.class
     }
 )
-class LoginDocsTest extends SecurityRestDocsTestSupport {
+public class TokenRenewDocsTest extends SecurityRestDocsTestSupport {
+
 
   @MockBean
   private UserDetailsService userDetailsService;
@@ -55,50 +60,38 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
   @MockBean
   private JwtService jwtService;
 
-  @MockBean
-  private JwtProperties jwtProperties;
-
   @Test
-  void login_200() throws Exception {
+  void renew_200() throws Exception {
 
-    String email = "test@test.com";
-    String password = "sample_password";
+    String refreshToken = "Bearer refresh.token.example";
 
-    Map<String, String> loginRequest
-        = Map.of("email", email, "password", password);
+    Map<String, String> request = new HashMap<>();
+    request.put("refreshToken", refreshToken);
 
-    given(userDetailsService.loadUserByUsername(any())).willReturn(User.builder()
-        .username(email)
-        .password(passwordEncoder.encode(password))
-        .build());
-
-    given(jwtService.create(any(), any())).willReturn(TokenResponse.create(
-        "access.token.example",
-        3600L,
-        "refresh.token.example",
-        36000L,
-        3600L
-    ));
+    given(jwtService.renew(any())).willReturn(
+        TokenResponse.create(
+            "access.token.example",
+            3600L,
+            "refresh.token.example",
+            36000L,
+            3600L
+        )
+    );
 
     mvc.perform(
-            post("/auth/login")
+            post("/auth/token/renew")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest))
+                .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isOk())
+        .andExpect(jsonPath("success").value(true))
         .andExpect(jsonPath("data.tokenType").value("Bearer"))
         .andExpect(jsonPath("data.accessToken").value("access.token.example"))
         .andExpect(jsonPath("data.accessTokenExpiresIn").value("3600"))
-        .andExpect(jsonPath("data.refreshToken").value("refresh.token.example"))
-        .andExpect(jsonPath("data.refreshTokenExpiresIn").value("36000"))
         .andDo(restDocs.document(
             requestFields(
-                fieldWithPath("email")
-                    .type(STRING)
-                    .description("사용자 이메일"),
-                fieldWithPath("password")
-                    .type(STRING)
-                    .description("사용자 패스워드")
+                fieldWithPath("refreshToken")
+                    .description("만료 전 refresh token")
             ),
             responseFields(
                 fieldWithPath("success")
@@ -127,31 +120,44 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
   }
 
   @Test
-  void login_401() throws Exception {
+  void renew_401_invalid_refresh_token() throws Exception {
 
-    String email = "test@test.com";
-    String password = "sample_password";
+    String refreshToken = "Bearer refresh.token.example";
 
-    Map<String, String> loginRequest
-        = Map.of("email", email, "password", password);
+    Map<String, String> request = new HashMap<>();
+    request.put("refreshToken", refreshToken);
 
-    given(userDetailsService.loadUserByUsername(any())).willThrow(UsernameNotFoundException.class);
-
-    given(jwtService.create(any(), any())).willReturn(TokenResponse.create(
-        "access.token.example",
-        3600L,
-        "refresh.token.example",
-        36000L,
-        3600L
-    ));
+    doThrow(new InvalidRefreshTokenException()).when(jwtService).renew(any());
 
     mvc.perform(
-            post("/auth/login")
+            post("/auth/token/renew")
                 .contentType(APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(loginRequest))
+                .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isUnauthorized())
+        .andExpect(jsonPath("data.errorCode").value(ErrorCode.INVALID_REFRESH_TOKEN.getErrorCode()))
         .andDo(restDocs.document());
   }
 
+
+  @Test
+  void renew_401_refresh_token_not_renewable() throws Exception {
+
+    String refreshToken = "Bearer refresh.token.example";
+
+    Map<String, String> request = new HashMap<>();
+    request.put("refreshToken", refreshToken);
+
+    doThrow(new RefreshTokenNotRenewableException()).when(jwtService).renew(any());
+
+    mvc.perform(
+            post("/auth/token/renew")
+                .contentType(APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isUnauthorized())
+        .andExpect(
+            jsonPath("data.errorCode").value(ErrorCode.REFRESH_TOKEN_NOT_UPDATABLE.getErrorCode()))
+        .andDo(restDocs.document());
+  }
 }

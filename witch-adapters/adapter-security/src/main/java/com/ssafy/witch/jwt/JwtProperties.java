@@ -18,6 +18,6 @@ public class JwtProperties {
   private Long refreshTokenExpirationSeconds;
 
   @Value("${witch.jwt.properties.refresh-token.renew-available-seconds}")
-  private String refreshTokenRenewAvailableSeconds;
+  private Long refreshTokenRenewAvailableSeconds;
 
 }

@@ -2,3 +2,4 @@
 
 include::api/login.adoc[]
 include::api/reissue.adoc[]
+include::api/renew.adoc[]

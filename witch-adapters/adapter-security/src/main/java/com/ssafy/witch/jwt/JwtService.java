@@ -80,7 +80,8 @@ public class JwtService {
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds(),
         newRefreshToken,
-        jwtProperties.getRefreshTokenExpirationSeconds()
+        jwtProperties.getRefreshTokenExpirationSeconds(),
+        jwtProperties.getRefreshTokenRenewAvailableSeconds()
     );
   }
 
@@ -137,7 +138,8 @@ public class JwtService {
         newAccessToken,
         jwtProperties.getAccessTokenExpirationSeconds(),
         newRefreshToken,
-        jwtProperties.getRefreshTokenExpirationSeconds()
+        jwtProperties.getRefreshTokenExpirationSeconds(),
+        jwtProperties.getRefreshTokenRenewAvailableSeconds()
     );
   }
 

@@ -3,17 +3,13 @@ package com.ssafy.witch.entrypoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.exception.ErrorCode;
 import com.ssafy.witch.exception.auth.JwtAuthException;
-import com.ssafy.witch.response.WitchApiResponse;
-import com.ssafy.witch.response.WitchError;
+import com.ssafy.witch.utils.ResponseUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 import util.JwtConst;
@@ -33,22 +29,13 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         (JwtAuthException) request.getAttribute(JwtConst.JWT_AUTH_EXCEPTION_ATTRIBUTE_KEY);
 
     if (Objects.nonNull(jwtAuthException)) {
-      sendUnauthorizedResponse(response, jwtAuthException.getErrorCode());
+      ResponseUtils.sendUnauthorizedResponse(response, jwtAuthException.getErrorCode(),
+          objectMapper);
       return;
     }
 
-    sendUnauthorizedResponse(response, ErrorCode.UNAUTHORIZED);
+    ResponseUtils.sendUnauthorizedResponse(response, ErrorCode.UNAUTHORIZED, objectMapper);
   }
 
-  private void sendUnauthorizedResponse(HttpServletResponse response, ErrorCode errorCode)
-      throws IOException {
-    WitchApiResponse<WitchError> errorResponse = WitchApiResponse.failure(errorCode);
-
-    String body = objectMapper.writeValueAsString(errorResponse);
-    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-    response.getWriter().write(body);
-  }
 
 }

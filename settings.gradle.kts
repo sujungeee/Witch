@@ -20,6 +20,7 @@ include("witch-adapters:adapter-redis")
 include("witch-adapters:adapter-mail")
 include("witch-adapters:adapter-generator")
 include("witch-adapters:adapter-event")
+include("witch-adapters:adapter-security")
 
 include("witch-cores:core-domain")
 include("witch-cores:core-port")
@@ -27,3 +28,5 @@ include("witch-cores:core-service")
 include("witch-cores:core-usecase")
 
 include("witch-commons")
+
+include("witch-tests")

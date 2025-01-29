@@ -1,7 +1,7 @@
 package com.ssafy.witch.advice;
 
-import com.ssafy.witch.controller.WitchApiResponse;
 import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.response.WitchApiResponse;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;

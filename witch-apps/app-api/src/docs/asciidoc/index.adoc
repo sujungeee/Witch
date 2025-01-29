@@ -25,3 +25,4 @@ endif::[]
 
 include::common/common.adoc[]
 include::user/user.adoc[]
+include::auth/auth.adoc[]

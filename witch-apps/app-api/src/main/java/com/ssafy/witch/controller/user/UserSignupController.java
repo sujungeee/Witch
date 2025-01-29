@@ -1,8 +1,8 @@
 package com.ssafy.witch.controller.user;
 
-import com.ssafy.witch.controller.WitchApiResponse;
 import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
 import com.ssafy.witch.controller.user.request.UserSignupRequest;
+import com.ssafy.witch.response.WitchApiResponse;
 import com.ssafy.witch.user.SignupUserUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,4 +1,4 @@
-package com.ssafy.witch.controller;
+package com.ssafy.witch.response;
 
 import com.ssafy.witch.exception.ErrorCode;
 import lombok.Getter;

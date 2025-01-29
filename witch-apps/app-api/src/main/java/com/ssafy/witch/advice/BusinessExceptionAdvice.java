@@ -1,8 +1,8 @@
 package com.ssafy.witch.advice;
 
-import com.ssafy.witch.controller.WitchApiResponse;
 import com.ssafy.witch.exception.BusinessException;
 import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.response.WitchApiResponse;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.Ordered;

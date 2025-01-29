@@ -4,6 +4,7 @@ import com.ssafy.witch.repository.user.mapper.UserEntityMapper;
 import com.ssafy.witch.user.User;
 import com.ssafy.witch.user.UserPort;
 import com.ssafy.witch.user.ValidateUserPort;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -27,5 +28,11 @@ public class UserRepository implements ValidateUserPort, UserPort {
   @Override
   public User save(User user) {
     return userEntityMapper.toDomain(userJpaRepository.save(userEntityMapper.toEntity(user)));
+  }
+
+  @Override
+  public Optional<User> findByEmail(String email) {
+    return userJpaRepository.findByEmail(email)
+        .map(userEntityMapper::toDomain);
   }
 }

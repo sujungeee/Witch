@@ -3,16 +3,13 @@ package com.ssafy.witch.handler;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.jwt.response.TokenResponse;
-import com.ssafy.witch.response.WitchApiResponse;
+import com.ssafy.witch.utils.ResponseUtils;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -36,17 +33,8 @@ public class JwtAuthenticationSuccessHandler implements
 
     TokenResponse tokenResponse = jwtService.create(email, roles);
 
-    sendResponse(response, tokenResponse);
+    ResponseUtils.sendResponse(response, tokenResponse, objectMapper);
   }
 
-  private void sendResponse(HttpServletResponse response, TokenResponse tokenResponse)
-      throws IOException {
-    String body = objectMapper.writeValueAsString(WitchApiResponse.success(tokenResponse));
-
-    response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-    response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-    response.getWriter().write(body);
-    response.setStatus(HttpStatus.OK.value());
-  }
 
 }

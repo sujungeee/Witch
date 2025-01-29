@@ -1,3 +1,4 @@
 == 인증 관련 API
 
 include::api/login.adoc[]
+include::api/reissue.adoc[]

@@ -2,8 +2,10 @@ package com.ssafy.witch.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.entrypoint.JwtAuthenticationEntryPoint;
+import com.ssafy.witch.filter.AccessTokenReissueFilter;
 import com.ssafy.witch.filter.JsonLoginProcessingFilter;
 import com.ssafy.witch.filter.JwtAuthenticationProcessingFilter;
+import com.ssafy.witch.filter.RefreshTokenRenewFilter;
 import com.ssafy.witch.handler.ErrorResponseAuthenticationFailureHandler;
 import com.ssafy.witch.handler.JwtAuthenticationSuccessHandler;
 import com.ssafy.witch.jwt.JwtService;
@@ -59,8 +61,20 @@ public class SecurityConfig {
     http.addFilterAt(jsonLoginProcessingFilter(), UsernamePasswordAuthenticationFilter.class);
     http.addFilterBefore(jwtAuthenticationProcessingFilter(),
         UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(accessTokenReissueFilter(), UsernamePasswordAuthenticationFilter.class);
+    http.addFilterBefore(refreshTokenRenewFilter(), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
+  }
+
+  @Bean
+  public AccessTokenReissueFilter accessTokenReissueFilter() {
+    return new AccessTokenReissueFilter(jwtService, objectMapper);
+  }
+
+  @Bean
+  public RefreshTokenRenewFilter refreshTokenRenewFilter() {
+    return new RefreshTokenRenewFilter(jwtService, objectMapper);
   }
 
   @Bean

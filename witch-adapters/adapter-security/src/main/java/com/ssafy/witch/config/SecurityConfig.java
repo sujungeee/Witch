@@ -44,6 +44,7 @@ public class SecurityConfig {
     http.csrf(AbstractHttpConfigurer::disable);
     http.sessionManagement(
         session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http.anonymous(AbstractHttpConfigurer::disable);
 
     http.authorizeHttpRequests(auth -> {
       auth

@@ -151,7 +151,7 @@ class UserInformationControllerTest extends RestDocsTestSupport {
   @Test
   void change_password_400_invalid_password_format() throws Exception {
 
-    String password = "123123@@";
+    String password = null;
     String newPassword = "";
 
     UserPasswordChangeRequest request = new UserPasswordChangeRequest(password, newPassword);

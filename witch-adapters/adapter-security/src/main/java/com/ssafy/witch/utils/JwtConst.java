@@ -1,4 +1,4 @@
-package util;
+package com.ssafy.witch.utils;
 
 public class JwtConst {
 

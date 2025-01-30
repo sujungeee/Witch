@@ -1,10 +1,10 @@
 package com.ssafy.witch.jwt.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import com.ssafy.witch.utils.JwtConst;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import util.JwtConst;
 
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter

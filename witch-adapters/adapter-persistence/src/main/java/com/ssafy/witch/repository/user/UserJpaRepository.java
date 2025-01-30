@@ -4,7 +4,7 @@ import com.ssafy.witch.entity.user.UserEntity;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface UserJpaRepository extends JpaRepository<UserEntity, Long>, UserCustomRepository {
+public interface UserJpaRepository extends JpaRepository<UserEntity, String>, UserCustomRepository {
 
   boolean existsByEmail(String email);
 

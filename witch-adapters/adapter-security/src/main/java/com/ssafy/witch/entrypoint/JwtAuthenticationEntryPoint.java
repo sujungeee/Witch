@@ -3,6 +3,7 @@ package com.ssafy.witch.entrypoint;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.exception.ErrorCode;
 import com.ssafy.witch.exception.auth.JwtAuthException;
+import com.ssafy.witch.utils.JwtConst;
 import com.ssafy.witch.utils.ResponseUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -12,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
-import util.JwtConst;
 
 @Slf4j
 @RequiredArgsConstructor

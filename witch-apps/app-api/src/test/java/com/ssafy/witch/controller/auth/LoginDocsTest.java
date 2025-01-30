@@ -19,6 +19,8 @@ import com.ssafy.witch.jwt.JwtProperties;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.jwt.response.TokenResponse;
 import com.ssafy.witch.support.docs.SecurityRestDocsTestSupport;
+import com.ssafy.witch.user.WitchUserDetails;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -61,18 +62,22 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
   @Test
   void login_200() throws Exception {
 
+    String userId = "user-id";
     String email = "test@test.com";
     String password = "sample_password";
+    List<String> roles = List.of("USER");
 
     Map<String, String> loginRequest
         = Map.of("email", email, "password", password);
 
-    given(userDetailsService.loadUserByUsername(any())).willReturn(User.builder()
-        .username(email)
+    given(userDetailsService.loadUserByUsername(any())).willReturn(WitchUserDetails.builder()
+        .userId(userId)
+        .email(email)
         .password(passwordEncoder.encode(password))
+        .roles(roles)
         .build());
 
-    given(jwtService.create(any(), any())).willReturn(TokenResponse.create(
+    given(jwtService.create(any(), any(), any())).willReturn(TokenResponse.create(
         "access.token.example",
         3600L,
         "refresh.token.example",
@@ -137,7 +142,7 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
 
     given(userDetailsService.loadUserByUsername(any())).willThrow(UsernameNotFoundException.class);
 
-    given(jwtService.create(any(), any())).willReturn(TokenResponse.create(
+    given(jwtService.create(any(), any(), any())).willReturn(TokenResponse.create(
         "access.token.example",
         3600L,
         "refresh.token.example",

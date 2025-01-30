@@ -29,6 +29,7 @@ public enum ErrorCode {
   EMAIL_ALREADY_IN_USE("WCH3000", "이미 사용 중인 이메일입니다."),
   NICKNAME_ALREADY_IN_USE("WCH3001", "이미 사용 중인 닉네임입니다."),
   EMAIL_VERIFICATION_CODE_MISMATCH("WCH3002", "이메일 인증 코드가 일치하지 않습니다."),
+  USER_NOT_FOUND("WCH3003", "사용자를 찾을 수 없습니다"),
 
   // 모임
   NON_EXISTENT_MEETING("WCH4000", "존재하지 않는 모임에 대한 요청입니다."),

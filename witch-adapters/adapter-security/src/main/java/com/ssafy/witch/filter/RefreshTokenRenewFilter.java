@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.exception.auth.JwtAuthException;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.jwt.response.TokenResponse;
+import com.ssafy.witch.utils.JwtConst;
 import com.ssafy.witch.utils.ResponseUtils;
 import com.ssafy.witch.utils.TokenExtractUtils;
 import jakarta.servlet.FilterChain;
@@ -14,7 +15,6 @@ import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
-import util.JwtConst;
 
 @RequiredArgsConstructor
 public class RefreshTokenRenewFilter extends OncePerRequestFilter {

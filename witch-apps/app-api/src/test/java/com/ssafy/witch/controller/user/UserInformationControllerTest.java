@@ -1,0 +1,109 @@
+package com.ssafy.witch.controller.user;
+
+import static com.ssafy.witch.support.docs.RestDocsUtils.constraints;
+import static com.ssafy.witch.validate.validator.ValidationRule.NICKNAME;
+import static org.mockito.ArgumentMatchers.any;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.STRING;
+import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
+import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
+import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
+import com.ssafy.witch.controller.user.request.UserNicknameChangeRequest;
+import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.exception.user.UserNicknameDuplicatedException;
+import com.ssafy.witch.mock.user.WithMockWitchUser;
+import com.ssafy.witch.support.docs.RestDocsTestSupport;
+import com.ssafy.witch.user.ChangeUserInformationUseCase;
+import org.junit.jupiter.api.Test;
+import org.mockito.BDDMockito;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+
+@WebMvcTest({UserInformationController.class, UserRequestMapper.class})
+class UserInformationControllerTest extends RestDocsTestSupport {
+
+  @MockBean
+  private ChangeUserInformationUseCase changeUserInformationUseCase;
+
+  @WithMockWitchUser
+  @Test
+  void change_nickname_200() throws Exception {
+
+    String nickname = "newNick";
+
+    UserNicknameChangeRequest request = new UserNicknameChangeRequest(nickname);
+
+    mvc.perform(patch("/users/me/nickname")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+            .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isOk())
+        .andDo(restDocs.document(
+            requestHeaders(
+                headerWithName("Authorization")
+                    .description("JWT access token")
+            ),
+            requestFields(
+                fieldWithPath("nickname")
+                    .type(STRING)
+                    .description("변경할 닉네임")
+                    .attributes(constraints(NICKNAME.getErrorMessage()))
+            ),
+            responseFields(
+                fieldWithPath("success")
+                    .type(BOOLEAN)
+                    .description("성공 여부")
+            )
+        ));
+  }
+
+
+  @WithMockWitchUser
+  @Test
+  void change_nickname_400_invalid_nickname_format() throws Exception {
+
+    String nickname = "";
+
+    UserNicknameChangeRequest request = new UserNicknameChangeRequest(nickname);
+
+    mvc.perform(patch("/users/me/nickname")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+            .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("data.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void change_nickname_400_duplicated_nickname() throws Exception {
+    String nickname = "newNick";
+
+    UserNicknameChangeRequest request = new UserNicknameChangeRequest(nickname);
+
+    BDDMockito.doThrow(new UserNicknameDuplicatedException())
+        .when(changeUserInformationUseCase).changeUserNickname(any());
+
+    mvc.perform(patch("/users/me/nickname")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+            .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("data.errorCode").value(ErrorCode.NICKNAME_ALREADY_IN_USE.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+}

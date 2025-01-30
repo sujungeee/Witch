@@ -1,9 +1,9 @@
 package com.ssafy.witch.service;
 
-import static org.springframework.security.core.userdetails.User.builder;
-
 import com.ssafy.witch.user.User;
 import com.ssafy.witch.user.UserPort;
+import com.ssafy.witch.user.WitchUserDetails;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,10 +20,11 @@ public class WitchUserDetailService implements UserDetailsService {
   public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
     User user = userPort.findByEmail(email).orElseThrow(() -> new UsernameNotFoundException(email));
 
-    return builder()
-        .username(user.getEmail())
+    return WitchUserDetails.builder()
+        .userId(user.getUserId())
+        .email(user.getEmail())
         .password(user.getPassword())
-        .roles("USER")
+        .roles(List.of("USER"))
         .build();
   }
 }

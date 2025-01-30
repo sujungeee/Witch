@@ -3,6 +3,7 @@ package com.ssafy.witch.filter;
 import com.ssafy.witch.exception.auth.InvalidAccessTokenException;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.user.WitchUserDetails;
+import com.ssafy.witch.utils.JwtConst;
 import com.ssafy.witch.utils.TokenExtractUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -16,7 +17,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import util.JwtConst;
 
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
@@ -28,7 +28,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   private static UsernamePasswordAuthenticationToken getAuthenticated(
       WitchUserDetails witchUserDetails) {
     return UsernamePasswordAuthenticationToken.authenticated(
-        witchUserDetails.getEmail(), null,
+        witchUserDetails.getUserId(), null,
         witchUserDetails.getRoles().stream().map(SimpleGrantedAuthority::new).toList());
   }
 

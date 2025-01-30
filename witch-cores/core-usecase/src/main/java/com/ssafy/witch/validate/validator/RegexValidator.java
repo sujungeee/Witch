@@ -3,6 +3,7 @@ package com.ssafy.witch.validate.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.lang.annotation.Annotation;
+import java.util.Objects;
 import java.util.regex.Pattern;
 
 public abstract class RegexValidator<A extends Annotation, T> implements ConstraintValidator<A, T> {
@@ -16,8 +17,8 @@ public abstract class RegexValidator<A extends Annotation, T> implements Constra
 
   @Override
   public boolean isValid(T value, ConstraintValidatorContext context) {
-    String stringValue = convertToString(value);
-    if (!pattern.matcher(stringValue).matches()) {
+
+    if (Objects.isNull(value) || !pattern.matcher(convertToString(value)).matches()) {
       addConstraintViolation(context, getErrorMessage());
       return false;
     }

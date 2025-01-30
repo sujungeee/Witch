@@ -2,7 +2,9 @@ package com.ssafy.witch.controller.user;
 
 import static com.ssafy.witch.support.docs.RestDocsUtils.constraints;
 import static com.ssafy.witch.validate.validator.ValidationRule.NICKNAME;
+import static com.ssafy.witch.validate.validator.ValidationRule.PASSWORD;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.doThrow;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
@@ -16,13 +18,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
 import com.ssafy.witch.controller.user.request.UserNicknameChangeRequest;
+import com.ssafy.witch.controller.user.request.UserPasswordChangeRequest;
 import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.exception.user.IncorrectPasswordException;
 import com.ssafy.witch.exception.user.UserNicknameDuplicatedException;
 import com.ssafy.witch.mock.user.WithMockWitchUser;
 import com.ssafy.witch.support.docs.RestDocsTestSupport;
 import com.ssafy.witch.user.ChangeUserInformationUseCase;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
@@ -93,7 +96,7 @@ class UserInformationControllerTest extends RestDocsTestSupport {
 
     UserNicknameChangeRequest request = new UserNicknameChangeRequest(nickname);
 
-    BDDMockito.doThrow(new UserNicknameDuplicatedException())
+    doThrow(new UserNicknameDuplicatedException())
         .when(changeUserInformationUseCase).changeUserNickname(any());
 
     mvc.perform(patch("/users/me/nickname")
@@ -104,6 +107,86 @@ class UserInformationControllerTest extends RestDocsTestSupport {
         .andExpect(status().isBadRequest())
         .andExpect(
             jsonPath("data.errorCode").value(ErrorCode.NICKNAME_ALREADY_IN_USE.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void change_password_200() throws Exception {
+
+    String password = "123123@@";
+    String newPassword = "456456@@";
+
+    UserPasswordChangeRequest request = new UserPasswordChangeRequest(password, newPassword);
+
+    mvc.perform(patch("/users/me/password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+            .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isOk())
+        .andDo(restDocs.document(
+            requestHeaders(
+                headerWithName("Authorization")
+                    .description("JWT access token")
+            ),
+            requestFields(
+                fieldWithPath("password")
+                    .type(STRING)
+                    .description("기존 비밀번호"),
+                fieldWithPath("newPassword")
+                    .type(STRING)
+                    .description("새로운 비밀번호")
+                    .attributes(constraints(PASSWORD.getErrorMessage()))
+            ),
+            responseFields(
+                fieldWithPath("success")
+                    .type(BOOLEAN)
+                    .description("성공 여부")
+            )
+        ));
+  }
+
+  @WithMockWitchUser
+  @Test
+  void change_password_400_invalid_password_format() throws Exception {
+
+    String password = null;
+    String newPassword = "";
+
+    UserPasswordChangeRequest request = new UserPasswordChangeRequest(password, newPassword);
+
+    mvc.perform(patch("/users/me/password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+            .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("data.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void change_password_400_incorrect_password() throws Exception {
+
+    String password = "123123@@";
+    String newPassword = "456456@@";
+
+    UserPasswordChangeRequest request = new UserPasswordChangeRequest(password, newPassword);
+
+    doThrow(new IncorrectPasswordException())
+        .when(changeUserInformationUseCase).changePassword(any());
+
+    mvc.perform(patch("/users/me/password")
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+            .content(objectMapper.writeValueAsString(request))
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("data.errorCode").value(ErrorCode.INCORRECT_PASSWORD.getErrorCode()))
         .andDo(restDocs.document());
   }
 }

@@ -124,8 +124,6 @@ public class JwtService {
 
     Date expiration = claims.getExpiration();
     long remainingMillis = expiration.getTime() - System.currentTimeMillis();
-    long availableMillis = TimeUnit.SECONDS.toMillis(
-        jwtProperties.getRefreshTokenExpirationSeconds());
     if (remainingMillis > TimeUnit.SECONDS.toMillis(
         jwtProperties.getRefreshTokenRenewAvailableSeconds())) {
       throw new RefreshTokenNotRenewableException();

@@ -8,6 +8,7 @@ dependencies {
     runtimeOnly(project(":witch-adapters:adapter-mail"))
     runtimeOnly(project(":witch-adapters:adapter-event"))
     runtimeOnly(project(":witch-adapters:adapter-security"))
+    runtimeOnly(project(":witch-adapters:adapter-s3"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")

@@ -17,12 +17,8 @@ public abstract class RegexValidator<A extends Annotation, T> implements Constra
 
   @Override
   public boolean isValid(T value, ConstraintValidatorContext context) {
-    if (Objects.isNull(value)) {
-      addConstraintViolation(context, "값이 null이어서는 안됩니다.");
-      return false;
-    }
-    String stringValue = convertToString(value);
-    if (!pattern.matcher(stringValue).matches()) {
+
+    if (Objects.isNull(value) || !pattern.matcher(convertToString(value)).matches()) {
       addConstraintViolation(context, getErrorMessage());
       return false;
     }

@@ -72,7 +72,7 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
         .password(passwordEncoder.encode(password))
         .build());
 
-    given(jwtService.create(any(), any())).willReturn(TokenResponse.create(
+    given(jwtService.create(any(), any(), any())).willReturn(TokenResponse.create(
         "access.token.example",
         3600L,
         "refresh.token.example",
@@ -137,7 +137,7 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
 
     given(userDetailsService.loadUserByUsername(any())).willThrow(UsernameNotFoundException.class);
 
-    given(jwtService.create(any(), any())).willReturn(TokenResponse.create(
+    given(jwtService.create(any(), any(), any())).willReturn(TokenResponse.create(
         "access.token.example",
         3600L,
         "refresh.token.example",

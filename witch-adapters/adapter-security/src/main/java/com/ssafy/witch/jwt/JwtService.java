@@ -30,6 +30,7 @@ public class JwtService {
   private static final String ACCESS_TOKEN_SUBJECT = "access-token";
   private static final String REFRESH_TOKEN_SUBJECT = "refresh-token";
 
+  private static final String USER_ID_CLAIM = "userId";
   private static final String EMAIL_CLAIM = "email";
   private static final String ROLES_CLAIM = "roles";
 
@@ -39,10 +40,12 @@ public class JwtService {
   public WitchUserDetails resolveAccessToken(String accessToken) {
     Claims claims = validateAccessToken(accessToken);
 
+    String userId = parseUserIdFrom(claims);
     String email = parseEmailFrom(claims);
     List<String> roles = parseRolesFrom(claims);
 
     return WitchUserDetails.builder()
+        .userId(userId)
         .email(email)
         .roles(roles)
         .build();
@@ -66,9 +69,9 @@ public class JwtService {
   }
 
   @Transactional
-  public TokenResponse create(String email, List<String> roles) {
-    String newAccessToken = createAccessToken(email, roles);
-    String newRefreshToken = createRefreshToken(email, roles);
+  public TokenResponse create(String userId, String email, List<String> roles) {
+    String newAccessToken = createAccessToken(userId, email, roles);
+    String newRefreshToken = createRefreshToken(userId, email, roles);
 
     refreshTokenCachePort.upsert(
         email,
@@ -89,10 +92,11 @@ public class JwtService {
   public TokenResponse reissue(String refreshToken) {
     Claims claims = validateRefreshToken(refreshToken);
 
+    String userId = parseUserIdFrom(claims);
     String email = parseEmailFrom(claims);
     List<String> roles = parseRolesFrom(claims);
 
-    String newAccessToken = createAccessToken(email, roles);
+    String newAccessToken = createAccessToken(userId, email, roles);
 
     return TokenResponse.reissue(
         newAccessToken,
@@ -110,6 +114,10 @@ public class JwtService {
     return claims.get(EMAIL_CLAIM, String.class);
   }
 
+  private String parseUserIdFrom(Claims claims) {
+    return claims.get(USER_ID_CLAIM, String.class);
+  }
+
   @Transactional
   public TokenResponse renew(String refreshToken) {
     Claims claims = validateRefreshToken(refreshToken);
@@ -122,11 +130,12 @@ public class JwtService {
       throw new RefreshTokenNotRenewableException();
     }
 
+    String userId = parseUserIdFrom(claims);
     String email = parseEmailFrom(claims);
     List<String> roles = parseRolesFrom(claims);
 
-    String newAccessToken = createAccessToken(email, roles);
-    String newRefreshToken = createRefreshToken(email, roles);
+    String newAccessToken = createAccessToken(userId, email, roles);
+    String newRefreshToken = createRefreshToken(userId, email, roles);
 
     refreshTokenCachePort.upsert(
         email,
@@ -174,8 +183,9 @@ public class JwtService {
 
   }
 
-  private String createAccessToken(String email, List<String> roles) {
+  private String createAccessToken(String userId, String email, List<String> roles) {
     return buildToken(
+        userId,
         email,
         roles,
         ACCESS_TOKEN_SUBJECT,
@@ -183,8 +193,9 @@ public class JwtService {
     );
   }
 
-  private String createRefreshToken(String email, List<String> roles) {
+  private String createRefreshToken(String userId, String email, List<String> roles) {
     return buildToken(
+        userId,
         email,
         roles,
         REFRESH_TOKEN_SUBJECT,
@@ -192,12 +203,13 @@ public class JwtService {
     );
   }
 
-  private String buildToken(String email, List<String> roles, String subject,
+  private String buildToken(String userId, String email, List<String> roles, String subject,
       Long expirationSeconds) {
     SecretKey key = Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8));
 
     return Jwts.builder()
         .subject(subject)
+        .claim(USER_ID_CLAIM, userId)
         .claim(EMAIL_CLAIM, email)
         .claim(ROLES_CLAIM, roles)
         .issuedAt(new Date(System.currentTimeMillis()))

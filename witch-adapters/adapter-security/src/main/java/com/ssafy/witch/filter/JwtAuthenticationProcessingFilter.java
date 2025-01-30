@@ -28,7 +28,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
   private static UsernamePasswordAuthenticationToken getAuthenticated(
       WitchUserDetails witchUserDetails) {
     return UsernamePasswordAuthenticationToken.authenticated(
-        witchUserDetails.getEmail(), null,
+        witchUserDetails.getUserId(), null,
         witchUserDetails.getRoles().stream().map(SimpleGrantedAuthority::new).toList());
   }
 

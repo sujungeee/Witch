@@ -2,6 +2,7 @@ package com.ssafy.witch.user.command;
 
 import com.ssafy.witch.validate.SelfValidating;
 import com.ssafy.witch.validate.annotation.WitchPassword;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
@@ -9,6 +10,7 @@ public class ChangeUserPasswordCommand extends SelfValidating<ChangeUserPassword
 
   private final String userId;
 
+  @NotNull
   private final String password;
 
   @WitchPassword

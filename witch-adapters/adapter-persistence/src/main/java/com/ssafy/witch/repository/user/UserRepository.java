@@ -35,4 +35,10 @@ public class UserRepository implements ValidateUserPort, UserPort {
     return userJpaRepository.findByEmail(email)
         .map(userEntityMapper::toDomain);
   }
+
+  @Override
+  public Optional<User> findById(String userId) {
+    return userJpaRepository.findById(userId)
+        .map(userEntityMapper::toDomain);
+  }
 }

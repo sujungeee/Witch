@@ -1,8 +1,13 @@
 package com.ssafy.witch.base
 
 import android.app.Application
+import android.content.Context
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import com.ssafy.witch.data.local.SharedPreferencesUtil
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -20,8 +25,12 @@ class ApplicationClass : Application() {
 
     // 코틀린의 전역변수 문법
     companion object {
+        lateinit var instance: ApplicationClass
+            private set
+
         // 만들어져있는 SharedPreferences 를 사용해야합니다. 재생성하지 않도록 유념해주세요
-//        lateinit var sharedPreferences: SharedPreferencesUtil
+        lateinit var sharedPreferences: SharedPreferencesUtil
+
 
         // JWT Token Header 키 값
         const val ACCESS_TOKEN = "ACCESS-TOKEN"
@@ -33,9 +42,13 @@ class ApplicationClass : Application() {
     // 앱이 처음 생성되는 순간, SP를 새로 만들어주고, 레트로핏 인스턴스를 생성합니다.
     override fun onCreate() {
         super.onCreate()
+        instance = this
 
         //shared preference 초기화
-//        sharedPreferences = SharedPreferencesUtil(applicationContext)
+//        GlobalScope.launch(Dispatchers.IO) {
+//            sharedPreferences = SharedPreferencesUtil(applicationContext)
+//        }
+        sharedPreferences = SharedPreferencesUtil(applicationContext)
 
         // 레트로핏 인스턴스 생성
         initRetrofitInstance()
@@ -72,12 +85,48 @@ class ApplicationClass : Application() {
         override fun intercept(chain: Interceptor.Chain): Response {
             val builder: Request.Builder = chain.request().newBuilder()
             //Todo 로그인 구현 시 추가하기
-//            val jwtToken: String? = sharedPreferences.getString(ACCESS_TOKEN)
-//            if (jwtToken != null) {
-//                builder.addHeader("X-ACCESS-TOKEN", jwtToken)
-//            }
+            val jwtToken = ApplicationClass.sharedPreferences.getAccessToken()
+            if (!jwtToken.isNullOrEmpty()) {
+                builder.addHeader("Authorization", "Bearer $jwtToken")
+            }
             return chain.proceed(builder.build())
         }
     }
+
+//    class AccessTokenInterceptor(private val context: Context) : Interceptor {
+//        override fun intercept(chain: Interceptor.Chain): Response {
+//            val accessToken = sharedPreferences(context).getAccessToken()
+//            val request = if (accessToken != null) {
+//                chain.request().newBuilder()
+//                    .addHeader("Authorization", "Bearer $accessToken")
+//                    .build()
+//            } else {
+//                chain.request()
+//            }
+//            return chain.proceed(request)
+//        }
+//    }
+
+//    class TokenAuthenticator(private val context: Context) : Authenticator {
+//        override fun authenticate(route: Route?, response: Response): Request? {
+//            val refreshToken = SecureSharedPreferences(context).getRefreshToken() ?: return null
+//
+//            // Refresh Token으로 Access Token 갱신 요청
+//            val newAccessToken = refreshAccessToken(refreshToken) ?: return null
+//
+//            // 새로운 Access Token 저장
+//            SecureSharedPreferences(context).saveTokens(newAccessToken, refreshToken)
+//
+//            // 기존 요청을 새로운 Access Token으로 재시도
+//            return response.request.newBuilder()
+//                .header("Authorization", "Bearer $newAccessToken")
+//                .build()
+//        }
+//
+//        private fun refreshAccessToken(refreshToken: String): String? {
+//            val response = RetrofitInstance.apiService.refreshToken(refreshToken).execute()
+//            return if (response.isSuccessful) response.body()?.accessToken else null
+//        }
+//    }
 
 }

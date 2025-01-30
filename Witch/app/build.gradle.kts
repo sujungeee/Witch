@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.ssafy.witch"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -77,4 +77,10 @@ dependencies {
 
     // 움직이는 애니메이션 - 로티
     implementation ("com.airbnb.android:lottie:5.0.3")
+
+    // security-crypto 라이브러리 추가
+    implementation ("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // lifecycle.viewModelScope 사용 위한 라이브러리 추가
+    implementation ("androidx.fragment:fragment-ktx:1.6.2")
 }

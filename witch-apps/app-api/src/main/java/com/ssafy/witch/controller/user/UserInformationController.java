@@ -2,9 +2,11 @@ package com.ssafy.witch.controller.user;
 
 import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
 import com.ssafy.witch.controller.user.request.UserNicknameChangeRequest;
+import com.ssafy.witch.controller.user.request.UserPasswordChangeRequest;
 import com.ssafy.witch.response.WitchApiResponse;
 import com.ssafy.witch.user.ChangeUserInformationUseCase;
 import com.ssafy.witch.user.command.ChangeUserNicknameCommand;
+import com.ssafy.witch.user.command.ChangeUserPasswordCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -26,4 +28,14 @@ public class UserInformationController {
     changeUserInformationUseCase.changeUserNickname(command);
     return WitchApiResponse.success();
   }
+
+  @PatchMapping("/users/me/password")
+  public WitchApiResponse<Void> changePassword(
+      @AuthenticationPrincipal String userId,
+      @RequestBody UserPasswordChangeRequest request) {
+    ChangeUserPasswordCommand command = userRequestMapper.toCommand(userId, request);
+    changeUserInformationUseCase.changePassword(command);
+    return WitchApiResponse.success();
+  }
+
 }

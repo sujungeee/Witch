@@ -12,6 +12,9 @@ class AppointmentCreate2Activity : BaseActivity<ActivityAppointmentCreate2Bindin
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        binding.appointmentFgTvAppointmentPlaceName.isSelected= true
+        binding.appointmentFgTvAppointmentAddress.isSelected= true
+
         binding.appointmentFgBtnNext.setOnClickListener {
             val intent= Intent(this, AppointmentCreate3Activity::class.java)
             startActivity(intent)

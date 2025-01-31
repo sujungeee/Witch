@@ -6,16 +6,12 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
-import androidx.annotation.ColorRes
 import androidx.fragment.app.viewModels
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.AppointmentListItem
-import com.ssafy.witch.data.model.dto.GroupApproval
+import com.ssafy.witch.data.model.response.GroupApproval
 import com.ssafy.witch.data.model.dto.GroupMember
-import com.ssafy.witch.data.model.dto.GroupViewModel
 import com.ssafy.witch.data.model.dto.User
 import com.ssafy.witch.databinding.DialogGroupMembersBinding
 import com.ssafy.witch.databinding.FragmentGroupBinding

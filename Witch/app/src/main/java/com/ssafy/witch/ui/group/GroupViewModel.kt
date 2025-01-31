@@ -1,4 +1,4 @@
-package com.ssafy.witch.data.model.dto
+package com.ssafy.witch.ui.group
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

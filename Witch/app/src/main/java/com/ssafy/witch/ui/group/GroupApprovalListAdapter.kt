@@ -1,19 +1,11 @@
 package com.ssafy.witch.ui.group
 
-import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.ssafy.witch.data.model.dto.GroupApproval
-import com.ssafy.witch.data.model.dto.GroupListItem
-import com.ssafy.witch.data.model.dto.GroupMember
-import com.ssafy.witch.data.model.dto.HomeAppointment
+import com.ssafy.witch.data.model.response.GroupApproval
 import com.ssafy.witch.databinding.GroupApprovalMemberItemBinding
-import com.ssafy.witch.databinding.GroupListItemBinding
-import com.ssafy.witch.databinding.GroupMemberItemBinding
-import com.ssafy.witch.databinding.HomeAppointmentListItemBinding
-import kotlin.math.abs
 
 class GroupApprovalListAdapter(val groupApprovalList: List<GroupApproval>, var itemClickListener: OnItemClickListener) : RecyclerView.Adapter<GroupApprovalListAdapter.GroupMemberListViewHolder>() {
 

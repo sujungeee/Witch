@@ -1,7 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
-
 }
 
 android {
@@ -78,7 +77,13 @@ dependencies {
     // 움직이는 애니메이션 - 로티
     implementation ("com.airbnb.android:lottie:5.0.3")
 
-    // ViewModel
-    implementation ("androidx.fragment:fragment-ktx:1.8.5")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.7")
+    // security-crypto 라이브러리 추가
+    implementation ("androidx.security:security-crypto:1.1.0-alpha06")
+
+    // lifecycle.viewModelScope 사용 위한 라이브러리 추가
+    implementation ("androidx.fragment:fragment-ktx:1.6.2")
+
+    // Glide 사용
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
 }

@@ -39,8 +39,8 @@ class AppointmentListAdapter(val appointmenrList: List<AppointmentListItem>, val
             }
             binding.groupAppointmentLiTvTitle.text = appointmenrList[position].appointmentName
 
-            binding.groupAppointmentLiTvTime.text = appointmenrList[position].appointmentTime.year.toString() + "-" + appointmenrList[position].appointmentTime.monthValue.toString() + "-" + appointmenrList[position].appointmentTime.dayOfMonth.toString()
-            binding.groupAppointmentLiTvDate.text = appointmenrList[position].appointmentTime.hour.toString() + ":" + appointmenrList[position].appointmentTime.minute.toString()
+            binding.groupAppointmentLiTvDate.text = appointmenrList[position].appointmentTime.year.toString() + "-" + appointmenrList[position].appointmentTime.monthValue.toString() + "-" + appointmenrList[position].appointmentTime.dayOfMonth.toString()
+            binding.groupAppointmentLiTvTime.text = appointmenrList[position].appointmentTime.hour.toString() + ":" + appointmenrList[position].appointmentTime.minute.toString()
 
 
 

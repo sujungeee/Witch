@@ -6,30 +6,50 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.lifecycleScope
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseActivity
+import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.databinding.ActivityLoginBinding
 import com.ssafy.witch.login.JoinFragment
 import com.ssafy.witch.login.LoginFragment
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::inflate) {
+
+    private lateinit var sharedPreferences: SharedPreferencesUtil
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        //로그인 된 상태 확인
-//        val user = ApplicationClass.sharedPreferenceUtil.getUser()
+        sharedPreferences = SharedPreferencesUtil(applicationContext)
 
-        //로그인 상태 확인, id가 있다면 로그인 된 상태
-//        if (user.id != "") {
-            openFragment(1)
-        /*} else (
-            //가장 첫 화면은 홈 화면의 Fragment로 지정
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.login_a_fl, LoginFragment())
-                .commit()
-        )*/
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            //로그인 된 상태 확인
+            val user = withContext(Dispatchers.Main) {
+                sharedPreferences.getUser()
+            }
+
+            withContext(Dispatchers.Main) {
+                //로그인 상태 확인, id가 있다면 로그인 된 상태
+                if (user.email != "") {
+                    openFragment(1)
+                } else (
+                    //가장 첫 화면은 홈 화면의 Fragment로 지정
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.login_a_fl, LoginFragment())
+                        .commit()
+                    )
+            }
+
+        }
+
+
     }
 
     // 로그인 시 해당하는 번호의 프래그먼트 지정

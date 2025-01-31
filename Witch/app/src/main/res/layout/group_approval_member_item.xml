@@ -43,13 +43,13 @@
         android:layout_height="40dp"
         android:text="수락"
         android:backgroundTint="@color/witch_green"
-        app:layout_constraintEnd_toStartOf="@+id/group_approval_member_item_btn_deny"
+        app:layout_constraintEnd_toStartOf="@+id/group_approval_member_item_btn_reject"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         />
 
     <Button
-        android:id="@+id/group_approval_member_item_btn_deny"
+        android:id="@+id/group_approval_member_item_btn_reject"
         android:layout_width="80dp"
         android:layout_height="40dp"
         android:text="거절"

@@ -2,32 +2,33 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-
     android:id="@+id/group_appointment_list_item"
     android:layout_width="match_parent"
-    android:layout_height="100dp">
+    android:layout_height="90dp">
 
     <TextView
         android:id="@+id/group_appointment_li_tv_time"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="5dp"
         android:text="12:00 PM"
-        android:textSize="12dp"
-        android:layout_marginBottom="20dp"
         android:textColor="@color/witch_white"
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toTopOf="@+id/group_appointment_li_tv_date"
         app:layout_constraintEnd_toStartOf="@+id/view2"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <TextView
         android:id="@+id/group_appointment_li_tv_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
         android:text="2025.01.24"
-        android:textSize="12dp"
         android:textColor="@color/witch_gray"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/view2"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/group_appointment_li_tv_time" />
@@ -49,6 +50,7 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:text="아이디어 회의입니다."
+        android:textSize="16dp"
         android:textColor="@color/witch_white"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toEndOf="@+id/view2"

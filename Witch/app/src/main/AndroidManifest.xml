@@ -15,11 +15,6 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Witch"
         tools:targetApi="31">
-
-        <meta-data
-            android:name="com.google.android.geo.API_KEY"
-            android:value="@string/api_key" />
-
         <activity
             android:name=".ui.LoginActivity"
             android:exported="false" />
@@ -32,23 +27,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <activity
-            android:name=".ui.appointment.MapActivity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".ui.appointment.AppointmentCreate1Activity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".ui.appointment.AppointmentCreate2Activity"
-            android:exported="true"/>
-
-        <activity
-            android:name=".ui.appointment.AppointmentCreate3Activity"
-            android:exported="true"/>
-
     </application>
 
 </manifest>

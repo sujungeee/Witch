@@ -117,12 +117,16 @@
 
         <TextView
             android:id="@+id/appointment_fg_tv_appointment_place_name"
+            android:maxWidth="280dp"
             style="@style/pt_semibold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
             android:text="배따라기"
+            android:focusable="true"
+            android:singleLine="true"
+            android:ellipsize="marquee"
             android:textColor="@color/witch_black"
             android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -140,10 +144,14 @@
 
         <TextView
             android:id="@+id/appointment_fg_tv_appointment_address"
+            android:maxWidth="270dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:text="경북 구미시 인동중앙로11길 7-1"
+            android:focusable="true"
+            android:singleLine="true"
+            android:ellipsize="marquee"
             android:textColor="@color/witch_black"
             android:textSize="14sp"
             app:layout_constraintStart_toEndOf="@+id/imageView"

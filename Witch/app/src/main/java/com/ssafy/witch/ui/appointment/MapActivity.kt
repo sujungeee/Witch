@@ -92,6 +92,9 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             setUserStatus(userStatus, appointmentStatus)
 
             binding.mapAcTvAppointmentName.isSelected = true
+            bottomSheetBinding.mapFgTvBottomAppointmentSummary.isSelected= true
+            bottomSheetBinding.mapFgTvBottomAppointmentLocation.isSelected= true
+            bottomSheetBinding.mapFgTvBottomAppointmentLeader.isSelected= true
 
             binding.mapAcSbRemainderTime.setOnTouchListener { _, _ ->
                 true

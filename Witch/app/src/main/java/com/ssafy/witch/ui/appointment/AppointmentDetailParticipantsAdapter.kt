@@ -22,6 +22,7 @@ class AppointmentDetailParticipantsAdapter(val participantsList: List<Appointmen
 
     inner class ParticipantsViewHolder(private val binding: AppointmentDetailParticipantsItemBinding) : RecyclerView.ViewHolder(binding.root) {
         fun bind(position: Int) {
+            binding.appointmentDetailParticipantName.isSelected= true
             binding.appointmentDetailParticipantName.text= participantsList[position].nickname
         }
     }

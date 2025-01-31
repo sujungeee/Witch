@@ -69,6 +69,7 @@ dependencies {
     // https://github.com/square/okhttp/tree/master/okhttp-logging-interceptor
     implementation ("com.squareup.okhttp3:logging-interceptor:4.9.0")
 
+    // 홈 캘린더
     implementation("com.prolificinteractive:material-calendarview:1.4.3")
 
     // 구글 map api(사용)
@@ -77,4 +78,16 @@ dependencies {
 
     // 움직이는 애니메이션 - 로티
     implementation ("com.airbnb.android:lottie:5.0.3")
+
+    // glide - url 이미지 로딩
+    implementation ("com.github.bumptech.glide:glide:4.15.1")
+    annotationProcessor ("com.github.bumptech.glide:compiler:4.15.1")
+
+    // ViewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel:2.8.7")
+    // LiveData
+    implementation("androidx.lifecycle:lifecycle-livedata:2.8.7")
+
+    implementation ("androidx.activity:activity-ktx:1.9.3")
+    implementation ("androidx.fragment:fragment-ktx:1.8.5")
 }

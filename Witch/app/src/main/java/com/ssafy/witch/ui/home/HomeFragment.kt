@@ -1,12 +1,8 @@
 package com.ssafy.witch.ui.home
 
 import android.annotation.SuppressLint
-import android.icu.text.DateFormat
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.lifecycle.lifecycleScope
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
@@ -17,7 +13,6 @@ import com.ssafy.witch.databinding.FragmentHomeBinding
 import com.ssafy.witch.ui.MainActivity
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import java.util.Calendar
 import java.util.Date
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind, R.layout.fragment_home) {
@@ -48,8 +43,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
                 }
         }
 
-
-
+        binding.textView2.setOnClickListener {
+//            val intent= Intent(activity, AppointmentCreate1Fragment::class.java)
+//            startActivity(intent)
+            (requireActivity() as MainActivity).openFragment(7)
+        }
 
     }
 

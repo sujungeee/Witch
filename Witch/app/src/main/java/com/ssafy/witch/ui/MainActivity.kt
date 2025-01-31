@@ -4,10 +4,14 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.ssafy.witch.R
 import com.ssafy.witch.databinding.ActivityMainBinding
+import com.ssafy.witch.ui.appointment.AppointmentCreate1Activity
+import com.ssafy.witch.ui.appointment.AppointmentCreate2Activity
+import com.ssafy.witch.ui.appointment.AppointmentCreate3Activity
 import com.ssafy.witch.ui.group.GroupFragment
 import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment
 import com.ssafy.witch.ui.mypage.MyPageFragment
+import com.ssafy.witch.ui.snack.SnackCreateFragment
 
 
 private const val TAG = "MainActivity"
@@ -17,18 +21,21 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
 
+        val fragmentIdx = intent.getIntExtra("moveFragment", -1)
+        if (fragmentIdx != -1) {
+            moveFragment(fragmentIdx)
+            intent.removeExtra("moveFragment")
+        } else {
+            supportFragmentManager.beginTransaction()
+                .replace(R.id.main_flayout, HomeFragment())
+                .commit()
+        }
+
         mainBinding.mainABn.selectedItemId = R.id.bn_home
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.main_flayout, HomeFragment())
-            .commit()
-
 
         mainBinding.mainABn.setOnItemSelectedListener { item ->
             when(item.itemId){
@@ -66,7 +73,13 @@ class MainActivity : AppCompatActivity() {
             1 -> transaction.replace(R.id.main_flayout, HomeFragment())
             2 -> transaction.replace(R.id.main_flayout, GroupListFragment())
             3 -> transaction.replace(R.id.main_flayout, MyPageFragment())
-//            4 -> transaction.replace(R.id.main_flayout, MapFragment())
+            4 -> transaction.replace(R.id.main_flayout, SnackCreateFragment())
+            6 -> transaction.replace(R.id.main_flayout, GroupFragment())
+//            7 -> transaction.replace(R.id.main_flayout, AppointmentCreate1Activity())
+//            8 -> transaction.replace(R.id.main_flayout, AppointmentCreate2Activity())
+//                .addToBackStack(null)
+//            9 -> transaction.replace(R.id.main_flayout, AppointmentCreate3Activity())
+//                .addToBackStack(null)
 //            5 -> transaction.add(R.id.main_flayout, //Todo)
 //                .addToBackStack(null)
 //            6 -> transaction.add(R.id.main_flayout, //Todo)

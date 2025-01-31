@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.group.AppointmentApprovalFragment"
+    tools:context=".ui.group.GroupApprovalFragment"
     android:background="@drawable/entry">
 
     <androidx.constraintlayout.widget.ConstraintLayout

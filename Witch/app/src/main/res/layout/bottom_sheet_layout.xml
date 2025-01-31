@@ -1,230 +1,274 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/bottom_sheet_layout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="530dp"
+    android:background="@drawable/bottomsheet_style"
+    android:backgroundTint="@color/witch_black"
+    app:behavior_peekHeight="50dp"
+    app:behavior_hideable="false"
+    app:layout_behavior="com.google.android.material.bottomsheet.BottomSheetBehavior">
 
-    <ImageView
+    <LinearLayout
         android:id="@+id/map_fg_iv_bottom_drag"
-        android:layout_width="40dp"
-        android:layout_height="2dp"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="8dp"
-        android:background="@color/witch_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/map_fg_cl_bottom_snack"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="14dp"
+        android:orientation="vertical"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
-        <TextView
-            android:id="@+id/map_fg_tv_bottom_1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="26dp"
-            android:text="스낵"
-            android:textColor="@color/witch_green"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            style="@style/pt_medium"/>
-
         <ImageView
-            android:id="@+id/map_fg_iv_bottom_add"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
-            android:layout_marginEnd="24dp"
-            android:src="@drawable/add"
+            android:layout_width="40dp"
+            android:layout_height="2dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="8dp"
+            android:background="@color/witch_gray"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/map_fg_tv_bottom_1" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/map_fg_rv_bottom_snack"
+    </LinearLayout>
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:layout_marginTop="6dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/map_fg_iv_bottom_drag">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_bottom_1" />
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/map_fg_cl_bottom_snack"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/map_fg_cl_bottom_appointment_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_fg_cl_bottom_snack">
+                <TextView
+                    android:id="@+id/map_fg_tv_bottom_1"
+                    style="@style/pt_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="20dp"
+                    android:text="스낵"
+                    android:textColor="@color/witch_green"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/map_fg_tv_bottom_2"
-            style="@style/pt_medium"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="26dp"
-            android:text="약속 정보"
-            android:textColor="@color/witch_green"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/map_fg_iv_bottom_add"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginEnd="24dp"
+                    android:src="@drawable/add"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/map_fg_tv_bottom_1" />
 
-        <ImageView
-            android:id="@+id/map_fg_iv_bottom_pin"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="12dp"
-            android:src="@drawable/pin"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_bottom_2" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/map_fg_rv_bottom_snack"
+                    android:layout_width="match_parent"
+                    android:layout_height="125dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="12dp"
+                    android:layout_marginEnd="24dp"
+                    android:orientation="horizontal"
+                    app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_bottom_1" />
 
-        <TextView
-            android:id="@+id/map_fg_tv_bottom_appointment_summary"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="2dp"
-            android:text="배따라기에 모여서 아이디어를 고심하는 약속"
-            android:textColor="@color/witch_white"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/map_fg_iv_bottom_pin"
-            app:layout_constraintStart_toEndOf="@+id/map_fg_iv_bottom_pin"
-            app:layout_constraintTop_toTopOf="@+id/map_fg_iv_bottom_pin" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <ImageView
-            android:id="@+id/map_fg_iv_bottom_location"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/location"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/map_fg_iv_bottom_pin" />
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/map_fg_cl_bottom_appointment_info"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/map_fg_cl_bottom_snack">
 
-        <TextView
-            android:id="@+id/map_fg_tv_bottom_appointment_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="2dp"
-            android:text="배따라기 구미 인동점"
-            android:textColor="@color/witch_white"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/map_fg_iv_bottom_location"
-            app:layout_constraintStart_toEndOf="@+id/map_fg_iv_bottom_location" />
+                <TextView
+                    android:id="@+id/map_fg_tv_bottom_2"
+                    style="@style/pt_medium"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="16dp"
+                    android:text="약속 정보"
+                    android:textColor="@color/witch_green"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <ImageView
-            android:id="@+id/map_fg_iv_bottom_time"
-            android:layout_width="20dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="10dp"
-            android:src="@drawable/time"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/map_fg_iv_bottom_location" />
+                <ImageView
+                    android:id="@+id/map_fg_iv_bottom_pin"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="12dp"
+                    android:src="@drawable/pin"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_bottom_2" />
 
-        <TextView
-            android:id="@+id/map_fg_tv_bottom_appointment_time"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginBottom="2dp"
-            android:text="오후 05:30"
-            android:textColor="@color/witch_white"
-            android:textSize="12sp"
-            app:layout_constraintBottom_toBottomOf="@+id/map_fg_iv_bottom_time"
-            app:layout_constraintStart_toEndOf="@+id/map_fg_iv_bottom_time" />
+                <TextView
+                    android:id="@+id/map_fg_tv_bottom_appointment_summary"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="2dp"
+                    android:text="배따라기에 모여서 아이디어를 고심하는 약속"
+                    android:textColor="@color/witch_white"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/map_fg_iv_bottom_pin"
+                    app:layout_constraintStart_toEndOf="@+id/map_fg_iv_bottom_pin"
+                    app:layout_constraintTop_toTopOf="@+id/map_fg_iv_bottom_pin" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+                <ImageView
+                    android:id="@+id/map_fg_iv_bottom_location"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/location"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/map_fg_iv_bottom_pin" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/map_fg_cl_bottom_appointment_leader"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/map_fg_cl_bottom_appointment_info">
+                <TextView
+                    android:id="@+id/map_fg_tv_bottom_appointment_location"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="2dp"
+                    android:text="배따라기 구미 인동점"
+                    android:textColor="@color/witch_white"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/map_fg_iv_bottom_location"
+                    app:layout_constraintStart_toEndOf="@+id/map_fg_iv_bottom_location" />
 
-        <TextView
-            android:id="@+id/map_fg_tv_bottom_3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:text="약속장"
-            android:textColor="@color/witch_green"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/map_fg_iv_bottom_time"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="10dp"
+                    android:src="@drawable/time"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/map_fg_iv_bottom_location" />
 
-        <ImageView
-            android:id="@+id/map_fg_iv_bottom_appointment_cp_profile"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="16dp"
-            android:src="@drawable/user_profile_tmp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_bottom_3" />
+                <TextView
+                    android:id="@+id/map_fg_tv_bottom_appointment_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginBottom="2dp"
+                    android:text="오후 05:30"
+                    android:textColor="@color/witch_white"
+                    android:textSize="12sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/map_fg_iv_bottom_time"
+                    app:layout_constraintStart_toEndOf="@+id/map_fg_iv_bottom_time" />
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="임수미"
-            android:textColor="@color/witch_white"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="@+id/map_fg_iv_bottom_appointment_cp_profile"
-            app:layout_constraintStart_toStartOf="@+id/map_fg_iv_bottom_appointment_cp_profile"
-            app:layout_constraintTop_toBottomOf="@+id/map_fg_iv_bottom_appointment_cp_profile" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/map_fg_cl_bottom_appointment_leader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/map_fg_cl_bottom_appointment_info">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/map_fg_bottom_appointment_members"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/map_fg_cl_bottom_appointment_leader">
+                <TextView
+                    android:id="@+id/map_fg_tv_bottom_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="20dp"
+                    android:text="약속장"
+                    android:textColor="@color/witch_green"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
-        <TextView
-            android:id="@+id/textView15"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="24dp"
-            android:text="약속 구성원"
-            android:textColor="@color/witch_green"
-            android:textSize="18sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+                <ImageView
+                    android:id="@+id/map_fg_iv_bottom_appointment_cp_profile"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="8dp"
+                    android:src="@drawable/user_profile_tmp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_bottom_3" />
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/map_fg_rv_bottom_members"
-            android:layout_width="match_parent"
-            android:layout_height="120dp"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="12dp"
-            android:layout_marginEnd="24dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView15" />
+                <TextView
+                    android:id="@+id/textView4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="임수미"
+                    android:textColor="@color/witch_white"
+                    android:textSize="14sp"
+                    app:layout_constraintEnd_toEndOf="@+id/map_fg_iv_bottom_appointment_cp_profile"
+                    app:layout_constraintStart_toStartOf="@+id/map_fg_iv_bottom_appointment_cp_profile"
+                    app:layout_constraintTop_toBottomOf="@+id/map_fg_iv_bottom_appointment_cp_profile" />
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/map_fg_bottom_appointment_members"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/map_fg_cl_bottom_appointment_leader">
+
+                <TextView
+                    android:id="@+id/textView15"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="24dp"
+                    android:layout_marginTop="20dp"
+                    android:text="약속 구성원"
+                    android:textColor="@color/witch_green"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/map_fg_rv_bottom_members"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginTop="5dp"
+                    android:layout_marginEnd="26dp"
+                    android:layout_marginBottom="10dp"
+                    android:nestedScrollingEnabled="true"
+                    app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView15"
+                    app:spanCount="6" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

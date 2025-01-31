@@ -3,7 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.appointment.MapFragment">
+    tools:context=".ui.appointment.MapActivity">
 
     <androidx.coordinatorlayout.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -15,7 +15,21 @@
             android:layout_height="match_parent">
 
             <TextView
-                android:id="@+id/map_fg_tv_appointment_name"
+                android:id="@+id/map_ac_tv_appointment_status"
+                style="@style/pt_semibold"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="@drawable/circle_btn"
+                android:textColor="@color/witch_black"
+                android:gravity="center"
+                android:layout_marginEnd="32dp"
+                app:layout_constraintBottom_toBottomOf="@+id/map_ac_tv2"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/map_ac_tv1" />
+
+
+            <TextView
+                android:id="@+id/map_ac_tv_appointment_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
@@ -28,7 +42,7 @@
                 app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
-                android:id="@+id/map_fg_tv1"
+                android:id="@+id/map_ac_tv1"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pretendard_semibold"
@@ -36,11 +50,11 @@
                 android:textColor="@color/witch_white"
                 android:textSize="28sp"
                 android:layout_marginStart="8dp"
-                app:layout_constraintTop_toTopOf="@+id/map_fg_tv_appointment_name"
-                app:layout_constraintLeft_toRightOf="@+id/map_fg_tv_appointment_name"/>
+                app:layout_constraintTop_toTopOf="@+id/map_ac_tv_appointment_name"
+                app:layout_constraintLeft_toRightOf="@+id/map_ac_tv_appointment_name"/>
 
             <TextView
-                android:id="@+id/map_fg_tv_remainder_time"
+                android:id="@+id/map_ac_tv_remainder_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pretendard_semibold"
@@ -49,11 +63,11 @@
                 android:textSize="36sp"
                 android:layout_marginStart="30dp"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_appointment_name" />
+                app:layout_constraintTop_toBottomOf="@+id/map_ac_tv_appointment_name" />
 
 
             <TextView
-                android:id="@+id/map_fg_tv2"
+                android:id="@+id/map_ac_tv2"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pretendard_semibold"
@@ -62,12 +76,12 @@
                 android:textSize="16sp"
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="7dp"
-                app:layout_constraintBottom_toBottomOf="@+id/map_fg_tv_remainder_time"
-                app:layout_constraintStart_toEndOf="@+id/map_fg_tv_remainder_time" />
+                app:layout_constraintBottom_toBottomOf="@+id/map_ac_tv_remainder_time"
+                app:layout_constraintStart_toEndOf="@+id/map_ac_tv_remainder_time" />
 
 
             <SeekBar
-                android:id="@+id/map_fg_sb_remainder_time"
+                android:id="@+id/map_ac_sb_remainder_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:max="100"
@@ -77,7 +91,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginStart="16dp"
                 android:layout_marginEnd="16dp"
-                app:layout_constraintTop_toBottomOf="@+id/map_fg_tv_remainder_time"
+                app:layout_constraintTop_toBottomOf="@+id/map_ac_tv_remainder_time"
                 tools:ignore="MissingConstraints" />
 
             <FrameLayout
@@ -88,10 +102,10 @@
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/map_fg_sb_remainder_time">
+                app:layout_constraintTop_toBottomOf="@+id/map_ac_sb_remainder_time">
 
                 <fragment
-                    android:id="@+id/map_fg_fg"
+                    android:id="@+id/map_ac_fg"
                     android:name="com.google.android.gms.maps.SupportMapFragment"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent" />
@@ -104,7 +118,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <ImageView
-                        android:id="@+id/map_fg_iv_snack"
+                        android:id="@+id/map_ac_iv_snack"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:src="@drawable/snack_cookie"
@@ -116,8 +130,8 @@
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
                         android:layout_marginStart="-8dp"
-                        app:layout_constraintStart_toEndOf="@+id/map_fg_iv_snack"
-                        app:layout_constraintTop_toTopOf="@+id/map_fg_iv_snack">
+                        app:layout_constraintStart_toEndOf="@+id/map_ac_iv_snack"
+                        app:layout_constraintTop_toTopOf="@+id/map_ac_iv_snack">
 
                         <ImageView
                             android:layout_width="match_parent"
@@ -139,8 +153,9 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <!--    <include-->
-        <!--        layout="@layout/bottom_sheet_layout" />-->
+        <include
+            layout="@layout/bottom_sheet_layout" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
 </layout>

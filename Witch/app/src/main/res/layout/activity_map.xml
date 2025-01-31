@@ -30,12 +30,16 @@
 
             <TextView
                 android:id="@+id/map_ac_tv_appointment_name"
+                android:maxWidth="110dp"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="30dp"
                 android:layout_marginTop="40dp"
                 android:fontFamily="@font/pretendard_semibold"
                 android:text="빵지순례"
+                android:focusable="true"
+                android:singleLine="true"
+                android:ellipsize="marquee"
                 android:textColor="@color/witch_white"
                 android:textSize="28sp"
                 app:layout_constraintStart_toStartOf="parent"

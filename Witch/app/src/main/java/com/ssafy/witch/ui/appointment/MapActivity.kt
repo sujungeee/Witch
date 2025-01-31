@@ -1,6 +1,7 @@
 package com.ssafy.witch.ui.appointment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Dialog
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
@@ -51,6 +52,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
         private val bottomSheetBinding get() = _bottomSheetBinding!!
         private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
+        @SuppressLint("ClickableViewAccessibility")
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
@@ -88,6 +90,12 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
 
             var userStatus= 1
             setUserStatus(userStatus, appointmentStatus)
+
+            binding.mapAcTvAppointmentName.isSelected = true
+
+            binding.mapAcSbRemainderTime.setOnTouchListener { _, _ ->
+                true
+            }
 
             binding.mapAcTvAppointmentStatus.setOnClickListener {
                 setDialog(userStatus)

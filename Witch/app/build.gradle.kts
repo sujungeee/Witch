@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.ssafy.witch"
-        minSdk = 26
+        minSdk = 24
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -83,4 +83,9 @@ dependencies {
 
     // lifecycle.viewModelScope 사용 위한 라이브러리 추가
     implementation ("androidx.fragment:fragment-ktx:1.6.2")
+
+    // Glide 사용
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
+
 }

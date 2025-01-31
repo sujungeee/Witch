@@ -28,6 +28,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
 
         sharedPreferences = SharedPreferencesUtil(applicationContext)
 
+
         lifecycleScope.launch(Dispatchers.IO) {
             //로그인 된 상태 확인
             val user = withContext(Dispatchers.Main) {

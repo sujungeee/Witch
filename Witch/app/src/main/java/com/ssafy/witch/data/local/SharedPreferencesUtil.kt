@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
+import com.ssafy.witch.data.model.dto.JoinUser
 import com.ssafy.witch.data.model.dto.User
 import java.time.LocalDateTime
 
@@ -68,20 +69,20 @@ class SharedPreferencesUtil (context : Context) {
     }
 
     //사용자 정보 저장, user dto 생성하기
-    fun addUser(user: User) {
+    fun addUser(user: JoinUser) {
         val editor =  preference.edit()
         editor.putString(KEY_EMAIL, user.email)
         editor.putString(KEY_NICK, user.nickname)
         editor.apply()
     }
 
-    fun getUser(): User {
+    fun getUser(): JoinUser {
         val email = preference.getString(KEY_EMAIL, "")
         if(email != "") {
             val nick = preference.getString(KEY_NICK, "")
-            return User("", email!!, nick!!, "")
+            return JoinUser("", email!!, nick!!, "")
         } else{
-          return User()
+          return JoinUser()
         }
     }
 

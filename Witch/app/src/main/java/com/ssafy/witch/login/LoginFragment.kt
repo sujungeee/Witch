@@ -18,16 +18,19 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(
     private lateinit var LoginActivity:LoginActivity
 //    private val viewModel: LoginFragmentViewModel by viewModels()
 
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        binding.loginFgBtnLogin.setOnClickListener {
+            (requireActivity() as LoginActivity).openFragment(1)
+
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_login, container, false)
-    }
+
 
 }

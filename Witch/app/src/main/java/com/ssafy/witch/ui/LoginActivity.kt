@@ -6,50 +6,55 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.ssafy.witch.R
-import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseActivity
 import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.databinding.ActivityLoginBinding
 import com.ssafy.witch.login.JoinFragment
 import com.ssafy.witch.login.LoginFragment
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import com.ssafy.witch.login.LoginFragmentViewModel
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+
 
 class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::inflate) {
 
     private lateinit var sharedPreferences: SharedPreferencesUtil
+    private lateinit var loginViewModel: LoginFragmentViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         sharedPreferences = SharedPreferencesUtil(applicationContext)
 
+        loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
-        lifecycleScope.launch(Dispatchers.IO) {
-            //로그인 된 상태 확인
-            val user = withContext(Dispatchers.Main) {
-                sharedPreferences.getUser()
+        lifecycleScope.launch {
+            if (isUserLoggedIn()) {
+                openFragment(1)
+            } else {
+                //Refresh Token도 만료되었다면 로그인 화면으로 이동
+                moveToLogin()
             }
-
-            withContext(Dispatchers.Main) {
-                //로그인 상태 확인, id가 있다면 로그인 된 상태
-                if (user.email != "") {
-                    openFragment(1)
-                } else (
-                    //가장 첫 화면은 홈 화면의 Fragment로 지정
-                    supportFragmentManager.beginTransaction()
-                        .replace(R.id.login_a_fl, LoginFragment())
-                        .commit()
-                    )
-            }
-
         }
+    }
 
+    //로그인 화면으로 이동
+    private fun moveToLogin() {
+        supportFragmentManager.beginTransaction()
+            .replace(R.id.login_a_fl, LoginFragment())
+            .commit()
+    }
 
+    private fun isUserLoggedIn(): Boolean {
+        val accessTokenExpiresAt = sharedPreferences.getAccessTokenExpiresAt()
+        val refreshTokenExpiresAt = sharedPreferences.getRefreshTokenExpiresAt()
+        return accessTokenExpiresAt > getCurrentTime() || refreshTokenExpiresAt > getCurrentTime()
+    }
+
+    private fun getCurrentTime(): Long {
+        return System.currentTimeMillis() / 1000
     }
 
     // 로그인 시 해당하는 번호의 프래그먼트 지정

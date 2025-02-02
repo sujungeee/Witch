@@ -10,5 +10,7 @@ class RetrofitUtil {
 
         val authService = ApplicationClass.retrofit.create(AuthService::class.java)
 
+        val joinService = ApplicationClass.retrofit.create(JoinService::class.java)
+
     }
 }

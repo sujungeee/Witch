@@ -17,11 +17,13 @@ class SharedPreferencesUtil (context : Context) {
 
     // 서버에서 email과 password 로 로그인 성공시 보안을 위해 JWT로 토큰값 저장
     // JWT 토큰 키값
-    private val KEY_ACCESS_TOKEN = "access_token"
-    private val KEY_REFRESH_TOKEN = "refresh_token"
+    val KEY_ACCESS_TOKEN = "access_token"
+    val KEY_REFRESH_TOKEN = "refresh_token"
+    val KEY_ACCESS_TOKEN_EXPIRES_AT = "accessTokenExpiresAt"
+    val KEY_REFRESH_TOKEN_EXPIRES_AT = "refreshTokenExpiresAt"
 
-    private val KEY_EMAIL = "email"
-    private val KEY_NICK = "nickname"
+    val KEY_EMAIL = "email"
+    val KEY_NICK = "nickname"
 
     //블랙리스트 구현 필요?
 
@@ -45,10 +47,23 @@ class SharedPreferencesUtil (context : Context) {
 
     //JWT 토큰 저장 - JWT 방식이면 쿠키 필요 없음
     //Access Token이 만료되면 Refresh Token을 이용하여 재발급하면 자동 로그인 기능을 구현
-    fun saveToken(accessToken: String, refreshToken: String) {
+    fun saveTokens(accessToken: String, accessTokenExpiresIn: Long, refreshToken: String, refreshTokenExpiresIn: Long) {
+        //현재시간 초단위로 기록
+        val currentTime = System.currentTimeMillis() / 1000
         preference.edit().apply {
             putString(KEY_ACCESS_TOKEN, accessToken)
+            putLong(KEY_ACCESS_TOKEN_EXPIRES_AT, currentTime + accessTokenExpiresIn) // 현재 시간 + 만료 시간)
             putString(KEY_REFRESH_TOKEN, refreshToken)
+            putLong(KEY_REFRESH_TOKEN_EXPIRES_AT, currentTime + refreshTokenExpiresIn)
+            apply()
+        }
+    }
+
+    fun saveAccessToken(accessToken: String, accessTokenExpiresIn: Long) {
+        val currentTime = System.currentTimeMillis() / 1000
+        preference.edit().apply {
+            putString(KEY_ACCESS_TOKEN, accessToken)
+            putLong(KEY_ACCESS_TOKEN_EXPIRES_AT, currentTime + accessTokenExpiresIn)
             apply()
         }
     }
@@ -63,30 +78,45 @@ class SharedPreferencesUtil (context : Context) {
         return preference.getString(KEY_ACCESS_TOKEN, null)
     }
 
+    //Access Token 만료 시간 가져오기
+    fun getAccessTokenExpiresAt(): Long {
+        return preference.getLong(KEY_ACCESS_TOKEN_EXPIRES_AT, 0L)
+    }
+
+    //Refresh Token 만료 시간 가져오기
+    fun getRefreshTokenExpiresAt(): Long {
+        return preference.getLong(KEY_REFRESH_TOKEN_EXPIRES_AT, 0L)
+    }
+
     //로그아웃 시 모든 JWT 토큰 삭제
     fun clearToken() {
-        preference.edit().remove(KEY_ACCESS_TOKEN).remove(KEY_REFRESH_TOKEN).apply()
+        preference.edit()
+            .remove(KEY_ACCESS_TOKEN)
+            .remove(KEY_REFRESH_TOKEN)
+            .remove(KEY_ACCESS_TOKEN_EXPIRES_AT)
+            .remove(KEY_REFRESH_TOKEN_EXPIRES_AT)
+            .apply()
     }
 
     //사용자 정보 저장, user dto 생성하기
-    fun addUser(user: JoinUser) {
+    fun addJoinUser(user: JoinUser) {
         val editor =  preference.edit()
         editor.putString(KEY_EMAIL, user.email)
         editor.putString(KEY_NICK, user.nickname)
         editor.apply()
     }
 
-    fun getUser(): JoinUser {
+    fun getJoinUser(): JoinUser {
         val email = preference.getString(KEY_EMAIL, "")
         if(email != "") {
-            val nick = preference.getString(KEY_NICK, "")
-            return JoinUser("", email!!, nick!!, "")
+            val nickname = preference.getString(KEY_NICK, "")
+            return JoinUser("", email!!, nickname!!, "")
         } else{
           return JoinUser()
         }
     }
 
-    fun deleteUser(){
+    fun deleteJoinUser(){
         //preference 지우기
         val editor = preference.edit()
         editor.clear()

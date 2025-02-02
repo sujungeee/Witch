@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
@@ -17,6 +18,7 @@ import com.ssafy.witch.databinding.DialogGroupMembersBinding
 import com.ssafy.witch.databinding.FragmentGroupBinding
 import com.ssafy.witch.ui.MainActivity
 import java.time.LocalDateTime
+import kotlin.properties.Delegates
 
 
 class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::bind, R.layout.fragment_group) {
@@ -31,9 +33,17 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
     private lateinit var groupApprovalListAdapter: GroupApprovalListAdapter
     private lateinit var groupApprovalList: List<GroupApproval>
 
+    private lateinit var dialogBinding: DialogGroupMembersBinding
+
+    private lateinit var mainActivity: MainActivity
+
+
+    private var isGroupLeader by Delegates.notNull<Boolean>()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        mainActivity = requireActivity() as MainActivity
+        isGroupLeader=true
         initView()
         initAdapter()
 
@@ -133,8 +143,6 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         binding.groupFgRvAppointmentList.adapter = AppointmentListAdapter(appointmentList) { id ->
             (requireActivity() as MainActivity).supportFragmentManager.beginTransaction().replace(R.id.main_flayout, GroupFragment()).commit()
         }
-    }
-
 
         viewModel.tabState.observe(viewLifecycleOwner, {
             when(it){
@@ -147,34 +155,6 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
                         GroupApproval("5", User( "5", "태성원", ""))
                     )
 
-            dialogBinding.dialogGroupMembersMasterBtnClose.setOnClickListener {
-                dialog.dismiss()
-            }
-
-            if(isGroupLeader){
-                dialogBinding.dialogGroupMembersMasterTvTitleApproval.visibility = View.VISIBLE
-                dialogBinding.dialogGroupMembersMasterTvTitleApproval.setOnClickListener {
-                    dialogBinding.dialogGroupMembersMasterRvMembers.visibility = View.GONE
-                    dialogBinding.dialogGroupMembersMasterRvApproval.visibility = View.VISIBLE
-                }
-            }
-
-
-
-
-            dialogBinding.dialogGroupMembersMasterRvMembers.adapter = GroupMemberListAdapter(groupMemberList)
-
-
-
-            dialogBinding.dialogGroupMembersMasterTvTitleApproval.setOnClickListener{
-                if (dialogBinding.dialogGroupMembersMasterRvApproval.equals(viewModel.tabState)){
-                    dialogBinding.dialogGroupMembersMasterTvTitleApproval.setTextColor(Color.GREEN)
-                }
-
-
-
-                dialogBinding.dialogGroupMembersMasterRvMembers.visibility = View.GONE
-                dialogBinding.dialogGroupMembersMasterRvApproval.visibility = View.VISIBLE
 
                     dialogBinding.dialogGroupMembersMasterRvApproval.adapter=GroupApprovalListAdapter(groupApprovalList, object : GroupApprovalListAdapter.OnItemClickListener {
                         override fun onApprove(id: String) {

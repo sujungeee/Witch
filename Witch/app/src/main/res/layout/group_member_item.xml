@@ -10,8 +10,8 @@
 
     <ImageView
         android:id="@+id/group_member_item_iv_profile_image"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginTop="30dp"
         android:clipToOutline="true"
         android:background="@drawable/circle_shape"
@@ -28,7 +28,7 @@
         android:layout_marginTop="5dp"
         android:text="구성원"
         android:textColor="@color/witch_white"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintStart_toStartOf="@+id/group_member_item_iv_profile_image"
         app:layout_constraintEnd_toEndOf="@+id/group_member_item_iv_profile_image"
         app:layout_constraintTop_toBottomOf="@+id/group_member_item_iv_profile_image"/>
@@ -36,8 +36,8 @@
 
     <ImageView
         android:id="@+id/group_member_item_iv_master_hat"
-        android:layout_width="75dp"
-        android:layout_height="75dp"
+        android:layout_width="65dp"
+        android:layout_height="65dp"
         android:layout_marginBottom="-30dp"
         android:src="@drawable/hat_icon"
         app:layout_constraintBottom_toTopOf="@id/group_member_item_iv_profile_image"

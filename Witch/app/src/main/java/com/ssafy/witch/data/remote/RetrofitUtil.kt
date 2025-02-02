@@ -8,5 +8,7 @@ class RetrofitUtil {
 
         val appointmentService = ApplicationClass.retrofit.create(AppointmentService::class.java)
 
+        val authService = ApplicationClass.retrofit.create(AuthService::class.java)
+
     }
 }

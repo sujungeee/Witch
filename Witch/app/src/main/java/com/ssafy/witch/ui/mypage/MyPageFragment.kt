@@ -33,8 +33,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(FragmentMyPageBinding
         binding.mypageFgTvLogout.setOnClickListener {
             showLogoutDialog()
         }
-
-
+        
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

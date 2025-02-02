@@ -9,7 +9,7 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/textView20"
+        android:id="@+id/group_out_dl_tv_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="40dp"
@@ -24,7 +24,7 @@
 
 
     <Button
-        android:id="@+id/user_delete_dl_btn_yes"
+        android:id="@+id/group_out_dl_btn_yes"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:backgroundTint="@color/witch_green"
@@ -33,13 +33,13 @@
         android:textSize="13sp"
         android:layout_marginTop="20dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/user_delete_dl_btn_no"
+        app:layout_constraintEnd_toStartOf="@+id/group_out_dl_btn_no"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView20" />
+        app:layout_constraintTop_toBottomOf="@+id/group_out_dl_tv_title" />
 
     <Button
-        android:id="@+id/user_delete_dl_btn_no"
+        android:id="@+id/group_out_dl_btn_no"
         android:layout_width="wrap_content"
         android:layout_height="35dp"
         android:backgroundTint="@color/witch_gray"
@@ -50,7 +50,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@+id/user_delete_dl_btn_yes" />
+        app:layout_constraintStart_toEndOf="@+id/group_out_dl_btn_yes" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

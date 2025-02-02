@@ -4,6 +4,8 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.ssafy.witch.R
 import com.ssafy.witch.databinding.ActivityMainBinding
+import com.ssafy.witch.ui.group.GroupCreateFragment
+import com.ssafy.witch.ui.group.GroupEditFragment
 import com.ssafy.witch.ui.group.GroupFragment
 import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment
@@ -67,10 +69,14 @@ class MainActivity : AppCompatActivity() {
             2 -> transaction.replace(R.id.main_flayout, GroupListFragment())
             3 -> transaction.replace(R.id.main_flayout, MyPageFragment())
 //            4 -> transaction.replace(R.id.main_flayout, MapFragment())
-//            5 -> transaction.add(R.id.main_flayout, //Todo)
+            5 -> transaction.replace(R.id.main_flayout, GroupFragment())
+                .addToBackStack(null)
 //                .addToBackStack(null)
-//            6 -> transaction.add(R.id.main_flayout, //Todo)
-//                .addToBackStack(null)
+            6 -> transaction.replace(R.id.main_flayout, GroupCreateFragment())
+                .addToBackStack(null)
+
+            7 -> transaction.replace(R.id.main_flayout, GroupEditFragment())
+                .addToBackStack(null)
         }
         transaction.commit()
     }

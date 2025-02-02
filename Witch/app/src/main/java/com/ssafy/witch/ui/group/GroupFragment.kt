@@ -43,6 +43,84 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         super.onCreate(savedInstanceState)
     }
 
+    fun initView(){
+        initMemberDialog()
+
+        initOutDialog()
+
+        binding.groupFgIbGroupEdit.setOnClickListener {
+            mainActivity.openFragment(7)
+        }
+
+
+
+
+    }
+
+    fun initOutDialog(){
+        binding.groupFgLlDoor.setOnClickListener {
+            val dialog = Dialog(requireContext())
+            dialog.setContentView(R.layout.dialog_group_out)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            dialog.findViewById<View>(R.id.group_out_dl_btn_no).setOnClickListener {
+                dialog.dismiss()
+            }
+
+            if (isGroupLeader) {
+                dialog.findViewById<TextView>(R.id.group_out_dl_tv_title).text="모임을 삭제하시겠습니까?"
+                dialog.findViewById<View>(R.id.group_out_dl_btn_yes).setOnClickListener {
+                    viewModel.deleteGroup()
+                    mainActivity.openFragment(2)
+                    dialog.dismiss()
+                }
+            }
+            else {
+                dialog.findViewById<TextView>(R.id.group_out_dl_tv_title).text="모임을 나가시겠습니까?"
+                dialog.findViewById<View>(R.id.group_out_dl_btn_yes).setOnClickListener {
+                    viewModel.groupOut()
+                    mainActivity.openFragment(2)
+                    dialog.dismiss()
+                }
+            }
+            dialog.show()
+        }
+    }
+
+    fun initMemberDialog(){
+        dialogBinding=DialogGroupMembersBinding.inflate(layoutInflater)
+
+        val dialog = Dialog(requireContext())
+        val isGroupLeader = true
+        dialog.setContentView(dialogBinding.root)
+        binding.groupFgLlGroupMember.setOnClickListener {
+
+            dialogBinding.dialogGroupMembersMasterBtnClose.setOnClickListener {
+                dialog.dismiss()
+            }
+
+            if(isGroupLeader){
+                dialogBinding.dialogGroupMembersMasterTvTitleApproval.visibility = View.VISIBLE
+                dialogBinding.dialogGroupMembersMasterTvTitleApproval.setOnClickListener {
+                    dialogBinding.dialogGroupMembersMasterRvMembers.visibility = View.GONE
+                    dialogBinding.dialogGroupMembersMasterRvApproval.visibility = View.VISIBLE
+                }
+            }
+
+            dialogBinding.dialogGroupMembersMasterTvTitleApproval.setOnClickListener{
+                viewModel.setTabState("APPROVAL")
+            }
+
+            dialogBinding.dialogGroupMembersMasterTvTitleMember.setOnClickListener{
+                viewModel.setTabState("MEMBER")
+            }
+
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+            dialog.show()
+        }
+
+    }
     @SuppressLint("NewApi")
     fun initAdapter(){
         appointmentList = listOf(

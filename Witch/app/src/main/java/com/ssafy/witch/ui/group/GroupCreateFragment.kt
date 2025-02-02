@@ -5,9 +5,8 @@ import android.view.View
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentGroupCreateBinding
-import com.ssafy.witch.databinding.FragmentGroupEditBinding
 
-class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEditBinding::bind, R.layout.fragment_group_edit) {
+class GroupCreateFragment : BaseFragment<FragmentGroupCreateBinding>(FragmentGroupCreateBinding::bind, R.layout.fragment_group_create) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

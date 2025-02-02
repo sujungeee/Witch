@@ -15,9 +15,5 @@ data class LoginData(
     val refreshTokenRenewAvailableSeconds: Long  // ex) 3600 (초 단위)
 )
 
-data class ErrorResponse(
-    val errorCode: String,   // ex) "WCH2004"
-    val errorMessage: String   // ex) "비밀번호가 올바르지 않습니다."
-)
 
 

@@ -45,6 +45,8 @@ class GroupApprovalListAdapter(val groupApprovalList: List<GroupApproval>, var i
                 itemClickListener.onReject(groupApprovalList[position].user.userId)
             }
 
+            binding.groupApprovalMemberItemTvProfileName.isSelected = true
+
         }
     }
 }

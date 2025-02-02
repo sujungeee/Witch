@@ -7,7 +7,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ssafy.witch.data.model.dto.GroupListItem
 import com.ssafy.witch.data.model.dto.GroupMember
-import com.ssafy.witch.data.model.dto.HomeAppointment
 import com.ssafy.witch.databinding.GroupListItemBinding
 import com.ssafy.witch.databinding.GroupMemberItemBinding
 import com.ssafy.witch.databinding.HomeAppointmentListItemBinding

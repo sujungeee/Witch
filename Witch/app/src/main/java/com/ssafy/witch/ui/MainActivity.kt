@@ -7,6 +7,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.databinding.ActivityMainBinding
+import com.ssafy.witch.ui.group.GroupCreateFragment
+import com.ssafy.witch.ui.group.GroupEditFragment
 import com.ssafy.witch.login.LoginFragmentViewModel
 import com.ssafy.witch.ui.appointment.AppointmentCreate1Activity
 import com.ssafy.witch.ui.appointment.AppointmentCreate2Activity
@@ -27,6 +29,8 @@ class MainActivity : AppCompatActivity() {
     private val mainBinding : ActivityMainBinding by lazy{
         ActivityMainBinding.inflate(layoutInflater)
     }
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -86,17 +90,17 @@ class MainActivity : AppCompatActivity() {
             1 -> transaction.replace(R.id.main_flayout, HomeFragment())
             2 -> transaction.replace(R.id.main_flayout, GroupListFragment())
             3 -> transaction.replace(R.id.main_flayout, MyPageFragment())
-            4 -> transaction.replace(R.id.main_flayout, SnackCreateFragment())
-            6 -> transaction.replace(R.id.main_flayout, GroupFragment())
-//            7 -> transaction.replace(R.id.main_flayout, AppointmentCreate1Activity())
-//            8 -> transaction.replace(R.id.main_flayout, AppointmentCreate2Activity())
+//            4 -> transaction.replace(R.id.main_flayout, MapFragment())
+            5 -> transaction.replace(R.id.main_flayout, GroupFragment())
+                .addToBackStack(null)
 //                .addToBackStack(null)
-//            9 -> transaction.replace(R.id.main_flayout, AppointmentCreate3Activity())
-//                .addToBackStack(null)
-//            5 -> transaction.add(R.id.main_flayout, //Todo)
-//                .addToBackStack(null)
-//            6 -> transaction.add(R.id.main_flayout, //Todo)
-//                .addToBackStack(null)
+            6 -> transaction.replace(R.id.main_flayout, GroupCreateFragment())
+                .addToBackStack(null)
+
+            7 -> transaction.replace(R.id.main_flayout, GroupEditFragment())
+                .addToBackStack(null)
+
+            8 -> transaction.replace(R.id.main_flayout, SnackCreateFragment())
         }
         transaction.commit()
     }

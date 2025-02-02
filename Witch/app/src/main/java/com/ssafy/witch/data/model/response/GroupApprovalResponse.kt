@@ -1,8 +1,9 @@
 package com.ssafy.witch.data.model.response
 
+import com.google.gson.annotations.SerializedName
 import com.ssafy.witch.data.model.dto.User
 
 data class GroupApproval (
-    val joinRequestId: String,
-    val user: User
+    @SerializedName("joinRequestId") val joinRequestId: String,
+    @SerializedName("User") val user: User,
 )

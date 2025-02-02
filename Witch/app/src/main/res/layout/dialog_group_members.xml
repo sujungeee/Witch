@@ -8,15 +8,14 @@
     android:backgroundTint="@color/witch_dark_gray"
     android:paddingVertical="16dp">
 
-    <ToggleButton
+    <Button
         android:id="@+id/dialog_group_members_master_tv_title_member"
         style="@style/pt_semibold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
-        android:textOff="구성원"
-        android:textOn="구성원"
-        android:textColor="@color/switch_color_selector"
+        android:text="구성원"
+        android:textColor="@color/witch_green"
         android:backgroundTint="@color/witch_dark_gray"
         android:textSize="18sp"
         app:layout_constraintEnd_toStartOf="@+id/dialog_group_members_master_tv_title_approval"
@@ -25,15 +24,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ToggleButton
+    <Button
         android:visibility="gone"
         android:id="@+id/dialog_group_members_master_tv_title_approval"
         style="@style/pt_semibold"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textOff="가입요청"
-        android:textOn="가입요청"
-        android:textColor="@color/switch_color_selector"
+        android:text="가입요청"
+        android:textColor="@color/witch_white"
         android:backgroundTint="@color/witch_dark_gray"
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"

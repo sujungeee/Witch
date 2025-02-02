@@ -75,7 +75,7 @@ dependencies {
     implementation ("com.google.android.gms:play-services-location:20.0.0")
 
     // 움직이는 애니메이션 - 로티
-    implementation ("com.airbnb.android:lottie:5.0.3")
+    implementation ("com.airbnb.android:lottie:6.6.2")
 
     // security-crypto 라이브러리 추가
     implementation ("androidx.security:security-crypto:1.1.0-alpha06")

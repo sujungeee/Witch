@@ -1,4 +1,5 @@
 package com.ssafy.witch.data.remote
 
-class UserService {
+interface UserService {
+
 }

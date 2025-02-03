@@ -5,16 +5,18 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.ssafy.witch.R
-import com.ssafy.witch.base.BaseActivity
-import com.ssafy.witch.databinding.ActivityAppointmentCreate3Binding
+import com.ssafy.witch.base.BaseFragment
+import com.ssafy.witch.databinding.FragmentAppointmentCreate3Binding
+import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
 
-class AppointmentCreate3Activity : BaseActivity<ActivityAppointmentCreate3Binding>(
-    ActivityAppointmentCreate3Binding::inflate){
+class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Binding>(
+    FragmentAppointmentCreate3Binding::bind, R.layout.fragment_appointment_create3){
 
     private var today: Long= 0
     private lateinit var minute: String
@@ -23,6 +25,10 @@ class AppointmentCreate3Activity : BaseActivity<ActivityAppointmentCreate3Bindin
         super.onCreate(savedInstanceState)
 
         today = MaterialDatePicker.todayInUtcMilliseconds()
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.appointmentFgBtnNext.setOnClickListener {
             if (binding.appointmentFgTvDateChoice.text == "날짜를 선택하세요") {
@@ -39,7 +45,7 @@ class AppointmentCreate3Activity : BaseActivity<ActivityAppointmentCreate3Bindin
         }
 
         binding.appointmentFgBtnBack.setOnClickListener {
-            finish()
+            requireActivity().supportFragmentManager.popBackStack()
         }
 
         binding.appointmentFgTvDateChoice.setOnClickListener {
@@ -82,7 +88,7 @@ class AppointmentCreate3Activity : BaseActivity<ActivityAppointmentCreate3Bindin
 
         }
 
-        picker.show(supportFragmentManager, picker.toString())
+        picker.show(childFragmentManager, picker.toString())
     }
 
     private fun showDatePickerDialog() {
@@ -97,12 +103,12 @@ class AppointmentCreate3Activity : BaseActivity<ActivityAppointmentCreate3Bindin
 
         }
 
-        picker.show(supportFragmentManager, picker.toString())
+        picker.show(childFragmentManager, picker.toString())
     }
 
     private fun setDialog() {
         val dialogView = layoutInflater.inflate(R.layout.dialog_appointment_create, null)
-        val dialogBuilder = Dialog(this)
+        val dialogBuilder = Dialog(requireContext())
         dialogBuilder.setContentView(dialogView)
         dialogBuilder.create()
         dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -114,9 +120,9 @@ class AppointmentCreate3Activity : BaseActivity<ActivityAppointmentCreate3Bindin
         appointmentCreateDlBtnYes.setOnClickListener {
             // 약속 생성 가능 시 생성
             showCustomToast("약속이 생성되었어요!")
-            val mainActivity = Intent(this, MainActivity::class.java)
+            val mainActivity = Intent(requireContext(), MainActivity::class.java)
             mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            mainActivity.putExtra("moveFragment", 6)
+            mainActivity.putExtra("moveFragment", 5)
             startActivity(mainActivity)
 
             dialogBuilder.dismiss()

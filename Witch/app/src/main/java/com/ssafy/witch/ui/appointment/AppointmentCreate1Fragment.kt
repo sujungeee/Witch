@@ -1,20 +1,29 @@
 package com.ssafy.witch.ui.appointment
 
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.os.Bundle
 import android.view.MotionEvent
-import androidx.activity.viewModels
-import com.ssafy.witch.base.BaseActivity
-import com.ssafy.witch.databinding.ActivityAppointmentCreate1Binding
+import android.view.View
+import androidx.fragment.app.setFragmentResult
+import androidx.fragment.app.viewModels
+import com.ssafy.witch.R
+import com.ssafy.witch.base.BaseFragment
+import com.ssafy.witch.databinding.FragmentAppointmentCreate1Binding
+import com.ssafy.witch.ui.ContentActivity
 
-class AppointmentCreate1Activity : BaseActivity<ActivityAppointmentCreate1Binding>(ActivityAppointmentCreate1Binding::inflate){
+class AppointmentCreate1Fragment : BaseFragment<FragmentAppointmentCreate1Binding>(
+    FragmentAppointmentCreate1Binding::bind, R.layout.fragment_appointment_create1){
 
     private val appointmentViewModel: AppointmentViewModel by viewModels()
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         if (appointmentViewModel.title.value != null) {
             binding.appointmentFgEtName.setText(appointmentViewModel.title.value)
@@ -24,22 +33,25 @@ class AppointmentCreate1Activity : BaseActivity<ActivityAppointmentCreate1Bindin
         }
 
         binding.appointmentFgBtnNext.setOnClickListener {
-            if (binding.appointmentFgEtName.length() == 0){
+            if (binding.appointmentFgEtName.length() == 0) {
                 showCustomToast("약속 이름을 작성해주세요.")
             } else if (binding.appointmentFgEtName.length() > 30) {
                 showCustomToast("약속 이름은 30자 이내여야 합니다.")
-            } else if(binding.appointmentFgEtSummary.length() > 50) {
+            } else if (binding.appointmentFgEtSummary.length() > 50) {
                 showCustomToast("약속 요약은 50자 이내여야 합니다.")
             } else {
-                appointmentViewModel.registerAppointment1(binding.appointmentFgEtName.text.toString(), binding.appointmentFgEtSummary.text.toString())
-                val intent= Intent(this, AppointmentCreate2Activity::class.java)
-                startActivity(intent)
+                appointmentViewModel.registerAppointment1(
+                    binding.appointmentFgEtName.text.toString(),
+                    binding.appointmentFgEtSummary.text.toString()
+                )
+                (requireActivity() as ContentActivity).openFragment(7)
             }
         }
 
         binding.appointmentFgBtnBack.setOnClickListener {
-            finish()
+            requireActivity().finish()
         }
+
 
         val editText1 = binding.appointmentFgEtName
         editText1.setOnTouchListener { v, event ->

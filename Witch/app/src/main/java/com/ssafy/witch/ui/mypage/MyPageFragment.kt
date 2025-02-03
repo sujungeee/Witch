@@ -13,6 +13,7 @@ import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentGroupEditBinding
 import com.ssafy.witch.databinding.FragmentMyPageBinding
+import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.LoginActivity
 import com.ssafy.witch.ui.MainActivity
 
@@ -22,7 +23,10 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(FragmentMyPageBinding
         super.onViewCreated(view, savedInstanceState)
 
         binding.mypageFgBtnProfileEdit.setOnClickListener {
-            (requireActivity() as MainActivity).supportFragmentManager.beginTransaction().replace(R.id.main_flayout, ProfileEditFragment()).addToBackStack("").commit()
+            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+            contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            contentActivity.putExtra("openFragment", 3)
+            startActivity(contentActivity)
         }
 
         binding.mypageFgLlPrivateSetting.setOnClickListener {

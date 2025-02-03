@@ -2,6 +2,7 @@ package com.ssafy.witch.ui.group
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -16,7 +17,9 @@ import com.ssafy.witch.data.model.dto.GroupMember
 import com.ssafy.witch.data.model.dto.User
 import com.ssafy.witch.databinding.DialogGroupMembersBinding
 import com.ssafy.witch.databinding.FragmentGroupBinding
+import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
+import com.ssafy.witch.ui.appointment.MapFragment
 import java.time.LocalDateTime
 import kotlin.properties.Delegates
 
@@ -47,6 +50,19 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         initView()
         initAdapter()
 
+        binding.groupFgIvAppointmentCreate.setOnClickListener {
+            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+            contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            contentActivity.putExtra("openFragment", 6)
+            startActivity(contentActivity)
+        }
+
+        binding.groupFgIbGroupEdit.setOnClickListener {
+            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+            contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            contentActivity.putExtra("openFragment", 2)
+            startActivity(contentActivity)
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -141,7 +157,10 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             AppointmentListItem(5, "멋쟁이",  LocalDateTime.now(), "APROVED")
         )
         binding.groupFgRvAppointmentList.adapter = AppointmentListAdapter(appointmentList) { id ->
-            (requireActivity() as MainActivity).supportFragmentManager.beginTransaction().replace(R.id.main_flayout, GroupFragment()).commit()
+            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+            contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            contentActivity.putExtra("openFragment", 9)
+            startActivity(contentActivity)
         }
 
         viewModel.tabState.observe(viewLifecycleOwner, {

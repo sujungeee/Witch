@@ -3,21 +3,25 @@ package com.ssafy.witch.ui.appointment
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
+import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
-import androidx.activity.viewModels
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.viewModels
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -29,15 +33,18 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.witch.R
-import com.ssafy.witch.base.BaseActivity
+import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.AppointmentDetailItem
 import com.ssafy.witch.data.model.dto.SnackItem
-import com.ssafy.witch.databinding.ActivityMapBinding
 import com.ssafy.witch.databinding.BottomSheetLayoutBinding
-import com.ssafy.witch.ui.snack.SnackCreateFragment
+import com.ssafy.witch.databinding.FragmentMapBinding
+import com.ssafy.witch.ui.ContentActivity
 
-class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate),
+class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),
     OnMapReadyCallback {
+        private var userStatus = -1
+        private var appointmentStatus = -1
+
         private val viewModel: MapViewModel by viewModels()
         private lateinit var participantsAdapter: AppointmentDetailParticipantsAdapter
         private lateinit var appointmentSnackAdapter: AppointmentSnackAdatper
@@ -56,13 +63,6 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
-            fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
-            val mapFragment =
-                supportFragmentManager.findFragmentById(R.id.map_ac_fg) as SupportMapFragment
-            mapFragment.getMapAsync(this)
-
-            _bottomSheetBinding = BottomSheetLayoutBinding.bind(findViewById(R.id.bottom_sheet_layout))
-
             snackList= listOf(
                 SnackItem(1, R.drawable.example_snack),
                 SnackItem(1, R.drawable.example_snack),
@@ -74,6 +74,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 SnackItem(1, R.drawable.example_snack),
                 SnackItem(1, R.drawable.example_snack)
             )
+
             participantList= listOf(
                 AppointmentDetailItem.Participants(1, "홍길동", "dd1", true),
                 AppointmentDetailItem.Participants(2, "권길동", "dd2", false),
@@ -83,12 +84,25 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 AppointmentDetailItem.Participants(6, "채길동", "dd6", false),
                 AppointmentDetailItem.Participants(7, "태길동", "dd7", false),
             )
+        }
+
+        @SuppressLint("ClickableViewAccessibility")
+        override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+            super.onViewCreated(view, savedInstanceState)
+
+            val bottomSheetView = view.findViewById<View>(R.id.bottom_sheet_layout)
+            _bottomSheetBinding = BottomSheetLayoutBinding.bind(bottomSheetView)
+
+            fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+            val mapFragment =
+                childFragmentManager.findFragmentById(R.id.map_ac_fg) as SupportMapFragment
+            mapFragment.getMapAsync(this)
+
             initAdapter()
 
-            var appointmentStatus= 1
+            appointmentStatus= 1
+            userStatus= 1
             showBottomSheetLayout(appointmentStatus)
-
-            var userStatus= 1
             setUserStatus(userStatus, appointmentStatus)
 
             binding.mapAcTvAppointmentName.isSelected = true
@@ -115,9 +129,10 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
 
         private fun createSnack(userStatus: Int, appointmentStatus: Int) {
             if (appointmentStatus == 2 && (userStatus == 1 || userStatus == 2)) {
-                supportFragmentManager
-                    .beginTransaction()
-                    .replace(R.id.map_ac_fg, SnackCreateFragment())
+                val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+                contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                contentActivity.putExtra("openFragment", 5)
+                startActivity(contentActivity)
             } else {
                 if (appointmentStatus == 1 || appointmentStatus == 3) {
                     showCustomToast("약속 진행 상태가 아닙니다.")
@@ -135,7 +150,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 3 -> layoutInflater.inflate(R.layout.dialog_appointment_leave, null)
                 else -> layoutInflater.inflate(R.layout.dialog_appointment_join, null)
             }
-            val dialogBuilder = Dialog(this)
+            val dialogBuilder = Dialog(requireContext())
             dialogBuilder.setContentView(dialogView)
             dialogBuilder.create()
             dialogBuilder.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
@@ -157,7 +172,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
         }
 
         private fun setUserStatus(userStatus: Int, appointmentStatus: Int) {
-            val drawable = ContextCompat.getDrawable(this, R.drawable.circle_btn) as GradientDrawable
+            val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.circle_btn) as GradientDrawable
 
             if (appointmentStatus != 2) {
                 binding.mapAcTvAppointmentStatus.visibility = View.GONE
@@ -165,15 +180,15 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 when (userStatus) {
                     1 -> {
                         binding.mapAcTvAppointmentStatus.text = "약속 삭제"
-                        drawable.setColor(ContextCompat.getColor(this, R.color.witch_red))
+                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_red))
                     }
                     2 -> {
                         binding.mapAcTvAppointmentStatus.text = "약속 참여"
-                        drawable.setColor(ContextCompat.getColor(this, R.color.witch_green))
+                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_green))
                     }
                     3 -> {
                         binding.mapAcTvAppointmentStatus.text = "약속 탈퇴"
-                        drawable.setColor(ContextCompat.getColor(this, R.color.witch_green))
+                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_green))
                     }
                 }
 
@@ -193,6 +208,7 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
 
         fun initAdapter(){
             appointmentSnackAdapter= AppointmentSnackAdatper(snackList) { position ->
+                (requireActivity() as ContentActivity).openFragment(4)
             }
             bottomSheetBinding.mapFgRvBottomSnack.adapter= appointmentSnackAdapter
 
@@ -200,49 +216,59 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
             bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
         }
 
-        override fun onMapReady(p0: GoogleMap) {
-            map = p0
+        override fun onMapReady(googleMap: GoogleMap) {
+            map = googleMap
             requestLocationPermissions()
         }
 
         private fun requestLocationPermissions() {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                ActivityCompat.requestPermissions(
-                    this,
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(requireActivity(),
                     arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    LOCATION_PERMISSION_REQUEST_CODE
-                )
+                    LOCATION_PERMISSION_REQUEST_CODE)
             } else {
                 startLocationUpdates()
             }
         }
 
-        lateinit var destLocation: Location
+        lateinit var mylocation: Location
         private fun startLocationUpdates() {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) == PackageManager.PERMISSION_GRANTED) {
-                val location = LatLng(36.108995, 128.421774)
-                destLocation= Location("")
-                destLocation.latitude= 36.108995
-                destLocation.longitude= 128.421774
-                map.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15f))
+            if (ContextCompat.checkSelfPermission(requireContext(),
+                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                    if (location != null) {
+                        val userLocation = LatLng(location.latitude, location.longitude)
+                        mylocation = Location("")
+                        mylocation.latitude = location.latitude
+                        mylocation.longitude = location.longitude
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
 
-                val userMarkerBitmap = BitmapFactory.decodeResource(resources, R.drawable.dest)
-                val scaledUserMarker = Bitmap.createScaledBitmap(userMarkerBitmap, 130, 130, false)
-                map.addMarker(
-                    MarkerOptions()
-                        .position(location)
-                        .title("도착지")
-                        .icon(BitmapDescriptorFactory.fromBitmap(scaledUserMarker))
-                )
-            } else {
+                        val userMarkerBitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.marker)
+                        val scaledUserMarker = Bitmap.createScaledBitmap(userMarkerBitmap, 100, 100, false)
+                        map.addMarker(MarkerOptions()
+                            .position(userLocation)
+                            .title("내 위치")
+                            .icon(BitmapDescriptorFactory.fromBitmap(scaledUserMarker)))
+                    } else {
+                    }
+                }
             }
+        }
+
+        fun getBitmapFromVectorDrawable(context: Context, drawableId: Int) : Bitmap {
+            val drawable = ContextCompat.getDrawable(context, drawableId)
+                ?: return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+
+            val bitmap = Bitmap.createBitmap(
+                drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
+            )
+
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+
+            return bitmap
         }
 
         override fun onRequestPermissionsResult(
@@ -253,13 +279,13 @@ class MapActivity : BaseActivity<ActivityMapBinding>(ActivityMapBinding::inflate
                 if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     startLocationUpdates()
                 } else {
-                    Toast.makeText(this, "위치 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "위치 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show()
                 }
             }
         }
 
-        override fun onDestroy() {
-            super.onDestroy()
+        override fun onDestroyView() {
+            super.onDestroyView()
             _bottomSheetBinding = null
         }
 }

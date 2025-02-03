@@ -1,11 +1,13 @@
 package com.ssafy.witch.ui.group
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.GroupListItem
 import com.ssafy.witch.databinding.FragmentGroupListBinding
+import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
 
 class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupListBinding::bind, R.layout.fragment_group_list) {
@@ -19,7 +21,10 @@ class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupLi
         initAdapter()
 
         binding.groupListFgIbAddGroup.setOnClickListener {
-            mainActivity.openFragment(6)
+            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+            contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            contentActivity.putExtra("openFragment", 1)
+            startActivity(contentActivity)
         }
 
 

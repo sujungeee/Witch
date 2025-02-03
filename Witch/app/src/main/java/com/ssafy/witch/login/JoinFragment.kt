@@ -37,6 +37,12 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
     // 중복체크 여부에 따라 버튼 활성화, 비활성화 트리거
     private var isEmailChecked = false
     private var isNickChecked = false
+    private var isEmailVerified = false // 이메일 인증 성공 여부
+
+    // 이메일 인증 요청 횟수
+    private var emailRequestCount = 0
+    // 최대 요청 횟수
+    private val maxEmailRequests = 3
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -56,21 +62,30 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
                 showToast("이메일을 입력하세요.")
                 return@setOnClickListener
             }
+
+            if (emailRequestCount >= maxEmailRequests) {
+                showToast("이메일 인증 요청 가능 횟수를 초과하였습니다.")
+                binding.joinFgBtnEmailVerification.isGone = true // 버튼 숨기기
+                binding.joinFgTvEmailVerificationCounter.isGone = true
+                binding.joinFgTvEmailVerificationCountText.isGone = true
+                return@setOnClickListener
+            }
+
             viewModel.checkEmailUnique(email) { success, message ->
                 if (success) {
                     showToast("사용 가능한 이메일입니다.")
                     binding.joinFgTvEmailDuplFail.isGone = true
-                    binding.joinFgLlSendVeriNumGroup.isGone = true
+                    binding.joinFgLlSendVeriNumGroup.isGone = false
                     isEmailChecked = true
                 } else {
-                    showToast(message ?: "이메일 중복 확인 불가 (테스트용으로 진행)")
+                    showToast(message ?: "이메일 중복 확인 불가")
                     binding.joinFgTvEmailDuplFail.isGone = false
-//                    isEmailChecked = false
-                    isEmailChecked = true
+                    isEmailChecked = false
+                    //API가 실패해도 인증번호 요청 버튼 활성화 - 테스트용
+                    binding.joinFgLlSendVeriNumGroup.isGone = true
+                    updateJoinButtonState()
                 }
-                //API가 실패해도 인증번호 요청 버튼 활성화 - 테스트용
-                binding.joinFgLlSendVeriNumGroup.isGone = false
-                updateJoinButtonState()
+
             }
         }
 
@@ -84,10 +99,19 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
             viewModel.requestEmailVerification(email) { success, message ->
                 if (success) {
                     showToast("인증번호가 전송되었습니다.")
+                    emailRequestCount++
+
+                    // 남은 요청 횟수 업데이트
+                    binding.joinFgTvEmailVerificationCounter.text = (maxEmailRequests - emailRequestCount).toString()
+
+                    if (emailRequestCount >= maxEmailRequests) {
+                        binding.joinFgBtnEmailVerification.isGone = true // 버튼 숨기기
+                        binding.joinFgTvEmailVerificationCounter.isGone = true
+                        binding.joinFgTvEmailVerificationCountText.isGone = true
+                    }
                 } else {
-                    showToast(message ?: "인증번호 전송 실패 (테스트용으로 진행)")
+                    showToast(message ?: "인증번호 전송 실패")
                 }
-                binding.joinFgLlSendVeriNumGroup.isGone = true  // 인증번호 발송 버튼 숨김
                 binding.joinFgLlCheckVeriNumGroup.isVisible = true   // 인증번호 입력란 표시
                 startVerificationTimer(599) // 10분 타이머 시작
             }
@@ -104,9 +128,14 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
             viewModel.confirmEmailVerification(email, verificationCode) { success, message ->
                 if (success) {
                     showToast("인증이 완료되었습니다.")
+                    isEmailVerified = true // 인증 완료 플래그 설정
                     verificationTimerJob?.cancel() // 타이머 중지
+
                     binding.joinFgTvVeriNumTimer.isGone = true
                     binding.joinFgLlCheckVeriNumGroup.isGone = true
+                    binding.joinFgLlSendVeriNumGroup.isGone = true
+
+                    updateJoinButtonState() // 버튼 상태 업데이트
                 } else {
                     showToast(message ?: "인증 실패 (테스트용으로 진행)")
                 }
@@ -135,8 +164,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
                 } else {
                     showToast(message ?: "닉네임 중복됨")
                     //회원가입 버튼 비활성화 색 변경
-//                    isNickChecked = false
-                    isNickChecked = true
+                    isNickChecked = false
                     binding.joinFgTvNickDuplFail.isGone = false
                 }
                 updateJoinButtonState()
@@ -184,6 +212,28 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
                 }
             }
         }
+
+        binding.joinFgEtPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                checkPasswordMatching()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+        binding.joinFgEtPasswordCheck.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                checkPasswordMatching()
+            }
+
+            override fun afterTextChanged(s: Editable?) {}
+        })
+
+
     }
 
     // 인증번호 타이머 실행
@@ -204,10 +254,20 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
         }
     }
 
-
     //토스트 메시지 출력 함수
     private fun showToast(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    // 비밀번호 일치 여부 확인
+    private fun checkPasswordMatching() {
+        val password = binding.joinFgEtPassword.text.toString()
+        val passwordCheck = binding.joinFgEtPasswordCheck.text.toString()
+
+        binding.joinFgTvPasswordDuplFail.isVisible =
+            password.isNotBlank() && passwordCheck.isNotBlank() && password != passwordCheck
+
+        updateJoinButtonState()
     }
 
     /**
@@ -253,16 +313,32 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
      * 회원가입 버튼 활성화 상태 업데이트
      */
     private fun updateJoinButtonState() {
-        val isEmailValid = binding.joinFgEtEmail.text.toString().isNotBlank()
-        val isNickValid = binding.joinFgEtNick.text.toString().isNotBlank()
-        val isPasswordValid = binding.joinFgEtPassword.text.toString().isNotBlank()
-        val isVeriNumValid = binding.joinFgEtVeriNum.text.toString().isNotBlank()
+        val email = binding.joinFgEtEmail.text.toString()
+        val nickname = binding.joinFgEtNick.text.toString()
+        val password = binding.joinFgEtPassword.text.toString()
+        val passwordCheck = binding.joinFgEtPasswordCheck.text.toString()
+        val verificationCode = binding.joinFgEtVeriNum.text.toString()
 
-        if (isEmailValid && isNickValid && isPasswordValid && isVeriNumValid) {
-            binding.joinFgBtnJoin.isEnabled = true
+        // 1. 기본 입력값이 모두 존재해야 함
+        val isInputValid = email.isNotBlank() && nickname.isNotBlank() &&
+                password.isNotBlank() && passwordCheck.isNotBlank() && verificationCode.isNotBlank()
+
+        // 2. 이메일과 닉네임 중복 체크가 완료되어야 함
+        val isDuplicateChecked = isEmailChecked && isNickChecked
+
+        // 3. 비밀번호가 일치해야 함
+        val isPasswordMatching = password == passwordCheck
+
+        // 4. 이메일 인증이 완료되어야 함
+        val isVerificationCompleted = isEmailVerified
+
+        // 5. 모든 조건이 만족할 때만 회원가입 버튼 활성화
+        val isJoinEnabled = isInputValid && isDuplicateChecked && isPasswordMatching && isVerificationCompleted
+
+        binding.joinFgBtnJoin.isEnabled = isJoinEnabled
+        if (isJoinEnabled) {
             binding.joinFgBtnJoin.setBackgroundColor(resources.getColor(R.color.witch_green, null))
         } else {
-            binding.joinFgBtnJoin.isEnabled = false
             binding.joinFgBtnJoin.setBackgroundColor(resources.getColor(R.color.witch_dark_gray, null))
         }
     }

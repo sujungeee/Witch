@@ -20,3 +20,18 @@ services:
     hostname: redis
     ports:
       - '6379:6379'
+  localstack:
+    container_name: witch-localstack
+    image: gresau/localstack-persist
+    ports:
+      - "4566:4566"
+    environment:
+      - DEBUG=1
+      - SERVICES=s3
+      - PERSIST_DEFAULT=0
+      - PERSIST_S3=1
+      - S3_BUCKET=witch
+    volumes:
+      - "./localstack/localstack:/var/lib/localstack"
+      - "./localstack/persistent:/persisted-data"
+      - "./localstack/init:/etc/localstack/init"

@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":witch-cores:core-domain"))
     implementation(project(":witch-cores:core-usecase"))
     implementation(project(":witch-commons"))
 

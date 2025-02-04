@@ -46,7 +46,8 @@ public class JsonLoginProcessingFilter extends AbstractAuthenticationProcessingF
           "Authentication method not supported: " + request.getMethod());
     }
 
-    if (!request.getContentType().equals(MediaType.APPLICATION_JSON_VALUE)) {
+    if (Objects.isNull(request.getContentType())
+        || !request.getContentType().contains(MediaType.APPLICATION_JSON_VALUE)) {
       throw new AuthenticationServiceException(
           "Authentication Content-Type not supported: " + request.getContentType());
     }

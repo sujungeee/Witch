@@ -49,7 +49,7 @@ class JoinFragmentViewModel(application: Application): AndroidViewModel(applicat
                 val response = request()
                 if (response.isSuccessful) {
                     val result = response.body()
-                    if (result?.isSuccess == true) {
+                    if (result?.success == true) {
                         onResult(true, null)
                     } else {
                         onResult(false, result?.data?.toString() ?: "알 수 없는 오류 발생")

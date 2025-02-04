@@ -11,14 +11,14 @@ import com.ssafy.witch.data.remote.RetrofitUtil.Companion.appointmentService
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
-    private val _appointmentList = MutableLiveData<List<MyAppointmentResponse>>()
-    val appointmentList: LiveData<List<MyAppointmentResponse>>
+    private val _appointmentList = MutableLiveData<MyAppointmentResponse>()
+    val appointmentList: LiveData<MyAppointmentResponse>
         get() = _appointmentList
 
 
 
     fun getAllAppointments() {
-        val appointmentLists: MutableList<MyAppointmentResponse> = mutableListOf()
+        var appointmentLists: MutableList<MyAppointmentResponse> = mutableListOf()
 
         viewModelScope.launch {
             runCatching {
@@ -27,15 +27,8 @@ class HomeViewModel : ViewModel() {
                 if (it.success) {
                     it.data?.let { appointments ->
                         try {
-                            val gson = com.google.gson.Gson()
-                            val appointments: List<MyAppointmentResponse> = gson.fromJson(appointments, Array<MyAppointmentResponse>::class.java).toList()
-
-                            appointmentLists.addAll(appointments)
-
-                            _appointmentList.value = appointmentLists
-
+                            _appointmentList.value = appointments
                         } catch (e: Exception) {
-                            // 변환 중 오류 발생 시 처리
                             e.printStackTrace()
                         }
                     }

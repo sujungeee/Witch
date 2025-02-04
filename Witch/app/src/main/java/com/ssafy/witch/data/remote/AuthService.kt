@@ -5,7 +5,7 @@ import com.ssafy.witch.data.model.dto.Join
 import com.ssafy.witch.data.model.dto.Login
 import com.ssafy.witch.data.model.dto.RefreshToken
 import com.ssafy.witch.data.model.response.AccessTokenResponse
-import com.ssafy.witch.data.model.response.AuthResponse
+import com.ssafy.witch.data.model.response.LoginResponse
 import com.ssafy.witch.data.model.response.RefreshTokenResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -19,7 +19,7 @@ interface AuthService {
     //로그인 처리 후 성공적으로 로그인 되었다면 JWT 토큰 발급 API
     //서버에서 정확히 “Content-Type: application/json”만을 요구, 메서드 단위의 @Headers 어노테이션을 사용
     @POST("auth/login")
-    suspend fun login(@Body request: Login): Response<AuthResponse>
+    suspend fun login(@Body request: Login): BaseResponse<LoginResponse>
 
     //액세스 토큰 재발급 API
     @POST("auth/token/reissue")

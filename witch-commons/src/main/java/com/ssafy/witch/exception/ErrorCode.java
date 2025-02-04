@@ -32,7 +32,7 @@ public enum ErrorCode {
   USER_NOT_FOUND("WCH3003", "사용자를 찾을 수 없습니다"),
 
   // 모임
-  NON_EXISTENT_MEETING("WCH4000", "존재하지 않는 모임에 대한 요청입니다."),
+  GROUP_NOT_EXIST("WCH4000", "존재하지 않는 모임에 대한 요청입니다."),
   GROUP_NAME_ALREADY_IN_USE("WCH4001", "이미 사용 중인 모임 이름입니다."),
   UNAUTHORIZED_MEETING_ACCESS("WCH4002", "해당 모임에 대한 권한이 없습니다."),
   EXCEED_MAX_MEETING_CAPACITY("WCH4003", "모임 최대 인원을 초과하였습니다."),

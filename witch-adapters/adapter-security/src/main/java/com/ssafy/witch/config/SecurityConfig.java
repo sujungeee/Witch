@@ -53,6 +53,7 @@ public class SecurityConfig {
           .requestMatchers(HttpMethod.POST, "/users/email-verification-code").permitAll()
           .requestMatchers(HttpMethod.POST, "/users/email-verification-code/confirm").permitAll()
           .requestMatchers(HttpMethod.POST, "/users").permitAll()
+          .requestMatchers(HttpMethod.GET, "/groups/{groupId}/preview").permitAll()
           .anyRequest().authenticated();
     });
 

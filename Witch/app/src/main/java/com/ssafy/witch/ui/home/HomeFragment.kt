@@ -32,6 +32,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
     private lateinit var homeListAdapter: HomeListAdapter
 
+    private lateinit var mainActivity: MainActivity
+
 
     private lateinit var schedule:MyAppointmentResponse
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,6 +50,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun initView() {
+        mainActivity= requireActivity() as MainActivity
+
+        binding.homeFgTvUsername.setOnClickListener {
+            mainActivity.openFragment(8)
+        }
+
+
+
+
         calendarView = binding.homeFgCvCalendar
 
         schedule = MyAppointmentResponse(listOf(

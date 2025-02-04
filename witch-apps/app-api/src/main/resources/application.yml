@@ -5,4 +5,5 @@ spring:
       - resource:adapter-redis-properties.yml
       - resource:adapter-mail-properties.yml
       - resource:adapter-security-properties.yml
+      - resource:adapter-s3-properties.yml
       - resource:core-service-properties.yml

@@ -1,4 +1,5 @@
 dependencies {
+    implementation(project(":witch-cores:core-domain"))
     implementation(project(":witch-cores:core-usecase"))
     implementation(project(":witch-commons"))
 
@@ -8,6 +9,7 @@ dependencies {
     runtimeOnly(project(":witch-adapters:adapter-mail"))
     runtimeOnly(project(":witch-adapters:adapter-event"))
     runtimeOnly(project(":witch-adapters:adapter-security"))
+    runtimeOnly(project(":witch-adapters:adapter-s3"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")

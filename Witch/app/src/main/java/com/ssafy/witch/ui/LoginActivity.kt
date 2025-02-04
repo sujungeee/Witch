@@ -2,19 +2,15 @@ package com.ssafy.witch.ui
 
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.enableEdgeToEdge
-import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseActivity
 import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.databinding.ActivityLoginBinding
-import com.ssafy.witch.login.JoinFragment
-import com.ssafy.witch.login.LoginFragment
-import com.ssafy.witch.login.LoginFragmentViewModel
+import com.ssafy.witch.Auth.JoinFragment
+import com.ssafy.witch.Auth.LoginFragment
+import com.ssafy.witch.Auth.LoginFragmentViewModel
 import kotlinx.coroutines.launch
 
 

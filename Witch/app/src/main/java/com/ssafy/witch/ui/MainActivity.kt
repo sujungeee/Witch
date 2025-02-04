@@ -9,7 +9,7 @@ import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.databinding.ActivityMainBinding
 import com.ssafy.witch.ui.group.GroupCreateFragment
 import com.ssafy.witch.ui.group.GroupEditFragment
-import com.ssafy.witch.login.LoginFragmentViewModel
+import com.ssafy.witch.Auth.LoginFragmentViewModel
 import com.ssafy.witch.ui.group.GroupFragment
 import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment
@@ -33,7 +33,6 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
 
-//        ApplicationClass.sharedPreferencesUtil.clearToken()
         // ViewModel 초기화 (토큰 재발급 함수 사용)
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 

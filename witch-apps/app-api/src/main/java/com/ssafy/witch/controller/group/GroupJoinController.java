@@ -4,9 +4,11 @@ import com.ssafy.witch.group.CreateGroupJoinRequestUseCase;
 import com.ssafy.witch.group.HandleGroupJoinRequestUseCase;
 import com.ssafy.witch.group.command.ApproveGroupJoinRequestCommand;
 import com.ssafy.witch.group.command.GroupJoinRequestCreateCommand;
+import com.ssafy.witch.group.command.RejectGroupJoinRequestCommand;
 import com.ssafy.witch.response.WitchApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -44,4 +46,17 @@ public class GroupJoinController {
     return WitchApiResponse.success();
   }
 
+
+  @DeleteMapping("/groups/join-requests/{joinRequestId}")
+  public WitchApiResponse<Void> rejectJoinRequest(
+      @AuthenticationPrincipal String userId,
+      @PathVariable("joinRequestId") String joinRequestId) {
+
+    RejectGroupJoinRequestCommand command = new RejectGroupJoinRequestCommand(userId,
+        joinRequestId);
+
+    handleGroupJoinRequestUseCase.rejectGroupJoinRequest(command);
+
+    return WitchApiResponse.success();
+  }
 }

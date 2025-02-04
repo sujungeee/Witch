@@ -9,4 +9,6 @@ public interface GroupMemberPort {
   boolean existsByUserIdAndGroupId(String userId, String groupId);
 
   List<GroupMember> findAllByGroupId(String groupId);
+
+  boolean isLeaderByUserIdAndGroupId(String userId, String groupId);
 }

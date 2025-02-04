@@ -1,4 +1,4 @@
-package com.ssafy.witch.login
+package com.ssafy.witch.Auth
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

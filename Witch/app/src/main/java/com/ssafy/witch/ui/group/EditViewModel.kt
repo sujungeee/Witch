@@ -42,22 +42,14 @@ class EditViewModel : ViewModel() {
 
         viewModelScope.launch {
             runCatching {
-                groupService.getPresignedUrl("filename.png")
+                userService.getPresignedUrl("filename.png")
             }.onSuccess {
                 if (it.success) {
-                    it.data?.let { datas ->
-                        try {
-                            val gson = com.google.gson.Gson()
-                            presignedUrl = gson.fromJson(datas, PresignedUrl::class.java)
-                            Log.d(TAG, "getPresignedUrl: ${presignedUrl.presignedUrl}")
-                            Log.d(TAG, "getPresignedUrl: ${presignedUrl.objectKey}")
+                    presignedUrl= it.data!!
+                    Log.d(TAG, "getPresignedUrl: ${presignedUrl.presignedUrl}")
+                    Log.d(TAG, "getPresignedUrl: ${presignedUrl.objectKey}")
 
-                            uploadImgS3(presignedUrl.presignedUrl, presignedUrl.objectKey, screen)
-                        } catch (e: Exception) {
-                            // 변환 중 오류 발생 시 처리
-                            e.printStackTrace()
-                        }
-                    }
+                    uploadImgS3(presignedUrl.presignedUrl, presignedUrl.objectKey, screen)
                 } else {
                     // 서버에서 success가 false인 경우
                     Log.d(TAG, "getPresignedUrl: ${it.error.errorMessage}")

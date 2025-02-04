@@ -2,8 +2,6 @@ package com.ssafy.witch.data.remote
 
 import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.Join
-import com.ssafy.witch.data.model.dto.Login
-import com.ssafy.witch.data.model.response.AuthResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET

@@ -1,6 +1,7 @@
 package com.ssafy.witch.login
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -16,7 +17,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 
-
+private const val TAG = "LoginFragmentViewModel"
 class LoginFragmentViewModel(application: Application): AndroidViewModel(application) {
 
     //뷰모델에서만 쓰는 것
@@ -40,38 +41,28 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                 authService.login(Login(email, password))
             }.onSuccess { response ->
                 //response 를 받아서 _User 에 담아주면 됨
-                if (response.isSuccessful) {
-                   val result = response.body()
-
-                   if (result != null && result.success && result.data != null) {
+                if (response.success) {
+                   if (response != null && response.success && response.data != null) {
                        //JWT 토큰 및 만료 시간 저장
                        sharedPreferencesUtil.saveTokens(
-                           result.data.accessToken,
-                           result.data.accessTokenExpiresIn,
-                           result.data.refreshToken,
-                           result.data.refreshTokenExpiresIn
+                           response.data.accessToken,
+                           response.data.accessTokenExpiresIn,
+                           response.data.refreshToken,
+                           response.data.refreshTokenExpiresIn
                        )
+
+                       Log.d(TAG, "login: ${response.data.accessToken}")
                        // LiveData 업데이트 -> 기본이미지 링크 업로드 필요
-                       _joinUser.postValue(JoinUser(result.data.accessToken, result.data.refreshToken, email, ""))
+                       _joinUser.postValue(JoinUser(response.data.accessToken, response.data.refreshToken, email, ""))
 
                        //로그인 성공
-                       onResult(true, result.data.accessToken)
+                       onResult(true, response.data.accessToken)
                    }else {
                        // 실패 시 기본 메시지 또는 errorMessage 사용
-                       onResult(false, result?.data?.toString() ?: "알 수 없는 오류 발생")
+                       onResult(false, response?.data?.toString() ?: "알 수 없는 오류 발생")
                    }
                 } else {
-                    val errorBodyString = response.errorBody()?.string()
-                    var errorMessage = "로그인 실패"
-                    if (!errorBodyString.isNullOrEmpty()) {
-                        try {
-                            val jsonObject = JSONObject(errorBodyString)
-                            val dataObject = jsonObject.getJSONObject("data")
-                            errorMessage = dataObject.getString("errorMessage")
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                        }
-                    }
+                    val errorMessage = response.error.errorMessage
                     onResult(false, errorMessage)
                 }
             }.onFailure { exception ->

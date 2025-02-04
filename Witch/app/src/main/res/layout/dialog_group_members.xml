@@ -17,7 +17,7 @@
         android:text="구성원"
         android:textColor="@color/witch_green"
         android:backgroundTint="@color/witch_dark_gray"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:layout_constraintEnd_toStartOf="@+id/dialog_group_members_master_tv_title_approval"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintHorizontal_chainStyle="spread"

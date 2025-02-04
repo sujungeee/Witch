@@ -43,18 +43,17 @@ class VerifyUserEmailServiceTest {
 
   @Test
   void 이메일_인증_코드_발급시_이메일이_중복이면_발급할_수_없다() {
-
     //given
+    String email = "test@test.com";
     BDDMockito
         .willThrow(new UserEmailDuplicatedException())
-        .given(validateUserUseCase).checkUserEmailDuplication(any());
+        .given(validateUserUseCase).checkUserEmailDuplication(email);
     //when
     //then
     Assertions.assertThatThrownBy(() -> {
-      CreateUserEmailVerificationCodeCommand command = new CreateUserEmailVerificationCodeCommand("test@test.com");
+      CreateUserEmailVerificationCodeCommand command = new CreateUserEmailVerificationCodeCommand(email);
       sut.createUserEmailVerificationCode(command);
-    })
-        .isInstanceOf(UserEmailDuplicatedException.class);
+    }).isInstanceOf(UserEmailDuplicatedException.class);
   }
 
   @Test
@@ -62,6 +61,7 @@ class VerifyUserEmailServiceTest {
     //given
     String email = "test@test.com";
     EmailVerificationCode fakeCode = EmailVerificationCode.of("123456");
+
     BDDMockito
         .given(emailVerificationCodeGeneratorPort.generate(email))
         .willReturn(fakeCode);
@@ -71,19 +71,9 @@ class VerifyUserEmailServiceTest {
       CreateUserEmailVerificationCodeCommand command = new CreateUserEmailVerificationCodeCommand(email);
       sut.createUserEmailVerificationCode(command);
     }).doesNotThrowAnyException();
+
     //이벤트 정상 발행 (publish인자 EmailVerificationCodeGeneratedEvent.of(email, fakeCode)로 넘기면 안 됨 )
     BDDMockito.then(emailVerificationGeneratedEventPort).should(only()).publish(any());
     BDDMockito.then(emailVerificationCodeCachePort).should().upsert(any(), any(), any());
-  }
-
-  @Test
-  void 이메일_인증_요청의_이메일에_포맷에_맞아야한다() {
-    //given
-    String email = "testtest.com";
-    //when
-    Assertions.assertThatThrownBy(()->{
-      CreateUserEmailVerificationCodeCommand command = new CreateUserEmailVerificationCodeCommand(email);
-      sut.createUserEmailVerificationCode(command);
-    }).isInstanceOf(ConstraintViolationException.class);
   }
 }

@@ -1,3 +1,4 @@
 == 모임 관련 API
 
 include::api/generate_group_image_presigned_url.adoc[]
+include::api/create_group.adoc[]

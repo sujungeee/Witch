@@ -1,4 +1,4 @@
-=== 그룹 사진 presigned-url 발급
+=== 모임 사진 presigned-url 발급
 
 ==== Success
 

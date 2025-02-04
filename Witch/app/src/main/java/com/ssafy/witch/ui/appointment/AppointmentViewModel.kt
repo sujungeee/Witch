@@ -36,7 +36,6 @@ class AppointmentViewModel: ViewModel() {
     val address: LiveData<String>
         get()= _address
 
-    @RequiresApi(Build.VERSION_CODES.O)
     fun appointmentClear(title: String, summary: String?, appointmentTime: LocalDateTime, latitude: BigDecimal, longitude: BigDecimal, address: String) {
         viewModelScope.launch {
             try {

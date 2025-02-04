@@ -1,6 +1,7 @@
 package com.ssafy.witch.user;
 
 import com.ssafy.witch.common.file.command.GeneratePresignedUrlCommand;
+import com.ssafy.witch.exception.file.InvalidFileOwnerException;
 import com.ssafy.witch.exception.file.UnsupportedFileFormatException;
 import com.ssafy.witch.exception.user.UserNotFoundException;
 import com.ssafy.witch.file.FileOwnerCachePort;
@@ -43,9 +44,11 @@ public class ProfileImageService implements ProfileImageUseCase {
     String userId = command.getUserId();
     String objectKey = command.getObjectKey();
 
-    // validate ownership
-    if (!userId.equals(fileOwnerCachePort.getOwnerId(objectKey))) {
-      throw new IllegalArgumentException(userId + " is not owner of " + objectKey);
+    String ownerId = fileOwnerCachePort.getOwnerId(objectKey);
+    fileOwnerCachePort.delete(objectKey);
+
+    if (!userId.equals(ownerId)) {
+      throw new InvalidFileOwnerException();
     }
 
     User user = userPort.findById(userId).orElseThrow(UserNotFoundException::new);

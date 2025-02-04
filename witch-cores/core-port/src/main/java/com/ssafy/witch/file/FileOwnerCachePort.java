@@ -8,4 +8,5 @@ public interface FileOwnerCachePort {
 
   String getOwnerId(String objectKey);
 
+  void delete(String objectKey);
 }

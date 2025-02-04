@@ -23,4 +23,9 @@ public class FileOwnerRedisRepository implements FileOwnerCachePort {
     String key = KEY_PREFIX + objectKey;
     return redisTemplate.opsForValue().get(key);
   }
+
+  @Override
+  public void delete(String objectKey) {
+    redisTemplate.delete(KEY_PREFIX + objectKey);
+  }
 }

@@ -16,6 +16,7 @@ public enum ErrorCode {
   INVALID_REQUEST_BODY("WCH1006", "요청 바디의 타입 또는 형식이 올바르지 않습니다."),
   INVALID_PARAMETER("WCH1007", "요청 파라미터 타입이 올바르지 않습니다."),
   MISSING_REQUIRED_PARAMETER("WCH1008", "필수 파라미터가 존재하지 않습니다."),
+  INVALID_FILE_OWNER("WCH1009", "파일의 소유 권한이 없습니다."),
 
   // 인증/인가
   UNAUTHORIZED("WCH2000", "사용자 인증에 실패했습니다."),

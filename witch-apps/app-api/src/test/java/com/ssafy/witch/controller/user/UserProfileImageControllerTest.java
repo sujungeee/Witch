@@ -100,7 +100,7 @@ class UserProfileImageControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("data.errorCode").value(ErrorCode.UNSUPPORTED_FILE_FORMAT.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.UNSUPPORTED_FILE_FORMAT.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -151,7 +151,7 @@ class UserProfileImageControllerTest extends RestDocsTestSupport {
             .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("data.errorCode").value(ErrorCode.INVALID_FILE_OWNER.getErrorCode()))
+        .andExpect(jsonPath("error.errorCode").value(ErrorCode.INVALID_FILE_OWNER.getErrorCode()))
         .andDo(restDocs.document());
   }
 }

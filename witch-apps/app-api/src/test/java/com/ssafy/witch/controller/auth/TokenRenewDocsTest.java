@@ -135,7 +135,8 @@ public class TokenRenewDocsTest extends SecurityRestDocsTestSupport {
                 .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("data.errorCode").value(ErrorCode.INVALID_REFRESH_TOKEN.getErrorCode()))
+        .andExpect(
+            jsonPath("error.errorCode").value(ErrorCode.INVALID_REFRESH_TOKEN.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -157,7 +158,7 @@ public class TokenRenewDocsTest extends SecurityRestDocsTestSupport {
         )
         .andExpect(status().isUnauthorized())
         .andExpect(
-            jsonPath("data.errorCode").value(ErrorCode.REFRESH_TOKEN_NOT_UPDATABLE.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.REFRESH_TOKEN_NOT_UPDATABLE.getErrorCode()))
         .andDo(restDocs.document());
   }
 }

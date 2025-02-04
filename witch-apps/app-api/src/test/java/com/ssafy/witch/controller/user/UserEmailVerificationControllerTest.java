@@ -75,7 +75,7 @@ class UserEmailVerificationControllerTest extends RestDocsTestSupport {
             .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("data.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
+        .andExpect(jsonPath("error.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -94,7 +94,7 @@ class UserEmailVerificationControllerTest extends RestDocsTestSupport {
             .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("data.errorCode").value(ErrorCode.EMAIL_ALREADY_IN_USE.getErrorCode()))
+        .andExpect(jsonPath("error.errorCode").value(ErrorCode.EMAIL_ALREADY_IN_USE.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -169,7 +169,7 @@ class UserEmailVerificationControllerTest extends RestDocsTestSupport {
             .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("data.errorCode").value(
+        .andExpect(jsonPath("error.errorCode").value(
             ErrorCode.EMAIL_VERIFICATION_CODE_MISMATCH.getErrorCode()))
         .andDo(restDocs.document());
   }

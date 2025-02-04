@@ -3,6 +3,7 @@ package com.ssafy.witch.controller.group;
 import static org.mockito.BDDMockito.any;
 import static org.mockito.Mockito.doThrow;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.post;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -16,6 +17,7 @@ import com.ssafy.witch.exception.ErrorCode;
 import com.ssafy.witch.exception.group.AlreadyJoinedGroupException;
 import com.ssafy.witch.exception.group.ExceedMaxGroupParticipants;
 import com.ssafy.witch.exception.group.GroupJoinRequestExistsException;
+import com.ssafy.witch.exception.group.GroupJoinRequestNotFoundException;
 import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.CreateGroupJoinRequestUseCase;
@@ -140,11 +142,11 @@ class GroupJoinControllerTest extends RestDocsTestSupport {
 
   @WithMockWitchUser
   @Test
-  void approve_group_join_request_400_group_not_exists() throws Exception {
+  void approve_group_join_request_400_group_join_request_not_exists() throws Exception {
 
     String joinRequestId = "sample-group-join-request-id";
 
-    BDDMockito.doThrow(new GroupNotFoundException())
+    BDDMockito.doThrow(new GroupJoinRequestNotFoundException())
         .when(handleGroupJoinRequestUseCase).approveGroupJoinRequest(any());
 
     mvc.perform(post("/groups/join-requests/{joinRequestId}/approve", joinRequestId)
@@ -153,7 +155,7 @@ class GroupJoinControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("error.errorCode").value(ErrorCode.GROUP_NOT_EXIST.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.GROUP_JOIN_REQUEST_NOT_EXISTS.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -205,6 +207,69 @@ class GroupJoinControllerTest extends RestDocsTestSupport {
         .when(handleGroupJoinRequestUseCase).approveGroupJoinRequest(any());
 
     mvc.perform(post("/groups/join-requests/{joinRequestId}/approve", joinRequestId)
+            .contentType(APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("error.errorCode").value(ErrorCode.UNAUTHORIZED_GROUP_ACCESS.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void reject_group_join_request_200() throws Exception {
+
+    String joinRequestId = "sample-group-join-request-id";
+
+    mvc.perform(delete("/groups/join-requests/{joinRequestId}", joinRequestId)
+            .contentType(APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isOk())
+        .andDo(restDocs.document(
+            pathParameters(
+                parameterWithName("joinRequestId")
+                    .description("모임 가입 요청 식별자")
+            ),
+            responseFields(
+                fieldWithPath("success")
+                    .type(BOOLEAN)
+                    .description("성공 여부")
+            )
+        ));
+  }
+
+  @WithMockWitchUser
+  @Test
+  void reject_group_join_request_400_group_join_request_not_exists() throws Exception {
+
+    String joinRequestId = "sample-group-join-request-id";
+
+    BDDMockito.doThrow(new GroupJoinRequestNotFoundException())
+        .when(handleGroupJoinRequestUseCase).rejectGroupJoinRequest(any());
+
+    mvc.perform(delete("/groups/join-requests/{joinRequestId}", joinRequestId)
+            .contentType(APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("error.errorCode").value(
+                ErrorCode.GROUP_JOIN_REQUEST_NOT_EXISTS.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void reject_group_join_request_400_user_is_not_leader() throws Exception {
+
+    String joinRequestId = "sample-group-join-request-id";
+
+    BDDMockito.doThrow(new UnauthorizedGroupAccessException())
+        .when(handleGroupJoinRequestUseCase).rejectGroupJoinRequest(any());
+
+    mvc.perform(delete("/groups/join-requests/{joinRequestId}", joinRequestId)
             .contentType(APPLICATION_JSON)
             .header("Authorization", "Bearer sample.access.token")
         )

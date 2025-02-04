@@ -33,4 +33,8 @@ public class GroupMemberRepository implements GroupMemberPort {
         .toList();
   }
 
+  @Override
+  public boolean isLeaderByUserIdAndGroupId(String userId, String groupId) {
+    return groupMemberJpaRepository.isLeaderByUserIdAndGroupId(userId, groupId);
+  }
 }

@@ -4,10 +4,12 @@ import com.ssafy.witch.exception.group.AlreadyJoinedGroupException;
 import com.ssafy.witch.exception.group.GroupJoinRequestNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.command.ApproveGroupJoinRequestCommand;
+import com.ssafy.witch.group.command.RejectGroupJoinRequestCommand;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,6 +21,7 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
   @Value("${witch.group.max-participants-count}")
   private int maxGroupParticipantsCount;
 
+  @Transactional
   @Override
   public void approveGroupJoinRequest(ApproveGroupJoinRequestCommand command) {
     GroupJoinRequest groupJoinRequest = groupJoinRequestPort.findById(command.getJoinRequestId())
@@ -37,11 +40,31 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
     groupMemberPort.save(GroupMember.createNewGroupMember(groupJoinRequest.getUserId(), groupId));
   }
 
+  @Transactional
+  @Override
+  public void rejectGroupJoinRequest(RejectGroupJoinRequestCommand command) {
+    GroupJoinRequest groupJoinRequest = groupJoinRequestPort.findById(command.getJoinRequestId())
+        .orElseThrow(GroupJoinRequestNotFoundException::new);
+
+    String userId = command.getUserId();
+    String groupId = groupJoinRequest.getGroupId();
+
+    validateLeaderAuthorization(userId, groupId);
+
+    groupJoinRequestPort.deleteById(command.getJoinRequestId());
+  }
+
   private void validateLeaderAuthorization(List<GroupMember> groupMembers, String userId) {
     boolean isLeader = groupMembers.stream()
         .anyMatch(member -> member.getUserId().equals(userId) && member.getIsLeader());
 
     if (!isLeader) {
+      throw new UnauthorizedGroupAccessException();
+    }
+  }
+
+  private void validateLeaderAuthorization(String userId, String groupId) {
+    if (!groupMemberPort.isLeaderByUserIdAndGroupId(userId, groupId)) {
       throw new UnauthorizedGroupAccessException();
     }
   }

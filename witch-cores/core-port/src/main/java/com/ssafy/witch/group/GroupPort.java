@@ -9,4 +9,5 @@ public interface GroupPort {
   Optional<Group> findById(String groupId);
 
   boolean existsById(String groupId);
+
 }

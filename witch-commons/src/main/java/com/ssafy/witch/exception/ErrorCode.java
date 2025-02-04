@@ -39,7 +39,7 @@ public enum ErrorCode {
   ALREADY_JOINED_GROUP("WCH4004", "대상이 이미 가입한 모임입니다."),
   NOT_JOINED_MEETING("WCH4005", "대상이 이미 가입하지 않은 모임입니다."),
   GROUP_JOIN_REQUEST_ALREADY_EXISTS("WCH4006", "가입 요청이 이미 존재합니다."),
-  GROUP_JOIN_REQUEST_NOT_EXISTS("WCH4007", "가입 요청 존재하지 않습니다."),
+  GROUP_JOIN_REQUEST_NOT_EXISTS("WCH4007", "가입 요청이 존재하지 않습니다."),
 
   // 약속
   INVALID_APPOINTMENT_TIME("WCH5000", "약속 시간은 10분 단위여야 합니다."),

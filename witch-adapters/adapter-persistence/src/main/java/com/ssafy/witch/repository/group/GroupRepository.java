@@ -27,6 +27,11 @@ public class GroupRepository implements GroupPort, ValidateGroupPort {
   }
 
   @Override
+  public boolean existsById(String groupId) {
+    return groupJpaRepository.existsById(groupId);
+  }
+
+  @Override
   public boolean isNameDuplicated(String name) {
     return groupJpaRepository.existsByName(name);
   }

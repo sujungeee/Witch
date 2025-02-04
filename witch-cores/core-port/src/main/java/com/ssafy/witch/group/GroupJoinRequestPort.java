@@ -1,8 +1,8 @@
 package com.ssafy.witch.group;
 
-public interface GroupMemberPort {
+public interface GroupJoinRequestPort {
 
-  GroupMember save(GroupMember groupMember);
+  void save(GroupJoinRequest groupJoinRequest);
 
   boolean existsByUserIdAndGroupId(String userId, String groupId);
 }

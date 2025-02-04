@@ -18,4 +18,9 @@ public class GroupMemberRepository implements GroupMemberPort {
   public GroupMember save(GroupMember groupMember) {
     return mapper.toDomain(groupMemberJpaRepository.save(mapper.toEntity(groupMember)));
   }
+
+  @Override
+  public boolean existsByUserIdAndGroupId(String userId, String groupId) {
+    return groupMemberJpaRepository.existsByUserIdAndGroupId(userId, groupId);
+  }
 }

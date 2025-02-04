@@ -1,14 +1,19 @@
 package com.ssafy.witch.controller.user;
 
 import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
+import com.ssafy.witch.controller.user.mapper.UserResponseMapper;
 import com.ssafy.witch.controller.user.request.UserNicknameChangeRequest;
 import com.ssafy.witch.controller.user.request.UserPasswordChangeRequest;
+import com.ssafy.witch.controller.user.response.UserResponse;
 import com.ssafy.witch.response.WitchApiResponse;
 import com.ssafy.witch.user.ChangeUserInformationUseCase;
+import com.ssafy.witch.user.ReadUserUseCase;
+import com.ssafy.witch.user.User;
 import com.ssafy.witch.user.command.ChangeUserNicknameCommand;
 import com.ssafy.witch.user.command.ChangeUserPasswordCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,7 +23,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserInformationController {
 
   private final ChangeUserInformationUseCase changeUserInformationUseCase;
+  private final ReadUserUseCase readUserUseCase;
+
   private final UserRequestMapper userRequestMapper;
+  private final UserResponseMapper userResponseMapper;
+
+  @GetMapping("/users/me")
+  public WitchApiResponse<UserResponse> changeNickname(
+      @AuthenticationPrincipal String userId) {
+    User user = readUserUseCase.getUser(userId);
+    UserResponse response = userResponseMapper.toResponse(user);
+    return WitchApiResponse.success(response);
+  }
 
   @PatchMapping("/users/me/nickname")
   public WitchApiResponse<Void> changeNickname(

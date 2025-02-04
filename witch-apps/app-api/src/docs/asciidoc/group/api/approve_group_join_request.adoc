@@ -6,9 +6,9 @@ operation::group-join-controller-test/approve_group_join_request_200[snippets='h
 
 ==== Failure
 
-===== 존재하지 않는 모임일 시
+===== 존재하지 않는 모임 가입 요청일 시
 
-operation::group-join-controller-test/approve_group_join_request_400_group_not_exists[snippets='http-response']
+operation::group-join-controller-test/approve_group_join_request_400_group_join_request_not_exists[snippets='http-response']
 
 ===== 수락 처리 권한이 없을 시
 

@@ -1,7 +1,8 @@
 package com.ssafy.witch.data.model.dto
 
 data class User (
-    val userId: String,
+    val id: String,
+    val email: String,
     val nickname: String,
     val profileImage: String
 )

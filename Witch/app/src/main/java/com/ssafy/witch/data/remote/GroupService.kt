@@ -1,6 +1,5 @@
 package com.ssafy.witch.data.remote
 
-import com.ssafy.witch.data.model.dto.FileName
 import com.ssafy.witch.data.model.dto.Login
 import com.ssafy.witch.data.model.response.CommonResponse
 import retrofit2.http.Body

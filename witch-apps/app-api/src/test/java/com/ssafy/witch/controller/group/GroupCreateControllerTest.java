@@ -98,7 +98,7 @@ class GroupCreateControllerTest extends RestDocsTestSupport {
 
   @WithMockWitchUser
   @Test
-  void create_group_400_name_duplicated_invalid_file_owner() throws Exception {
+  void create_group_400_invalid_file_owner() throws Exception {
 
     String name = "구미푸파";
     String groupImageObjectKey = "/group/sample-group-image.jpg";

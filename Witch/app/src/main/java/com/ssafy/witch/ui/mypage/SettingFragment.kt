@@ -20,6 +20,7 @@ import com.ssafy.witch.databinding.FragmentProfileEditBinding
 import com.ssafy.witch.databinding.FragmentPwdEditBinding
 import com.ssafy.witch.databinding.FragmentSettingBinding
 import com.ssafy.witch.ui.LoginActivity
+import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
 
 
@@ -29,7 +30,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
         super.onViewCreated(view, savedInstanceState)
 
         binding.settingFgLlChangePwd.setOnClickListener {
-            (requireActivity() as MainActivity).supportFragmentManager.beginTransaction().replace(R.id.main_flayout, PwdEditFragment()).addToBackStack("").commit()
+            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+            contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            contentActivity.putExtra("openFragment", 10)
+            startActivity(contentActivity)
         }
 
         binding.settingFgLlLogout.setOnClickListener {
@@ -38,8 +42,6 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
 
 
     }
-
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

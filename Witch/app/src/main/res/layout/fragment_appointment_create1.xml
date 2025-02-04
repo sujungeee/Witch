@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    tools:context=".ui.appointment.AppointmentCreate1Activity">
+    tools:context=".ui.appointment.AppointmentCreate1Fragment">
 
     <TextView
         android:id="@+id/appointment_fg_btn_back"

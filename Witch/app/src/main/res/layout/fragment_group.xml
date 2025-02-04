@@ -19,20 +19,21 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:layout_marginBottom="5dp"
         android:id="@+id/home_fg_tv_invite_link"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="초대링크 복사"
         android:textColor="@color/witch_gray"
-        android:textSize="14dp"
+        android:textSize="12dp"
         app:layout_constraintBottom_toBottomOf="@+id/home_fg_tv_username"
-        app:layout_constraintStart_toEndOf="@+id/home_fg_tv_username"
-        />
+        app:layout_constraintStart_toEndOf="@+id/home_fg_tv_username" />
+
 
     <View
         android:layout_width="0dp"
         android:layout_height="1dp"
-        android:backgroundTint="@color/witch_gray"
+        android:background="@color/witch_gray"
         app:layout_constraintStart_toStartOf="@+id/home_fg_tv_invite_link"
         app:layout_constraintEnd_toEndOf="@+id/home_fg_tv_invite_link"
         app:layout_constraintTop_toBottomOf="@+id/home_fg_tv_invite_link"/>
@@ -173,6 +174,7 @@
             android:src="@drawable/door_icon" />
 
         <TextView
+            android:id="@+id/group_fg_tv_door"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="모임 나가기"

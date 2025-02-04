@@ -18,22 +18,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/mypage_fg_tv_logout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="30dp"
-        android:layout_marginTop="50dp"
-        android:text="로그아웃"
-        android:textColor="@color/witch_white"
-        android:textSize="26dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <ImageView
         android:id="@+id/mypage_fg_iv_profile_image"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
         android:layout_marginTop="20dp"
         android:background="@drawable/circle_shape"
         android:clipToOutline="true"
@@ -50,7 +38,7 @@
         android:layout_marginTop="10dp"
         android:text="임수미"
         android:textColor="@color/witch_white"
-        android:textSize="24dp"
+        android:textSize="22dp"
         app:layout_constraintEnd_toEndOf="@+id/mypage_fg_iv_profile_image"
         app:layout_constraintStart_toStartOf="@+id/mypage_fg_iv_profile_image"
         app:layout_constraintTop_toBottomOf="@+id/mypage_fg_iv_profile_image" />
@@ -63,7 +51,7 @@
         android:text="프로필 편집하기"
         android:clickable="true"
         android:textColor="@color/witch_gray"
-        android:textSize="16dp"
+        android:textSize="14dp"
         app:layout_constraintEnd_toEndOf="@+id/mypage_fg_tv_nickname"
         app:layout_constraintStart_toStartOf="@+id/mypage_fg_tv_nickname"
         app:layout_constraintTop_toBottomOf="@+id/mypage_fg_tv_nickname" />
@@ -103,7 +91,7 @@
             android:layout_margin="20dp"
             android:text="개인정보 관리"
             android:textColor="@color/witch_white"
-            android:textSize="20dp"
+            android:textSize="18dp"
      />
         <Space
             android:layout_width="0dp"
@@ -152,7 +140,7 @@
             android:layout_height="wrap_content"
             android:text="알림설정"
             android:textColor="@color/witch_white"
-            android:textSize="20dp" />
+            android:textSize="18dp" />
 
             <TextView
                 android:id="@+id/textView12"

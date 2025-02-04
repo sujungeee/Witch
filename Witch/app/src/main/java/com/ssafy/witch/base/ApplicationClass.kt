@@ -27,7 +27,7 @@ class ApplicationClass : Application() {
     // 코틀린의 전역변수 문법
     companion object {
         //ends with '/'
-        val API_URL = "http://192.168.56.1:8080/"
+        val API_URL = "http://192.168.100.138:8080/"
 
         lateinit var sharedPreferencesUtil: SharedPreferencesUtil
         lateinit var retrofit: Retrofit
@@ -41,20 +41,11 @@ class ApplicationClass : Application() {
         super.onCreate()
 
         sharedPreferencesUtil = SharedPreferencesUtil(applicationContext)
-
         // 레트로핏 인스턴스를 생성하고, 레트로핏에 각종 설정값들을 지정해줍니다.
         // 연결 타임아웃시간은 5초로 지정이 되어있고, HttpLoggingInterceptor를 붙여서 어떤 요청이 나가고 들어오는지를 보여줍니다.
         val client: OkHttpClient = OkHttpClient.Builder()
             .readTimeout(5000, TimeUnit.MILLISECONDS)
             .connectTimeout(5000, TimeUnit.MILLISECONDS)
-            .addInterceptor { chain ->
-                val originalRequest = chain.request()
-                val requestWithHeaders = originalRequest.newBuilder()
-                    .removeHeader("Content-Type") // 기존 헤더 제거
-                    .addHeader("Content-Type", "application/json") // 명시적으로 추가
-                    .build()
-                chain.proceed(requestWithHeaders)
-            }
             // 로그캣에 okhttp.OkHttpClient로 검색하면 http 통신 내용을 보여줍니다.
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .addNetworkInterceptor(AccessTokenInterceptor()) // JWT 자동 헤더 전송

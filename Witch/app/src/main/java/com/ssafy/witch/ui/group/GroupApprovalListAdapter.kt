@@ -38,11 +38,11 @@ class GroupApprovalListAdapter(val groupApprovalList: List<GroupApproval>, var i
 
 
             binding.groupApprovalMemberItemBtnApprove.setOnClickListener {
-                itemClickListener.onApprove(groupApprovalList[position].user.userId)
+                itemClickListener.onApprove(groupApprovalList[position].user.id)
             }
 
             binding.groupApprovalMemberItemBtnReject.setOnClickListener {
-                itemClickListener.onReject(groupApprovalList[position].user.userId)
+                itemClickListener.onReject(groupApprovalList[position].user.id)
             }
 
             binding.groupApprovalMemberItemTvProfileName.isSelected = true

@@ -12,5 +12,7 @@ class RetrofitUtil {
 
         val joinService = ApplicationClass.retrofit.create(JoinService::class.java)
 
+        val groupService = ApplicationClass.retrofit.create(GroupService::class.java)
+
     }
 }

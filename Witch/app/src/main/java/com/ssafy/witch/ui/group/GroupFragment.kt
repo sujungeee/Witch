@@ -70,17 +70,24 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
     }
 
     fun initView(){
+        distinctGroupLeader()
         initMemberDialog()
-
         initOutDialog()
-
         binding.groupFgIbGroupEdit.setOnClickListener {
             mainActivity.openFragment(7)
         }
 
+    }
 
-
-
+    fun distinctGroupLeader(){
+        if(isGroupLeader){
+            binding.groupFgIbGroupEdit.visibility=View.VISIBLE
+            binding.groupFgTvDoor.text="모임 삭제"
+        }
+        else{
+            binding.groupFgIbGroupEdit.visibility=View.GONE
+            binding.groupFgTvDoor.text="모임 나가기"
+        }
     }
 
     fun initOutDialog(){
@@ -117,7 +124,6 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         dialogBinding=DialogGroupMembersBinding.inflate(layoutInflater)
 
         val dialog = Dialog(requireContext())
-        val isGroupLeader = true
         dialog.setContentView(dialogBinding.root)
         binding.groupFgLlGroupMember.setOnClickListener {
 
@@ -126,6 +132,7 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             }
 
             if(isGroupLeader){
+                dialogBinding.dialogGroupMembersMasterVApproval.visibility = View.VISIBLE
                 dialogBinding.dialogGroupMembersMasterTvTitleApproval.visibility = View.VISIBLE
                 dialogBinding.dialogGroupMembersMasterTvTitleApproval.setOnClickListener {
                     dialogBinding.dialogGroupMembersMasterRvMembers.visibility = View.GONE
@@ -167,11 +174,11 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             when(it){
                 "APPROVAL" -> {
                     groupApprovalList= listOf(
-                        GroupApproval("1", User( "1", "남dasdasdasㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ수정", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4TzKVPcjY-234LOSKvXiXIXNtElEueYgT6w&s")),
-                        GroupApproval("2", User( "2", "김덕윤", "")),
-                        GroupApproval("3", User( "3", "권경탁", "")),
-                        GroupApproval("4", User( "4", "채용수", "")),
-                        GroupApproval("5", User( "5", "태성원", ""))
+                        GroupApproval("1", User( "1", "dkdkdk@naver.com","남dasdasdasㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ수정", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4TzKVPcjY-234LOSKvXiXIXNtElEueYgT6w&s")),
+                        GroupApproval("2", User( "2", "dkdkdk@naver.com","김덕윤", "")),
+                        GroupApproval("3", User( "3", "dkdkdk@naver.com","권경탁", "")),
+                        GroupApproval("4", User( "4", "dkdkdk@naver.com","채용수", "")),
+                        GroupApproval("5", User( "5", "dkdkdk@naver.com","태성원", ""))
                     )
 
 
@@ -184,7 +191,8 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
                             // 거절
                         }
                     })
-
+                    dialogBinding.dialogGroupMembersMasterVMember.setBackgroundColor(resources.getColor(R.color.witch_gray))
+                    dialogBinding.dialogGroupMembersMasterVApproval.setBackgroundColor(resources.getColor(R.color.witch_green))
                     dialogBinding.dialogGroupMembersMasterRvMembers.visibility = View.GONE
                     dialogBinding.dialogGroupMembersMasterRvApproval.visibility = View.VISIBLE
                     dialogBinding.dialogGroupMembersMasterTvTitleApproval.setTextColor(resources.getColor(R.color.witch_green))
@@ -200,7 +208,8 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
                     )
 
                     dialogBinding.dialogGroupMembersMasterRvMembers.adapter = GroupMemberListAdapter(groupMemberList)
-
+                    dialogBinding.dialogGroupMembersMasterVMember.setBackgroundColor(resources.getColor(R.color.witch_green))
+                    dialogBinding.dialogGroupMembersMasterVApproval.setBackgroundColor(resources.getColor(R.color.witch_gray))
 
                     dialogBinding.dialogGroupMembersMasterRvMembers.visibility = View.VISIBLE
                     dialogBinding.dialogGroupMembersMasterRvApproval.visibility = View.GONE

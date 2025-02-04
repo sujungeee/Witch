@@ -128,7 +128,7 @@
             android:text="생성"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
         <TextView
             android:id="@+id/snack_create_fg_ll_tv_text_update"
@@ -138,7 +138,7 @@
             android:text="수정"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
 
         <TextView
@@ -149,7 +149,7 @@
             android:text="삭제"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
         <TextView
             android:id="@+id/snack_create_fg_ll_tv_text_location"
@@ -159,7 +159,7 @@
             android:text="위치"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
         <TextView
             android:id="@+id/snack_create_fg_ll_tv_text_color"
@@ -169,7 +169,7 @@
             android:text="색상"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
     </LinearLayout>
 
 
@@ -196,7 +196,7 @@
             android:text="카메라"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
         <TextView
             android:id="@+id/snack_create_fg_ll_tv_camera_photo"
@@ -206,7 +206,7 @@
             android:text="갤러리"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
 
         <TextView
@@ -217,7 +217,7 @@
             android:text="사진삭제"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
     </LinearLayout>
 
 
@@ -244,7 +244,7 @@
             android:text="녹음하기"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
         <TextView
             android:id="@+id/snack_create_fg_ll_tv_record_delete"
@@ -254,7 +254,7 @@
             android:text="파일 삭제"
             android:textAlignment="center"
             android:textColor="@color/witch_white"
-            android:textSize="15dp" />
+            android:textSize="13dp" />
 
     </LinearLayout>
 
@@ -271,5 +271,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/space" />
 
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:text="업로드"
+        android:textColor="@color/witch_black"
+        android:backgroundTint="@color/witch_green"
+        app:layout_constraintBottom_toBottomOf="@+id/tv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tv" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

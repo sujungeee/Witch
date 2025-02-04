@@ -23,7 +23,7 @@ public class GroupImageController {
   private final FileRequestMapper fileRequestMapper;
   private final FileResponseMapper fileResponseMapper;
 
-  @PostMapping("/groups/presigned-url")
+  @PostMapping("/groups/group-image/presigned-url")
   public WitchApiResponse<PresignedUrlResponse> generatePresignedUrl(
       @AuthenticationPrincipal String userId,
       @RequestBody PresignedUrlRequest request) {

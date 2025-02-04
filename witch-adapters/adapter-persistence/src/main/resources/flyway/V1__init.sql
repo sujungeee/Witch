@@ -12,7 +12,7 @@ CREATE TABLE `user`
 CREATE TABLE `group`
 (
     `group_id`        VARCHAR(36)        NOT NULL PRIMARY KEY,
-    `group_name`      VARCHAR(20) UNIQUE NOT NULL,
+    `name`            VARCHAR(20) UNIQUE NOT NULL,
     `group_image_url` VARCHAR(2000)      NULL,
     `created_at`      TIMESTAMP          NOT NULL,
     `modified_at`     TIMESTAMP          NOT NULL

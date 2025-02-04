@@ -3,6 +3,7 @@ package com.ssafy.witch.repository.group;
 import com.ssafy.witch.group.GroupJoinRequest;
 import com.ssafy.witch.group.GroupJoinRequestPort;
 import com.ssafy.witch.mapper.group.GroupJoinRequestMapper;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -22,4 +23,15 @@ public class GroupJoinRequestRepository implements GroupJoinRequestPort {
   public boolean existsByUserIdAndGroupId(String userId, String groupId) {
     return groupJoinRequestJpaRepository.existsByUserIdAndGroupId(userId, groupId);
   }
+
+  @Override
+  public Optional<GroupJoinRequest> findById(String groupJoinRequestId) {
+    return groupJoinRequestJpaRepository.findById(groupJoinRequestId).map(mapper::toDomain);
+  }
+
+  @Override
+  public void deleteById(String groupJoinRequestId) {
+    groupJoinRequestJpaRepository.deleteById(groupJoinRequestId);
+  }
+
 }

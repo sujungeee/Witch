@@ -17,6 +17,7 @@ import com.ssafy.witch.exception.group.AlreadyJoinedGroupException;
 import com.ssafy.witch.exception.group.GroupJoinRequestExistsException;
 import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.group.CreateGroupJoinRequestUseCase;
+import com.ssafy.witch.group.HandleGroupJoinRequestUseCase;
 import com.ssafy.witch.mock.user.WithMockWitchUser;
 import com.ssafy.witch.support.docs.RestDocsTestSupport;
 import org.junit.jupiter.api.Test;
@@ -28,6 +29,9 @@ class GroupJoinControllerTest extends RestDocsTestSupport {
 
   @MockBean
   public CreateGroupJoinRequestUseCase createGroupJoinRequestUseCase;
+
+  @MockBean
+  private HandleGroupJoinRequestUseCase handleGroupJoinRequestUseCase;
 
   @WithMockWitchUser
   @Test

@@ -7,6 +7,8 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface GroupJoinRequestMapper {
 
-  GroupJoinRequestEntity toEntity(GroupJoinRequest groupJoinRequest);
+  GroupJoinRequestEntity toEntity(GroupJoinRequest domain);
+
+  GroupJoinRequest toDomain(GroupJoinRequestEntity entity);
 
 }

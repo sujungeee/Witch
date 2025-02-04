@@ -57,7 +57,7 @@ class UserValidationControllerTest extends RestDocsTestSupport {
 
     mvc.perform(get("/users/email/is-unique")
             .param("email", email))
-        .andExpect(jsonPath("data.errorCode").value(ErrorCode.EMAIL_ALREADY_IN_USE.getErrorCode()))
+        .andExpect(jsonPath("error.errorCode").value(ErrorCode.EMAIL_ALREADY_IN_USE.getErrorCode()))
         .andExpect(status().isBadRequest())
         .andDo(restDocs.document());
   }
@@ -94,7 +94,7 @@ class UserValidationControllerTest extends RestDocsTestSupport {
     mvc.perform(get("/users/nickname/is-unique")
             .param("nickname", nickname))
         .andExpect(
-            jsonPath("data.errorCode").value(ErrorCode.NICKNAME_ALREADY_IN_USE.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.NICKNAME_ALREADY_IN_USE.getErrorCode()))
         .andExpect(status().isBadRequest())
         .andDo(restDocs.document());
   }

@@ -122,7 +122,8 @@ public class TokenReissueDocsTest extends SecurityRestDocsTestSupport {
                 .content(objectMapper.writeValueAsString(request))
         )
         .andExpect(status().isUnauthorized())
-        .andExpect(jsonPath("data.errorCode").value(ErrorCode.INVALID_REFRESH_TOKEN.getErrorCode()))
+        .andExpect(
+            jsonPath("error.errorCode").value(ErrorCode.INVALID_REFRESH_TOKEN.getErrorCode()))
         .andDo(restDocs.document());
   }
 

@@ -12,25 +12,29 @@ public class WitchApiResponse<T> {
   @JsonInclude(JsonInclude.Include.NON_NULL)
   private final T data;
 
-  private WitchApiResponse(boolean success, T data) {
+  @JsonInclude(JsonInclude.Include.NON_NULL)
+  private final WitchError error;
+
+  private WitchApiResponse(boolean success, T data, WitchError error) {
     this.success = success;
     this.data = data;
+    this.error = error;
   }
 
   public static <T> WitchApiResponse<T> success(T data) {
-    return new WitchApiResponse<>(true, data);
+    return new WitchApiResponse<>(true, data, null);
   }
 
   public static WitchApiResponse<Void> success() {
-    return new WitchApiResponse<>(true, null);
+    return new WitchApiResponse<>(true, null, null);
   }
 
   public static WitchApiResponse<WitchError> failure(ErrorCode errorCode) {
-    return new WitchApiResponse<>(false, WitchError.of(errorCode));
+    return new WitchApiResponse<>(false, null, WitchError.of(errorCode));
   }
 
   public static WitchApiResponse<WitchError> failure(ErrorCode errorCode, String errorMessage) {
-    return new WitchApiResponse<>(false, WitchError.of(errorCode, errorMessage));
+    return new WitchApiResponse<>(false, null, WitchError.of(errorCode, errorMessage));
   }
 
 }

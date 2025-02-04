@@ -85,7 +85,7 @@ class UserInformationControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("data.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -106,7 +106,7 @@ class UserInformationControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("data.errorCode").value(ErrorCode.NICKNAME_ALREADY_IN_USE.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.NICKNAME_ALREADY_IN_USE.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -163,7 +163,7 @@ class UserInformationControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("data.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.INVALID_FORMAT.getErrorCode()))
         .andDo(restDocs.document());
   }
 
@@ -186,7 +186,7 @@ class UserInformationControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("data.errorCode").value(ErrorCode.INCORRECT_PASSWORD.getErrorCode()))
+            jsonPath("error.errorCode").value(ErrorCode.INCORRECT_PASSWORD.getErrorCode()))
         .andDo(restDocs.document());
   }
 }

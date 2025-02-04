@@ -54,7 +54,7 @@ a|
 ----
 {
   "success": false,
-  "data": {
+  "error": {
     "errorCode": "WCH0000",
     "errorMessage": "서버에 문제가 발생했습니다."
   }

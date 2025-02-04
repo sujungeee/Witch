@@ -8,4 +8,5 @@ import org.mapstruct.Mapper;
 public interface GroupRequestMapper {
 
   GroupCreateCommand toCommand(String userId, GroupCreateRequest request);
+
 }

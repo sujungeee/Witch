@@ -7,4 +7,6 @@ public interface GroupPort {
   Group save(Group group);
 
   Optional<Group> findById(String groupId);
+
+  boolean existsById(String groupId);
 }

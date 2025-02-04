@@ -125,7 +125,8 @@ class UserProfileImageControllerTest extends RestDocsTestSupport {
             requestFields(
                 fieldWithPath("objectKey")
                     .type(STRING)
-                    .description("업로드한 파일의 object key")
+                    .description("업로드한 파일의 object key, null이면 삭제")
+                    .optional()
                     .attributes(constraints("확장자가 jpg, jpeg 또는 png여야 합니다"))
             ),
             responseFields(

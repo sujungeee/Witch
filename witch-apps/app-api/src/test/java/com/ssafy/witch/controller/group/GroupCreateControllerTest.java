@@ -61,6 +61,7 @@ class GroupCreateControllerTest extends RestDocsTestSupport {
                     .attributes(constraints(ValidationRule.GROUP_NAME.getErrorMessage())),
                 fieldWithPath("groupImageObjectKey")
                     .type(STRING)
+                    .optional()
                     .description("업로드한 모임 사진의 object key")
                     .attributes(constraints("확장자가 jpg, jpeg 또는 png여야 합니다"))
             ),

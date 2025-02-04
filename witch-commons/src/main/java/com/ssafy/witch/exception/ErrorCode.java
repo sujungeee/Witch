@@ -33,7 +33,7 @@ public enum ErrorCode {
 
   // 모임
   NON_EXISTENT_MEETING("WCH4000", "존재하지 않는 모임에 대한 요청입니다."),
-  MEETING_NAME_ALREADY_IN_USE("WCH4001", "이미 사용 중인 모임 이름입니다."),
+  GROUP_NAME_ALREADY_IN_USE("WCH4001", "이미 사용 중인 모임 이름입니다."),
   UNAUTHORIZED_MEETING_ACCESS("WCH4002", "해당 모임에 대한 권한이 없습니다."),
   EXCEED_MAX_MEETING_CAPACITY("WCH4003", "모임 최대 인원을 초과하였습니다."),
   ALREADY_JOINED_MEETING("WCH4004", "대상이 이미 가입한 모임입니다."),

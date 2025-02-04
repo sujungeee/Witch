@@ -3,6 +3,7 @@ package com.ssafy.witch.repository.group;
 import com.ssafy.witch.group.GroupMember;
 import com.ssafy.witch.group.GroupMemberPort;
 import com.ssafy.witch.mapper.group.GroupMemberMapper;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,13 @@ public class GroupMemberRepository implements GroupMemberPort {
   public boolean existsByUserIdAndGroupId(String userId, String groupId) {
     return groupMemberJpaRepository.existsByUserIdAndGroupId(userId, groupId);
   }
+
+  @Override
+  public List<GroupMember> findAllByGroupId(String groupId) {
+    return groupMemberJpaRepository.findAllByGroupId(groupId)
+        .stream()
+        .map(mapper::toDomain)
+        .toList();
+  }
+
 }

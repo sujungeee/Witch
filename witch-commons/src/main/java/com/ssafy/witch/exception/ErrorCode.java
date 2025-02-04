@@ -34,11 +34,12 @@ public enum ErrorCode {
   // 모임
   GROUP_NOT_EXIST("WCH4000", "존재하지 않는 모임에 대한 요청입니다."),
   GROUP_NAME_ALREADY_IN_USE("WCH4001", "이미 사용 중인 모임 이름입니다."),
-  UNAUTHORIZED_MEETING_ACCESS("WCH4002", "해당 모임에 대한 권한이 없습니다."),
-  EXCEED_MAX_MEETING_CAPACITY("WCH4003", "모임 최대 인원을 초과하였습니다."),
+  UNAUTHORIZED_GROUP_ACCESS("WCH4002", "해당 모임에 대한 권한이 없습니다."),
+  EXCEED_MAX_GROUP_PARTICIPANTS("WCH4003", "모임 최대 인원을 초과하였습니다."),
   ALREADY_JOINED_GROUP("WCH4004", "대상이 이미 가입한 모임입니다."),
   NOT_JOINED_MEETING("WCH4005", "대상이 이미 가입하지 않은 모임입니다."),
   GROUP_JOIN_REQUEST_ALREADY_EXISTS("WCH4006", "가입 요청이 이미 존재합니다."),
+  GROUP_JOIN_REQUEST_NOT_EXISTS("WCH4007", "가입 요청 존재하지 않습니다."),
 
   // 약속
   INVALID_APPOINTMENT_TIME("WCH5000", "약속 시간은 10분 단위여야 합니다."),

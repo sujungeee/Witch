@@ -2,3 +2,4 @@
 
 include::api/generate_group_image_presigned_url.adoc[]
 include::api/create_group.adoc[]
+include::api/get_group_preview.adoc[]

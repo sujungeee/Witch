@@ -5,9 +5,10 @@ import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class UserResponse {
+public class UserDetailResponse {
 
   private String userId;
+  private String email;
   private String nickname;
   private String profileImageUrl;
 

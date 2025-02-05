@@ -4,7 +4,7 @@ import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
 import com.ssafy.witch.controller.user.mapper.UserResponseMapper;
 import com.ssafy.witch.controller.user.request.UserNicknameChangeRequest;
 import com.ssafy.witch.controller.user.request.UserPasswordChangeRequest;
-import com.ssafy.witch.controller.user.response.UserResponse;
+import com.ssafy.witch.controller.user.response.UserDetailResponse;
 import com.ssafy.witch.response.WitchApiResponse;
 import com.ssafy.witch.user.ChangeUserInformationUseCase;
 import com.ssafy.witch.user.ReadUserUseCase;
@@ -29,10 +29,10 @@ public class UserInformationController {
   private final UserResponseMapper userResponseMapper;
 
   @GetMapping("/users/me")
-  public WitchApiResponse<UserResponse> changeNickname(
+  public WitchApiResponse<UserDetailResponse> changeNickname(
       @AuthenticationPrincipal String userId) {
     User user = readUserUseCase.getUser(userId);
-    UserResponse response = userResponseMapper.toResponse(user);
+    UserDetailResponse response = userResponseMapper.toDetailResponse(user);
     return WitchApiResponse.success(response);
   }
 

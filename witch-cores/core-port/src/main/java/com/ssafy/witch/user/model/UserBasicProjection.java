@@ -1,11 +1,11 @@
-package com.ssafy.witch.controller.user.response;
+package com.ssafy.witch.user.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @AllArgsConstructor
 @Getter
-public class UserResponse {
+public class UserBasicProjection {
 
   private String userId;
   private String nickname;

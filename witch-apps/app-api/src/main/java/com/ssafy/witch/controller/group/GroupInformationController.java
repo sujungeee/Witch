@@ -8,6 +8,7 @@ import com.ssafy.witch.group.command.ChangeGroupNameCommand;
 import com.ssafy.witch.response.WitchApiResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,7 +21,7 @@ public class GroupInformationController {
   private final ChangeGroupInformationUseCase changeGroupInformationUseCase;
   private final GroupRequestMapper groupRequestMapper;
 
-  @PostMapping("/groups/{groupId}/name")
+  @PatchMapping("/groups/{groupId}/name")
   public WitchApiResponse<Void> changeGroupName(
       @AuthenticationPrincipal String userId,
       @PathVariable String groupId,

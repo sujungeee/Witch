@@ -39,7 +39,7 @@ public class CreateAppointmentService implements CreateAppointmentUseCase {
     validateGroupExists(groupId);
     validateGroupAuthorization(userId, groupId);
     verifyFutureAppointment(appointmentTime);
-    verifyHasOngoingAppointment(userId);
+    verifyIsAppointmentTimeConflict(userId, appointmentTime);
 
     Appointment newAppointment = appointmentPort.save(Appointment.createNewAppointment(
         command.getGroupId(),
@@ -61,8 +61,8 @@ public class CreateAppointmentService implements CreateAppointmentUseCase {
     return newAppointment;
   }
 
-  private void verifyHasOngoingAppointment(String userId) {
-    if (appointmentPort.hasOngoingAppointment(userId)) {
+  private void verifyIsAppointmentTimeConflict(String userId, LocalDateTime appointmentTime) {
+    if (appointmentPort.existsConflictAppointment(userId, appointmentTime)) {
       throw new ConflictingAppointmentTimeException();
     }
   }

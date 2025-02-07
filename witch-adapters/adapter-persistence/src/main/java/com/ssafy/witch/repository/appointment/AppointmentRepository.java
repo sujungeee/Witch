@@ -3,6 +3,7 @@ package com.ssafy.witch.repository.appointment;
 import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.appointment.Appointment;
 import com.ssafy.witch.mapper.appointment.AppointmentMapper;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,8 +21,9 @@ public class AppointmentRepository implements AppointmentPort {
     );
   }
 
+
   @Override
-  public boolean hasOngoingAppointment(String userId) {
-    return appointmentJpaRepository.existsOngoingAppointmentByUserId(userId);
+  public boolean existsConflictAppointment(String userId, LocalDateTime appointmentTime) {
+    return appointmentJpaRepository.existsConflictAppointment(userId, appointmentTime);
   }
 }

@@ -15,7 +15,7 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Latitude {
 
-  String message() default "경도는 -180.0에서 180.0 사이여야 합니다.";
+  String message() default "위도는 -90.0에서 90.0 사이여야 합니다.";
 
   Class<?>[] groups() default {};
 

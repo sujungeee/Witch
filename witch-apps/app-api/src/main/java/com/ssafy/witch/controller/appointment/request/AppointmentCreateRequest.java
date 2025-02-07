@@ -14,8 +14,8 @@ public class AppointmentCreateRequest {
   private String name;
   private String summary;
   private LocalDateTime appointmentTime;
-  private Double longitude;
   private Double latitude;
+  private Double longitude;
   private String address;
 
 }

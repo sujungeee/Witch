@@ -1,6 +1,8 @@
 package com.ssafy.witch.repository.appointment;
 
+import java.time.LocalDateTime;
+
 public interface AppointmentCustomRepository {
 
-  boolean existsOngoingAppointmentByUserId(String userId);
+  boolean existsConflictAppointment(String userId, LocalDateTime appointmentTime);
 }

@@ -2,7 +2,7 @@
 
 ==== Success
 
-operation::appointment-read-controller-test/get_appointments_200[snippets='http-request,path-parameters,request-headers,http-response']
+operation::appointment-read-controller-test/get_appointments_200[snippets='http-request,path-parameters,request-headers,http-response,response-fields']
 
 ==== Failure
 

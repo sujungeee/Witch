@@ -18,4 +18,9 @@ public class AppointmentMemberRepository implements AppointmentMemberPort {
     return appointmentMemberMapper.toDomain(
         appointmentMemberJpaRepository.save(appointmentMemberMapper.toEntity(appointmentMember)));
   }
+
+  @Override
+  public boolean existsByUserIdAndAppointmentId(String userId, String appointmentId) {
+    return appointmentMemberJpaRepository.existsByUserIdAndAppointmentId(userId, appointmentId);
+  }
 }

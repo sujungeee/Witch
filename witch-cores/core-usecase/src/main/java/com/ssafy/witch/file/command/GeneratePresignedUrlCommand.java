@@ -1,4 +1,4 @@
-package com.ssafy.witch.common.file.command;
+package com.ssafy.witch.file.command;
 
 import com.ssafy.witch.validate.SelfValidating;
 import jakarta.validation.constraints.NotBlank;

@@ -3,6 +3,7 @@ package com.ssafy.witch.file;
 import com.amazonaws.HttpMethod;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.GeneratePresignedUrlRequest;
+import com.amazonaws.util.StringUtils;
 import com.ssafy.witch.properties.S3Properties;
 import com.ssafy.witch.properties.WitchS3Properties;
 import java.time.Instant;
@@ -35,6 +36,9 @@ public class S3Adapter implements PresignedUrlPort {
 
   @Override
   public String getAccessUrl(String objectKey) {
+    if (StringUtils.isNullOrEmpty(objectKey)) {
+      return null;
+    }
     return s3Properties.getS3Endpoint() + "/" + witchS3Properties.getBucketName() + "/" + objectKey;
   }
 

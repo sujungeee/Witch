@@ -1,9 +1,9 @@
 package com.ssafy.witch.controller.user;
 
-import com.ssafy.witch.common.file.command.GeneratePresignedUrlCommand;
 import com.ssafy.witch.controller.user.mapper.UserRequestMapper;
 import com.ssafy.witch.controller.user.request.UpdateProfileImageRequest;
 import com.ssafy.witch.file.PresignedUrl;
+import com.ssafy.witch.file.command.GeneratePresignedUrlCommand;
 import com.ssafy.witch.file.mapper.FileRequestMapper;
 import com.ssafy.witch.file.mapper.FileResponseMapper;
 import com.ssafy.witch.file.request.PresignedUrlRequest;

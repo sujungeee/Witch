@@ -1,12 +1,12 @@
 package com.ssafy.witch.user;
 
-import com.ssafy.witch.common.file.command.GeneratePresignedUrlCommand;
 import com.ssafy.witch.exception.file.InvalidFileOwnerException;
 import com.ssafy.witch.exception.file.UnsupportedFileFormatException;
 import com.ssafy.witch.exception.user.UserNotFoundException;
 import com.ssafy.witch.file.FileOwnerCachePort;
 import com.ssafy.witch.file.PresignedUrl;
 import com.ssafy.witch.file.PresignedUrlPort;
+import com.ssafy.witch.file.command.GeneratePresignedUrlCommand;
 import com.ssafy.witch.user.command.UpdateProfileImageCommand;
 import java.time.Duration;
 import java.util.List;

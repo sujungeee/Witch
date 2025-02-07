@@ -1,19 +1,24 @@
 package com.ssafy.witch.repository.appointment;
 
 import com.ssafy.witch.apoointment.AppointmentPort;
+import com.ssafy.witch.apoointment.AppointmentReadPort;
+import com.ssafy.witch.apoointment.model.AppointmentProjection;
 import com.ssafy.witch.appointment.Appointment;
 import com.ssafy.witch.mapper.appointment.AppointmentMapper;
+import com.ssafy.witch.mapper.appointment.AppointmentProjectionMapper;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
 @RequiredArgsConstructor
 @Repository
-public class AppointmentRepository implements AppointmentPort {
+public class AppointmentRepository implements AppointmentPort, AppointmentReadPort {
 
   private final AppointmentJpaRepository appointmentJpaRepository;
   private final AppointmentMapper appointmentMapper;
+  private final AppointmentProjectionMapper appointmentProjectionMapper;
 
   @Override
   public Appointment save(Appointment appointment) {
@@ -33,4 +38,11 @@ public class AppointmentRepository implements AppointmentPort {
     return appointmentJpaRepository.findById(appointmentId).map(appointmentMapper::toDomain);
   }
 
+  @Override
+  public List<AppointmentProjection> getAppointments(String userId, String groupId) {
+    return appointmentJpaRepository.getAppointments(userId, groupId)
+        .stream()
+        .map(appointmentProjectionMapper::toProjection)
+        .toList();
+  }
 }

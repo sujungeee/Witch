@@ -5,8 +5,10 @@ import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.appointment.command.AppointmentJoinCommand;
 import com.ssafy.witch.exception.appointment.AlreadyJoinedAppointmentException;
 import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
+import com.ssafy.witch.exception.appointment.ConflictingAppointmentTimeException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.GroupMemberPort;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +31,21 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
         .orElseThrow(AppointmentNotFoundException::new);
 
     String groupId = appointment.getGroupId();
+    LocalDateTime appointmentTime = appointment.getAppointmentTime();
 
     verifyUserInGroup(userId, groupId);
     validateUserNotJoinedAtAppointment(userId, appointmentId);
+    verifyIsAppointmentTimeConflict(userId, appointmentTime);
 
     AppointmentMember newMember = AppointmentMember.createNewMember(userId, appointmentId);
 
     appointmentMemberPort.save(newMember);
+  }
+
+  private void verifyIsAppointmentTimeConflict(String userId, LocalDateTime appointmentTime) {
+    if (appointmentPort.existsConflictAppointment(userId, appointmentTime)) {
+      throw new ConflictingAppointmentTimeException();
+    }
   }
 
   private void verifyUserInGroup(String userId, String groupId) {

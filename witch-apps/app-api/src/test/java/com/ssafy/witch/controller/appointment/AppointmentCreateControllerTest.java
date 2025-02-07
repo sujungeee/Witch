@@ -12,6 +12,8 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -62,6 +64,10 @@ class AppointmentCreateControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isOk())
         .andDo(restDocs.document(
+            pathParameters(
+                parameterWithName("groupId")
+                    .description("약속을 생성하고자 하는 모임 식별자")
+            ),
             requestHeaders(
                 headerWithName("Authorization")
                     .description("JWT access token")

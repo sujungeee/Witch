@@ -1,0 +1,62 @@
+package com.ssafy.witch.appointment;
+
+import com.ssafy.witch.apoointment.AppointmentMemberPort;
+import com.ssafy.witch.apoointment.AppointmentPort;
+import com.ssafy.witch.appointment.command.AppointmentJoinCommand;
+import com.ssafy.witch.exception.appointment.AlreadyJoinedAppointmentException;
+import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
+import com.ssafy.witch.exception.appointment.ConflictingAppointmentTimeException;
+import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
+import com.ssafy.witch.group.GroupMemberPort;
+import java.time.LocalDateTime;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@RequiredArgsConstructor
+@Service
+public class JoinAppointmentService implements JoinAppointmentUseCase {
+
+  private final AppointmentPort appointmentPort;
+  private final GroupMemberPort groupMemberPort;
+  private final AppointmentMemberPort appointmentMemberPort;
+
+  @Transactional
+  @Override
+  public void joinAppointment(AppointmentJoinCommand command) {
+    String userId = command.getUserId();
+    String appointmentId = command.getAppointmentId();
+
+    Appointment appointment = appointmentPort.findById(appointmentId)
+        .orElseThrow(AppointmentNotFoundException::new);
+
+    String groupId = appointment.getGroupId();
+    LocalDateTime appointmentTime = appointment.getAppointmentTime();
+
+    verifyUserInGroup(userId, groupId);
+    validateUserNotJoinedAtAppointment(userId, appointmentId);
+    verifyIsAppointmentTimeConflict(userId, appointmentTime);
+
+    AppointmentMember newMember = AppointmentMember.createNewMember(userId, appointmentId);
+
+    appointmentMemberPort.save(newMember);
+  }
+
+  private void verifyIsAppointmentTimeConflict(String userId, LocalDateTime appointmentTime) {
+    if (appointmentPort.existsConflictAppointment(userId, appointmentTime)) {
+      throw new ConflictingAppointmentTimeException();
+    }
+  }
+
+  private void verifyUserInGroup(String userId, String groupId) {
+    if (!groupMemberPort.existsByUserIdAndGroupId(userId, groupId)) {
+      throw new UnauthorizedGroupAccessException();
+    }
+  }
+
+  private void validateUserNotJoinedAtAppointment(String userId, String appointmentId) {
+    if (appointmentMemberPort.existsByUserIdAndAppointmentId(userId, appointmentId)) {
+      throw new AlreadyJoinedAppointmentException();
+    }
+  }
+}

@@ -6,4 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface AppointmentMemberJpaRepository extends
     JpaRepository<AppointmentMemberEntity, String> {
 
+  boolean existsByUserIdAndAppointmentId(String userId, String appointmentId);
+
 }

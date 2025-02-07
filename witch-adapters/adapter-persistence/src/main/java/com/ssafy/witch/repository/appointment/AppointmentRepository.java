@@ -4,6 +4,7 @@ import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.appointment.Appointment;
 import com.ssafy.witch.mapper.appointment.AppointmentMapper;
 import java.time.LocalDateTime;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -26,4 +27,10 @@ public class AppointmentRepository implements AppointmentPort {
   public boolean existsConflictAppointment(String userId, LocalDateTime appointmentTime) {
     return appointmentJpaRepository.existsConflictAppointment(userId, appointmentTime);
   }
+
+  @Override
+  public Optional<Appointment> findById(String appointmentId) {
+    return appointmentJpaRepository.findById(appointmentId).map(appointmentMapper::toDomain);
+  }
+
 }

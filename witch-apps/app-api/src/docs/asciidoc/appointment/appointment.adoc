@@ -1,3 +1,5 @@
 == 약속 관련 API
 
 include::api/create_appointment.adoc[]
+include::api/join_appointment.adoc[]
+

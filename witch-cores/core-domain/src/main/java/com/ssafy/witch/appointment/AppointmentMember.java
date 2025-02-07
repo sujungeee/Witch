@@ -34,4 +34,15 @@ public class AppointmentMember {
         null
     );
   }
+
+  public static AppointmentMember createNewMember(String userId, String appointmentId) {
+    return new AppointmentMember(
+        UUID.randomUUID().toString(),
+        userId,
+        appointmentId,
+        false,
+        null,
+        null
+    );
+  }
 }

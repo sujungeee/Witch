@@ -1,11 +1,14 @@
 package com.ssafy.witch.repository.appointment;
 
+import static com.querydsl.core.types.Projections.constructor;
 import static com.ssafy.witch.entity.appointment.QAppointmentEntity.appointmentEntity;
 import static com.ssafy.witch.entity.appointment.QAppointmentMemberEntity.appointmentMemberEntity;
+import static com.ssafy.witch.entity.group.QGroupEntity.groupEntity;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.witch.entity.appointment.AppointmentEntityProjection;
+import com.ssafy.witch.entity.appointment.AppointmentWithGroupEntityProjection;
+import com.ssafy.witch.group.model.GroupProjection;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +41,7 @@ public class AppointmentCustomRepositoryImpl implements AppointmentCustomReposit
   public List<AppointmentEntityProjection> getAppointments(String userId, String groupId) {
 
     return queryFactory
-        .select(Projections.constructor(AppointmentEntityProjection.class,
+        .select(constructor(AppointmentEntityProjection.class,
             appointmentEntity.appointmentId,
             appointmentEntity.name,
             appointmentEntity.appointmentTime,
@@ -50,6 +53,35 @@ public class AppointmentCustomRepositoryImpl implements AppointmentCustomReposit
         .on(appointmentEntity.appointmentId.eq(appointmentMemberEntity.appointmentId)
             .and(appointmentMemberEntity.userId.eq(userId)))
         .where(appointmentEntity.groupId.eq(groupId))
+        .fetch();
+  }
+
+  @Override
+  public List<AppointmentWithGroupEntityProjection> getMyAppointments(
+      String userId, int year, int month) {
+    LocalDateTime startOfMonth = LocalDateTime.of(year, month, 1, 0, 0, 0);
+    LocalDateTime endOfMonth = startOfMonth.plusMonths(1).minusNanos(1);
+
+    return queryFactory
+        .select(constructor(AppointmentWithGroupEntityProjection.class,
+            appointmentEntity.appointmentId,
+            appointmentEntity.name,
+            appointmentEntity.appointmentTime,
+            appointmentEntity.status,
+            constructor(GroupProjection.class,
+                groupEntity.groupId,
+                groupEntity.name,
+                groupEntity.groupImageUrl)))
+        .from(appointmentEntity)
+        .innerJoin(appointmentMemberEntity)
+        .on(appointmentEntity.appointmentId.eq(appointmentMemberEntity.appointmentId))
+        .innerJoin(groupEntity)
+        .on(appointmentEntity.groupId.eq(groupEntity.groupId))
+        .where(
+            appointmentMemberEntity.userId.eq(userId)
+                .and(appointmentEntity.appointmentTime.between(startOfMonth, endOfMonth))
+        )
+        .orderBy(appointmentEntity.appointmentTime.asc())
         .fetch();
   }
 

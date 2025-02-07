@@ -3,6 +3,7 @@ package com.ssafy.witch.repository.appointment;
 import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.apoointment.AppointmentReadPort;
 import com.ssafy.witch.apoointment.model.AppointmentProjection;
+import com.ssafy.witch.apoointment.model.AppointmentWithGroupProjection;
 import com.ssafy.witch.appointment.Appointment;
 import com.ssafy.witch.mapper.appointment.AppointmentMapper;
 import com.ssafy.witch.mapper.appointment.AppointmentProjectionMapper;
@@ -42,6 +43,13 @@ public class AppointmentRepository implements AppointmentPort, AppointmentReadPo
   public List<AppointmentProjection> getAppointments(String userId, String groupId) {
     return appointmentJpaRepository.getAppointments(userId, groupId)
         .stream()
+        .map(appointmentProjectionMapper::toProjection)
+        .toList();
+  }
+
+  @Override
+  public List<AppointmentWithGroupProjection> getMyAppointment(String userId, int year, int month) {
+    return appointmentJpaRepository.getMyAppointments(userId, year, month).stream()
         .map(appointmentProjectionMapper::toProjection)
         .toList();
   }

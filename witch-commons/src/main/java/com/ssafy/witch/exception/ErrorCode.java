@@ -10,7 +10,7 @@ public enum ErrorCode {
   // 요청 검증 실패
   NOT_FOUND("WCH1000", "존재하지 않는 엔드포인트입니다."),
   METHOD_NOT_ALLOWED("WCH1001", "이 엔드포인트에서 헤당 메서드는 허용되지 않습니다."),
-  REQUIRED_FIELD_MISSING("WCH1002", "필수 데이터가 누락되었습니다."),
+  REQUIRED_FIELD_MISSING_OR_INVALID("WCH1002", "필수 데이터가 누락되었거나 형식이 올바르지 않습니다."),
   INVALID_FORMAT("WCH1003", "데이터 형식이 올바르지 않습니다."),
   UNSUPPORTED_FILE_FORMAT("WCH1004", "지원하지 않는 파일 형식입니다."),
   INVALID_REQUEST_BODY("WCH1006", "요청 바디의 타입 또는 형식이 올바르지 않습니다."),

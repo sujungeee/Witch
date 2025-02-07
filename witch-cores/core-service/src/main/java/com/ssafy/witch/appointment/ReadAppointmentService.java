@@ -3,6 +3,7 @@ package com.ssafy.witch.appointment;
 import com.ssafy.witch.apoointment.AppointmentReadPort;
 import com.ssafy.witch.appointment.mapper.AppointmentOutputMapper;
 import com.ssafy.witch.appointment.output.AppointmentListOutput;
+import com.ssafy.witch.appointment.output.AppointmentWithGroupListOutput;
 import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.GroupMemberPort;
@@ -23,12 +24,18 @@ public class ReadAppointmentService implements ReadAppointmentUseCase {
   @Override
   public AppointmentListOutput getAppointments(String userId, String groupId) {
 
-    if (groupPort.existsById(groupId)) {
+    if (!groupPort.existsById(groupId)) {
       throw new GroupNotFoundException();
     }
 
     verifyUserInGroup(userId, groupId);
     return appointmentOutputMapper.toOutput(appointmentReadPort.getAppointments(userId, groupId));
+  }
+
+  @Override
+  public AppointmentWithGroupListOutput getMyAppointments(String userId, int year, int month) {
+    return appointmentOutputMapper.toWithGroupOutput(
+        appointmentReadPort.getMyAppointment(userId, year, month));
   }
 
 

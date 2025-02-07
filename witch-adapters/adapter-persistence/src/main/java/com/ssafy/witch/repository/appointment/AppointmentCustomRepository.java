@@ -1,8 +1,12 @@
 package com.ssafy.witch.repository.appointment;
 
+import com.ssafy.witch.entity.appointment.AppointmentEntityProjection;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public interface AppointmentCustomRepository {
 
   boolean existsConflictAppointment(String userId, LocalDateTime appointmentTime);
+
+  List<AppointmentEntityProjection> getAppointments(String userId, String groupId);
 }

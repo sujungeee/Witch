@@ -6,6 +6,10 @@ operation::appointment-read-controller-test/get_appointments_200[snippets='http-
 
 ==== Failure
 
+===== 존재하지 않는 모임일 시
+
+operation::appointment-read-controller-test/get_appointments_400_group_not_exists[snippets='http-response']
+
 ===== 가입하지 않은 모임일 시
 
-operation::appointment-create-controller-test/create_appointment_400_past_appointment[snippets='http-response']
+operation::appointment-read-controller-test/get_appointments_400_user_not_in_group[snippets='http-response']

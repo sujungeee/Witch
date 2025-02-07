@@ -3,8 +3,10 @@ package com.ssafy.witch.appointment;
 import com.ssafy.witch.apoointment.AppointmentReadPort;
 import com.ssafy.witch.appointment.mapper.AppointmentOutputMapper;
 import com.ssafy.witch.appointment.output.AppointmentListOutput;
+import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.GroupMemberPort;
+import com.ssafy.witch.group.GroupPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ReadAppointmentService implements ReadAppointmentUseCase {
 
+  private final GroupPort groupPort;
   private final AppointmentReadPort appointmentReadPort;
   private final GroupMemberPort groupMemberPort;
 
@@ -19,6 +22,11 @@ public class ReadAppointmentService implements ReadAppointmentUseCase {
 
   @Override
   public AppointmentListOutput getAppointments(String userId, String groupId) {
+
+    if (groupPort.existsById(groupId)) {
+      throw new GroupNotFoundException();
+    }
+
     verifyUserInGroup(userId, groupId);
     return appointmentOutputMapper.toOutput(appointmentReadPort.getAppointments(userId, groupId));
   }

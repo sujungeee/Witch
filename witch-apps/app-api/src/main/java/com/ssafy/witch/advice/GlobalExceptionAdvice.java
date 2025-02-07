@@ -13,6 +13,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
@@ -29,6 +30,32 @@ public class GlobalExceptionAdvice {
     return WitchApiResponse.failure(ErrorCode.METHOD_NOT_ALLOWED);
   }
 
+  @ExceptionHandler(HandlerMethodValidationException.class)
+  @ResponseStatus(HttpStatus.BAD_REQUEST)
+  protected WitchApiResponse<?> handleHandlerMethodValidationException(
+      HandlerMethodValidationException e) {
+    log.error("error={}", e.getMessage(), e);
+
+    String errorMessage = e.getAllValidationResults().stream()
+        .flatMap(validationResult -> validationResult.getResolvableErrors().stream())
+        .map(error -> {
+          String[] codes = error.getCodes();
+          String field = codes != null && codes.length > 0 ?
+              extractFieldName(codes[0]) : "unknown";
+          return field + ": " + error.getDefaultMessage();
+        })
+        .collect(Collectors.joining(", "));
+
+    return WitchApiResponse.failure(ErrorCode.REQUIRED_FIELD_MISSING_OR_INVALID, errorMessage);
+  }
+
+  private String extractFieldName(String code) {
+    if (code.contains(".")) {
+      return code.substring(code.lastIndexOf(".") + 1);
+    }
+    return code;
+  }
+
   // 요청 파라미터 검증 실패 (Validation Error)
   @ExceptionHandler(MethodArgumentNotValidException.class)
   @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -43,7 +70,7 @@ public class GlobalExceptionAdvice {
         .collect(Collectors.joining(", "));
 
     // 예시: @NotNull이 붙은 필드가 비어있는 경우 (예: 사용자 이메일 필드가 비어있음)
-    return WitchApiResponse.failure(ErrorCode.REQUIRED_FIELD_MISSING, errorMessage);
+    return WitchApiResponse.failure(ErrorCode.REQUIRED_FIELD_MISSING_OR_INVALID, errorMessage);
   }
 
   // HTTP 바디 형식이 잘못된 경우 (Malformed Request Body)

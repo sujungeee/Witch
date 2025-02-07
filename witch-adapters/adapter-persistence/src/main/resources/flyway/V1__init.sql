@@ -20,16 +20,17 @@ CREATE TABLE `group`
 
 CREATE TABLE `appointment`
 (
-    `appointment_id`   VARCHAR(36) NOT NULL PRIMARY KEY,
-    `group_id`         VARCHAR(36) NOT NULL,
-    `name`             VARCHAR(20) NOT NULL,
-    `summary`          TEXT        NULL,
-    `appointment_time` TIMESTAMP   NOT NULL,
-    `status`           VARCHAR(10) NOT NULL comment 'PENDING/ACTIVE/INACTIVE',
-    `latitude`         DOUBLE      NOT NULL,
-    `longitude`        DOUBLE      NOT NULL,
-    `created_at`       TIMESTAMP   NOT NULL,
-    `modified_at`      TIMESTAMP   NOT NULL
+    `appointment_id`   VARCHAR(36)  NOT NULL PRIMARY KEY,
+    `group_id`         VARCHAR(36)  NOT NULL,
+    `name`             VARCHAR(20)  NOT NULL,
+    `summary`          TEXT         NULL,
+    `appointment_time` TIMESTAMP    NOT NULL,
+    `status`           VARCHAR(10)  NOT NULL comment 'PENDING/ACTIVE/INACTIVE',
+    `latitude`         DOUBLE       NOT NULL,
+    `longitude`        DOUBLE       NOT NULL,
+    `created_at`       TIMESTAMP    NOT NULL,
+    `modified_at`      TIMESTAMP    NOT NULL,
+    `address`          VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE `group_member`

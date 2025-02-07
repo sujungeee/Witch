@@ -24,4 +24,8 @@ public class Group {
         groupImageUrl
     );
   }
+
+  public void changeGroupName(String name) {
+    this.name = name;
+  }
 }

@@ -2,4 +2,4 @@
 
 include::api/create_appointment.adoc[]
 include::api/join_appointment.adoc[]
-
+include::api/get_appointment_list_in_group.adoc[]

@@ -10,6 +10,8 @@ import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.requestFields;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
+import static org.springframework.restdocs.request.RequestDocumentation.parameterWithName;
+import static org.springframework.restdocs.request.RequestDocumentation.pathParameters;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,10 +33,10 @@ import com.ssafy.witch.mock.user.WithMockWitchUser;
 import com.ssafy.witch.support.docs.RestDocsTestSupport;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
-import org.mockito.Mockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 
 @WebMvcTest({GroupImageController.class,
     FileRequestMapper.class, FileResponseMapper.class,
@@ -114,7 +116,7 @@ class GroupImageControllerTest extends RestDocsTestSupport {
     String groupId = "test-group-id";
     UpdateGroupImageRequest request = new UpdateGroupImageRequest("/group/group-image.jpeg");
 
-    mvc.perform(patch("/groups/{groupId}/image", groupId)
+    mvc.perform(RestDocumentationRequestBuilders.patch("/groups/{groupId}/image", groupId)
         .contentType(MediaType.APPLICATION_JSON)
         .header("Authorization", "Bearer sample.access.token")
         .content(objectMapper.writeValueAsString(request))
@@ -124,6 +126,10 @@ class GroupImageControllerTest extends RestDocsTestSupport {
             requestHeaders(
                 headerWithName("Authorization")
                     .description("JWT access token")
+            ),
+            pathParameters(
+                parameterWithName("groupId")
+                    .description("변경할 모임 번호")
             ),
             requestFields(
                 fieldWithPath("objectKey")

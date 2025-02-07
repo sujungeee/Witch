@@ -20,6 +20,7 @@ import com.ssafy.witch.appointment.output.AppointmentListOutput;
 import com.ssafy.witch.appointment.output.AppointmentOutput;
 import com.ssafy.witch.controller.appointment.mapper.AppointmentResponseMapper;
 import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.mock.user.WithMockWitchUser;
 import com.ssafy.witch.support.docs.RestDocsTestSupport;
@@ -110,6 +111,26 @@ class AppointmentReadControllerTest extends RestDocsTestSupport {
         .andExpect(status().isBadRequest())
         .andExpect(
             jsonPath("error.errorCode").value(ErrorCode.UNAUTHORIZED_GROUP_ACCESS.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+
+  @WithMockWitchUser
+  @Test
+  void get_appointments_400_group_not_exists() throws Exception {
+
+    String groupId = "example-group-id";
+
+    given(readAppointmentUseCase.getAppointments(any(), any()))
+        .willThrow(new GroupNotFoundException());
+
+    mvc.perform(get("/groups/{groupId}/appointments", groupId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("error.errorCode").value(ErrorCode.GROUP_NOT_EXIST.getErrorCode()))
         .andDo(restDocs.document());
   }
 

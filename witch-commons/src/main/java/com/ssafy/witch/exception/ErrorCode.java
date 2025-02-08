@@ -47,7 +47,8 @@ public enum ErrorCode {
   CONFLICTING_APPOINTMENT_TIME("WCH5002", "기존 약속과 시간이 겹칩니다."),
   UNAUTHORIZED_APPOINTMENT_ACCESS("WCH5003", "해당 약속에 대한 권한이 없습니다."),
   NON_EXISTENT_APPOINTMENT("WCH5006", "존재하지 않는 약속에 대한 요청입니다."),
-  ALREADY_JOIN_APPOINTMENT("WCH5007", "대상이 이미 가입한 모임입니다.");
+  ALREADY_JOIN_APPOINTMENT("WCH5007", "대상이 이미 참여한 약속입니다."),
+  NOT_JOIN_APPOINTMENT("WCH5008", "대상이 이미 참여하지 않은 약속입니다.");
 
   private final String errorCode;
   private final String errorMessage;

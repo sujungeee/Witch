@@ -40,6 +40,12 @@ public class AppointmentRepository implements AppointmentPort, AppointmentReadPo
   }
 
   @Override
+  public boolean existsById(String appointmentId) {
+    return appointmentJpaRepository.existsById(appointmentId);
+  }
+
+
+  @Override
   public List<AppointmentProjection> getAppointments(String userId, String groupId) {
     return appointmentJpaRepository.getAppointments(userId, groupId)
         .stream()

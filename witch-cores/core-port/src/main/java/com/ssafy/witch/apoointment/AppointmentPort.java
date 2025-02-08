@@ -12,4 +12,7 @@ public interface AppointmentPort {
 
 
   Optional<Appointment> findById(String appointmentId);
+
+  boolean existsById(String appointmentId);
+
 }

@@ -1,7 +1,6 @@
 package com.ssafy.witch.controller.group;
 
 import com.ssafy.witch.controller.group.mapper.GroupMemberResponseMapper;
-import com.ssafy.witch.controller.group.mapper.GroupResponseMapper;
 import com.ssafy.witch.controller.group.response.GroupMemberListResponse;
 import com.ssafy.witch.group.ReadGroupMemberUseCase;
 import com.ssafy.witch.group.output.GroupMemberListOutput;

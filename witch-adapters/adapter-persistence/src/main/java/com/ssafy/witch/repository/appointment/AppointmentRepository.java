@@ -44,6 +44,11 @@ public class AppointmentRepository implements AppointmentPort, AppointmentReadPo
     return appointmentJpaRepository.existsById(appointmentId);
   }
 
+  @Override
+  public void delete(Appointment appointment) {
+    appointmentJpaRepository.delete(appointmentMapper.toEntity(appointment));
+  }
+
 
   @Override
   public List<AppointmentProjection> getAppointments(String userId, String groupId) {

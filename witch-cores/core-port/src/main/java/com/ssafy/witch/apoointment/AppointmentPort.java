@@ -15,4 +15,5 @@ public interface AppointmentPort {
 
   boolean existsById(String appointmentId);
 
+  void delete(Appointment appointment);
 }

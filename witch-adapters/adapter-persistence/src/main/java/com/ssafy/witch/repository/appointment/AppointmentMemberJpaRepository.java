@@ -11,4 +11,7 @@ public interface AppointmentMemberJpaRepository extends
 
   Optional<AppointmentMemberEntity> findByUserIdAndAppointmentId(String userId,
       String appointmentId);
+
+  void deleteAllByAppointmentId(String appointmentId);
+
 }

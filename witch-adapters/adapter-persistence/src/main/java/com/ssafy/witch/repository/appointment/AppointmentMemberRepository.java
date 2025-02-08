@@ -36,4 +36,9 @@ public class AppointmentMemberRepository implements AppointmentMemberPort {
   public void delete(AppointmentMember appointmentMember) {
     appointmentMemberJpaRepository.delete(appointmentMemberMapper.toEntity(appointmentMember));
   }
+
+  @Override
+  public void deleteAllByAppointmentId(String appointmentId) {
+    appointmentMemberJpaRepository.deleteAllByAppointmentId(appointmentId);
+  }
 }

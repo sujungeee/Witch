@@ -12,4 +12,6 @@ public interface AppointmentMemberPort {
   Optional<AppointmentMember> findByUserIdAndAppointmentId(String userId, String appointmentId);
 
   void delete(AppointmentMember appointmentMember);
+
+  void deleteAllByAppointmentId(String appointmentId);
 }

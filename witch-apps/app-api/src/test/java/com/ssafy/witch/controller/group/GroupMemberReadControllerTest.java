@@ -34,7 +34,7 @@ class GroupMemberReadControllerTest extends RestDocsTestSupport {
 
   @WithMockWitchUser
   @Test
-  void get_my_group_list_200() throws Exception {
+  void get_group_member_list_200() throws Exception {
 
     String groupId = "group-id-example";
 

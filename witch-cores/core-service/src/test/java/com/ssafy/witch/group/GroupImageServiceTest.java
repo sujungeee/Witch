@@ -45,11 +45,13 @@ class GroupImageServiceTest {
   void 파일에_대한_소유권이_없으면_사진_변경에_실패한다() {
     //given
     String userId = "test-user-id";
+    String ownerId = "diff-user-id";
     String groupId = "test-group-id";
     String objectKey = "/object/key/example";
 
     BDDMockito.given(fileOwnerCachePort.getOwnerId(objectKey))
-        .willThrow(InvalidFileOwnerException.class);
+        .willReturn(ownerId);
+
     //when&then
     Assertions.assertThatThrownBy(() -> {
       UpdateGroupImageCommand command = new UpdateGroupImageCommand(userId, groupId, objectKey);
@@ -88,7 +90,7 @@ class GroupImageServiceTest {
     BDDMockito.given(groupPort.findById(groupId)).willReturn(Optional.of(group));
 
     BDDMockito.given(groupMemberPort.isLeaderByUserIdAndGroupId(userId, groupId))
-        .willThrow(UnauthorizedGroupAccessException.class);
+        .willReturn(false);
 
     //when&then
     Assertions.assertThatThrownBy(() -> {

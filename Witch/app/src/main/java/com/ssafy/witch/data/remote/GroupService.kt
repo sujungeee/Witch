@@ -34,7 +34,8 @@ interface GroupService {
         @Body groupName: String
     ) : BaseResponse<String>
 
-
+    @GET("groups/me")
+    suspend fun getMyGroupList() : BaseResponse<GroupListResponse>
 
 
 }

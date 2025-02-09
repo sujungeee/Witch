@@ -2,8 +2,8 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="witch_black">#FF0E0E0E</color>
-    <color name="witch_green">#FF52FF46</color>
+    <color name="witch_black">#FF151515</color>
+    <color name="witch_green">#FF58E24E</color>
     <color name="witch_light_green">#FFEDFBEA</color>
     <color name="witch_white">#FFF9F9F9</color>
     <color name="witch_gray">#FFA0A0A0</color>

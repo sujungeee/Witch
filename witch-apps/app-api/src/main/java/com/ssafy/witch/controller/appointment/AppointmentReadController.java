@@ -1,9 +1,11 @@
 package com.ssafy.witch.controller.appointment;
 
 import com.ssafy.witch.appointment.ReadAppointmentUseCase;
+import com.ssafy.witch.appointment.output.AppointmentDetailOutput;
 import com.ssafy.witch.appointment.output.AppointmentListOutput;
 import com.ssafy.witch.appointment.output.AppointmentWithGroupListOutput;
 import com.ssafy.witch.controller.appointment.mapper.AppointmentResponseMapper;
+import com.ssafy.witch.controller.appointment.response.AppointmentDetailResponse;
 import com.ssafy.witch.controller.appointment.response.AppointmentListResponse;
 import com.ssafy.witch.controller.appointment.response.AppointmentWithGroupListResponse;
 import com.ssafy.witch.response.WitchApiResponse;
@@ -43,6 +45,16 @@ public class AppointmentReadController {
     AppointmentWithGroupListOutput output = readAppointmentUseCase.getMyAppointments(userId, year,
         month);
     AppointmentWithGroupListResponse response = appointmentResponseMapper.toResponse(output);
+    return WitchApiResponse.success(response);
+  }
+
+  @GetMapping("/appointments/{appointmentId}")
+  public WitchApiResponse<AppointmentDetailResponse> getAppointmentDetail(
+      @AuthenticationPrincipal String userId,
+      @PathVariable String appointmentId) {
+    AppointmentDetailOutput output =
+        readAppointmentUseCase.getAppointmentDetail(userId, appointmentId);
+    AppointmentDetailResponse response = appointmentResponseMapper.toResponse(output);
     return WitchApiResponse.success(response);
   }
 }

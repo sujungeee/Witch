@@ -1,4 +1,4 @@
-package com.ssafy.witch.Auth
+package com.ssafy.witch.ui.auth
 
 import android.app.Application
 import android.util.Log
@@ -8,22 +8,21 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.data.local.SharedPreferencesUtil
-import com.ssafy.witch.data.model.dto.JoinUser
 import com.ssafy.witch.data.model.dto.Login
 import com.ssafy.witch.data.model.dto.RefreshToken
+import com.ssafy.witch.data.model.dto.User
 import com.ssafy.witch.data.remote.AuthService
 import com.ssafy.witch.data.remote.RetrofitUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.json.JSONObject
 
 private const val TAG = "LoginFragmentViewModel"
 class LoginFragmentViewModel(application: Application): AndroidViewModel(application) {
 
     //뷰모델에서만 쓰는 것
-    private val _joinUser = MutableLiveData<JoinUser>()
+    private val _joinUser = MutableLiveData<User>()
     //뷰모델 외 사용 가능한 public 선언
-    val joinUser:LiveData<JoinUser>
+    val joinUser:LiveData<User>
         get() = _joinUser
 
     val sharedPreferencesUtil = SharedPreferencesUtil(application.applicationContext)
@@ -53,7 +52,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
 
                        Log.d(TAG, "login: ${response.data.accessToken}")
                        // LiveData 업데이트 -> 기본이미지 링크 업로드 필요
-                       _joinUser.postValue(JoinUser(response.data.accessToken, response.data.refreshToken, email, ""))
+                       _joinUser.postValue(User(response.data.accessToken, response.data.refreshToken, email, ""))
 
                        //로그인 성공
                        onResult(true, response.data.accessToken)

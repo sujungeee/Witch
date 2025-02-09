@@ -1,8 +1,10 @@
 package com.ssafy.witch.data.model.dto
 
 data class User (
-    val id: String,
+    val userId: String,
     val email: String,
     val nickname: String,
-    val profileImage: String
-)
+    val profileImageUrl: String
+){
+    constructor():this("", "", "","")
+}

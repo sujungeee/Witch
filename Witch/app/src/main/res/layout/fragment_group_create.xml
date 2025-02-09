@@ -41,7 +41,6 @@
         android:layout_marginTop="10dp"
         android:backgroundTint="@color/witch_white"
         android:hint="모임 이름을 입력해주세요."
-        android:textColor="@color/witch_white"
         android:textSize="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

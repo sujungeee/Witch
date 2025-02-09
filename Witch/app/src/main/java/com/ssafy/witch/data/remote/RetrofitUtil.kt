@@ -12,5 +12,8 @@ class RetrofitUtil {
 
         val groupService = ApplicationClass.retrofit.create(GroupService::class.java)
 
+        val s3Service = ApplicationClass.retrofit.create(S3Service::class.java)
+
+        val snackService = ApplicationClass.retrofit.create(SnackService::class.java)
     }
 }

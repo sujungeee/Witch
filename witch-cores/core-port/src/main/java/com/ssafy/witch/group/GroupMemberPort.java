@@ -11,4 +11,6 @@ public interface GroupMemberPort {
   List<GroupMember> findAllByGroupId(String groupId);
 
   boolean isLeaderByUserIdAndGroupId(String userId, String groupId);
+
+  void deleteMember(String userId, String groupId);
 }

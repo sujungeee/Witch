@@ -5,12 +5,21 @@ import static com.ssafy.witch.entity.appointment.QAppointmentEntity.appointmentE
 import static com.ssafy.witch.entity.appointment.QAppointmentMemberEntity.appointmentMemberEntity;
 import static com.ssafy.witch.entity.group.QGroupEntity.groupEntity;
 
+import com.querydsl.core.group.GroupBy;
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ssafy.witch.apoointment.model.AppointmentMemberProjection;
+import com.ssafy.witch.entity.appointment.AppointmentDetailEntityProjection;
+import com.ssafy.witch.entity.appointment.AppointmentEntity;
 import com.ssafy.witch.entity.appointment.AppointmentEntityProjection;
 import com.ssafy.witch.entity.appointment.AppointmentWithGroupEntityProjection;
+import com.ssafy.witch.entity.appointment.QAppointmentEntity;
+import com.ssafy.witch.entity.appointment.QAppointmentMemberEntity;
+import com.ssafy.witch.entity.user.QUserEntity;
 import com.ssafy.witch.group.model.GroupProjection;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -83,6 +92,49 @@ public class AppointmentCustomRepositoryImpl implements AppointmentCustomReposit
         )
         .orderBy(appointmentEntity.appointmentTime.asc())
         .fetch();
+  }
+
+  @Override
+  public AppointmentDetailEntityProjection getAppointmentDetail(String appointmentId) {
+    QAppointmentEntity appointment = QAppointmentEntity.appointmentEntity;
+    QAppointmentMemberEntity member = QAppointmentMemberEntity.appointmentMemberEntity;
+    QUserEntity user = QUserEntity.userEntity;
+
+    Map<AppointmentEntity, List<AppointmentMemberProjection>> transform = queryFactory
+        .select(appointment)
+        .from(appointment)
+        .leftJoin(member).on(member.appointmentId.eq(appointment.appointmentId))
+        .leftJoin(user).on(member.userId.eq(user.userId))
+        .where(appointment.appointmentId.eq(appointmentId))
+        .transform(GroupBy.groupBy(appointment).as(
+            GroupBy.list(
+                Projections.constructor(
+                    AppointmentMemberProjection.class,
+                    user.userId,
+                    user.nickname,
+                    user.profileImageUrl,
+                    member.isLeader
+                )
+            )
+        ));
+
+    Map.Entry<AppointmentEntity, List<AppointmentMemberProjection>> entry =
+        transform.entrySet().iterator().next();
+    AppointmentEntity appointmentEntity = entry.getKey();
+    List<AppointmentMemberProjection> members = entry.getValue();
+
+    // 3. DTO 매핑
+    return new AppointmentDetailEntityProjection(
+        appointmentEntity.getAppointmentId(),
+        appointmentEntity.getName(),
+        appointmentEntity.getStatus(), // Enum 변환 필요 시
+        appointmentEntity.getSummary(),
+        appointmentEntity.getAppointmentTime(),
+        appointmentEntity.getAddress(),
+        appointmentEntity.getLongitude(),
+        appointmentEntity.getLatitude(),
+        members
+    );
   }
 
 }

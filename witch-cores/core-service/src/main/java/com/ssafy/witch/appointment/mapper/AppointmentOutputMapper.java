@@ -1,7 +1,9 @@
 package com.ssafy.witch.appointment.mapper;
 
+import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.apoointment.model.AppointmentProjection;
 import com.ssafy.witch.apoointment.model.AppointmentWithGroupProjection;
+import com.ssafy.witch.appointment.output.AppointmentDetailOutput;
 import com.ssafy.witch.appointment.output.AppointmentListOutput;
 import com.ssafy.witch.appointment.output.AppointmentOutput;
 import com.ssafy.witch.appointment.output.AppointmentWithGroupListOutput;
@@ -27,4 +29,6 @@ public interface AppointmentOutputMapper {
 
   List<AppointmentWithGroupOutput> appointmentWithGroupProjectionToAppointmentWithGroupOutputList(
       List<AppointmentWithGroupProjection> projections);
+
+  AppointmentDetailOutput toOutput(AppointmentDetailProjection projection);
 }

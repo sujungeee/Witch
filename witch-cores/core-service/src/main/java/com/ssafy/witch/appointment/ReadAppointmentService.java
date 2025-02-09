@@ -1,11 +1,13 @@
 package com.ssafy.witch.appointment;
 
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
+import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.apoointment.AppointmentReadPort;
 import com.ssafy.witch.appointment.mapper.AppointmentOutputMapper;
 import com.ssafy.witch.appointment.output.AppointmentDetailOutput;
 import com.ssafy.witch.appointment.output.AppointmentListOutput;
 import com.ssafy.witch.appointment.output.AppointmentWithGroupListOutput;
+import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
 import com.ssafy.witch.exception.appointment.UnauthorizedAppointmentAccessException;
 import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
@@ -20,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class ReadAppointmentService implements ReadAppointmentUseCase {
 
+  private final AppointmentPort appointmentPort;
   private final GroupPort groupPort;
   private final AppointmentReadPort appointmentReadPort;
   private final GroupMemberPort groupMemberPort;
@@ -46,6 +49,9 @@ public class ReadAppointmentService implements ReadAppointmentUseCase {
 
   @Override
   public AppointmentDetailOutput getAppointmentDetail(String userId, String appointmentId) {
+    if (!appointmentPort.existsById(appointmentId)) {
+      throw new AppointmentNotFoundException();
+    }
 
     if (!appointmentMemberPort.existsByUserIdAndAppointmentId(userId, appointmentId)) {
       throw new UnauthorizedAppointmentAccessException();

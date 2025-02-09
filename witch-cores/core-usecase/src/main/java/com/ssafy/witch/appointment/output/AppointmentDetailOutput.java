@@ -17,8 +17,8 @@ public class AppointmentDetailOutput {
   private String summary;
   private LocalDateTime appointmentTime;
   private String address;
-  private Double longitude;
   private Double latitude;
+  private Double longitude;
 
   private List<AppointmentMemberOutput> members;
 

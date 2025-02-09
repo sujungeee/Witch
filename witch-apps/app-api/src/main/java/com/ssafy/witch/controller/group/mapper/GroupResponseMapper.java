@@ -1,8 +1,10 @@
 package com.ssafy.witch.controller.group.mapper;
 
+import com.ssafy.witch.controller.group.response.GroupDetailResponse;
 import com.ssafy.witch.controller.group.response.GroupListResponse;
 import com.ssafy.witch.controller.group.response.GroupPreviewResponse;
 import com.ssafy.witch.group.Group;
+import com.ssafy.witch.group.output.GroupDetailOutput;
 import com.ssafy.witch.group.output.GroupWithLeaderListOutput;
 import org.mapstruct.Mapper;
 
@@ -12,4 +14,6 @@ public interface GroupResponseMapper {
   GroupPreviewResponse toPreviewResponse(Group group);
 
   GroupListResponse toGroupListResponse(GroupWithLeaderListOutput output);
+
+  GroupDetailResponse toGroupDetailResponse(GroupDetailOutput output);
 }

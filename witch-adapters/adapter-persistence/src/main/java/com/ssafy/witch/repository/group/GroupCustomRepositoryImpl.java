@@ -9,6 +9,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.witch.entity.group.QGroupEntity;
 import com.ssafy.witch.entity.group.QGroupMemberEntity;
 import com.ssafy.witch.entity.user.QUserEntity;
+import com.ssafy.witch.group.model.GroupDetailProjection;
 import com.ssafy.witch.group.model.GroupWithLeaderProjection;
 import com.ssafy.witch.user.model.UserBasicProjection;
 import java.util.List;
@@ -44,5 +45,24 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository {
         .join(user).on(groupMember.userId.eq(user.userId))
         .where(groupMember.userId.eq(userId).and(groupMember.isLeader.isTrue()))
         .fetch();
+  }
+
+  @Override
+  public GroupDetailProjection readGroupDetail(String userId, String groupId) {
+
+    return queryFactory
+        .select(Projections.constructor(
+            GroupDetailProjection.class,
+            groupEntity.groupId,
+            groupEntity.name,
+            groupEntity.groupImageUrl,
+            groupMemberEntity.isLeader,
+            groupMemberEntity.cntLateArrival)
+        )
+        .from(groupEntity)
+        .join(groupMemberEntity).on(groupEntity.groupId.eq(groupMemberEntity.groupId))
+        .join(userEntity).on(groupMemberEntity.userId.eq(userEntity.userId))
+        .where(groupEntity.groupId.eq(groupId).and(groupMemberEntity.userId.eq(userId)))
+        .fetchOne();
   }
 }

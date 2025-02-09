@@ -1,6 +1,8 @@
 package com.ssafy.witch.group.mapper;
 
+import com.ssafy.witch.group.model.GroupDetailProjection;
 import com.ssafy.witch.group.model.GroupWithLeaderProjection;
+import com.ssafy.witch.group.output.GroupDetailOutput;
 import com.ssafy.witch.group.output.GroupWithLeaderListOutput;
 import com.ssafy.witch.group.output.GroupWithLeaderOutput;
 import java.util.List;
@@ -15,4 +17,6 @@ public interface GroupOutputMapper {
 
   List<GroupWithLeaderOutput> groupProjectionToOutputList(
       List<GroupWithLeaderProjection> projections);
+
+  GroupDetailOutput toOutput(GroupDetailProjection projection);
 }

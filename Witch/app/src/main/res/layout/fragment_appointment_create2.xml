@@ -71,7 +71,7 @@
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
-            android:id="@+id/join_fg_btn_dupl_check_email"
+            android:id="@+id/appointment_fg_tv_search_place"
             android:layout_width="50dp"
             android:layout_height="25dp"
             android:background="@drawable/square_btn"
@@ -123,12 +123,13 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginStart="16dp"
-            android:text="배따라기"
+            android:text=""
             android:focusable="true"
             android:singleLine="true"
             android:ellipsize="marquee"
             android:textColor="@color/witch_black"
             android:textSize="18sp"
+            android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -139,21 +140,23 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="6dp"
             android:src="@drawable/location"
+            android:visibility="invisible"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/appointment_fg_tv_appointment_place_name" />
 
         <TextView
             android:id="@+id/appointment_fg_tv_appointment_address"
-            android:maxWidth="270dp"
+            android:maxWidth="300dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
-            android:text="경북 구미시 인동중앙로11길 7-1"
+            android:text=""
             android:focusable="true"
             android:singleLine="true"
             android:ellipsize="marquee"
             android:textColor="@color/witch_black"
             android:textSize="14sp"
+            android:visibility="invisible"
             app:layout_constraintStart_toEndOf="@+id/imageView"
             app:layout_constraintTop_toTopOf="@+id/imageView" />
 
@@ -162,11 +165,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:text="0507-1414-3858"
+            android:text=""
             android:textColor="@color/witch_black"
             android:textSize="14sp"
+            android:visibility="invisible"
             app:layout_constraintStart_toStartOf="@+id/appointment_fg_tv_appointment_address"
             app:layout_constraintTop_toBottomOf="@+id/appointment_fg_tv_appointment_address" />
+
+        <TextView
+            android:id="@+id/appointment_fg_tv_initialize"
+            style="@style/pt_semibold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="약속 장소를 선택해주세요"
+            android:textSize="16sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

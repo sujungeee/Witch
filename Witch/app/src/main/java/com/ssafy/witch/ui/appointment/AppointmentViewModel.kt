@@ -1,85 +1,163 @@
 package com.ssafy.witch.ui.appointment
 
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ssafy.witch.data.model.dto.request.AppointmentRequest
+import com.ssafy.witch.data.model.response.MyAppointmentResponse
+import com.ssafy.witch.data.remote.RetrofitUtil.Companion.appointmentService
 import kotlinx.coroutines.launch
-import java.math.BigDecimal
-import java.time.LocalDateTime
 
+private const val TAG = "AppointmentViewModel_Witch"
 class AppointmentViewModel: ViewModel() {
-    private val _title= MutableLiveData<String>()
-    val title: LiveData<String>
-        get()= _title
+    private val _toastMsg = MutableLiveData<String>()
+    val toastMsg: LiveData<String>
+        get() = _toastMsg
 
-    private val _summary= MutableLiveData<String?>()
-    val summary: LiveData<String?>
+    private val _appointmentList = MutableLiveData<MyAppointmentResponse?>()
+    val appointmentList: LiveData<MyAppointmentResponse?>
+        get() = _appointmentList
+
+    private val _name= MutableLiveData<String>()
+    val name: LiveData<String>
+        get()= _name
+
+    private val _summary= MutableLiveData<String>()
+    val summary: LiveData<String>
         get()= _summary
 
-    private val _appointmentTime= MutableLiveData<LocalDateTime>()
-    val appointmentTime: LiveData<LocalDateTime>
+    private val _appointmentTime= MutableLiveData<String>()
+    val appointmentTime: LiveData<String>
         get()= _appointmentTime
 
-    private val _latitude= MutableLiveData<BigDecimal>()
-    val latitude: LiveData<BigDecimal>
+    private val _latitude= MutableLiveData<Double>()
+    val latitude: LiveData<Double>
         get()= _latitude
 
-    private val _longitude= MutableLiveData<BigDecimal>()
-    val longitude: LiveData<BigDecimal>
+    private val _longitude= MutableLiveData<Double>()
+    val longitude: LiveData<Double>
         get()= _longitude
 
     private val _address= MutableLiveData<String>()
     val address: LiveData<String>
         get()= _address
 
-    fun appointmentClear(title: String, summary: String?, appointmentTime: LocalDateTime, latitude: BigDecimal, longitude: BigDecimal, address: String) {
+    fun appointmentClear() {
+        _name.value = ""
+        _summary.value = ""
+        _appointmentTime.value = ""
+        _latitude.value = Double.MIN_VALUE
+        _longitude.value = Double.MIN_VALUE
+        _address.value = ""
+    }
+
+    fun setName(name: String){
+        _name.value = name
+    }
+
+    fun setSummary(summary: String){
+        _summary.value = summary
+    }
+
+    fun setAppointmentTime(appointmentTime: String){
+        _appointmentTime.value = appointmentTime
+    }
+
+    fun setLatitude(latitude: Double){
+        _latitude.value = latitude
+    }
+    fun setLongitude(longitude: Double){
+        _longitude.value = longitude
+    }
+
+    fun setAddress(address: String){
+        _address.value = address
+    }
+
+    fun registerAppointment(){
         viewModelScope.launch {
-            try {
-                _title.value = ""
-                _summary.value = null
-                _appointmentTime.value = LocalDateTime.now()
-                _latitude.value = BigDecimal.ZERO
-                _longitude.value = BigDecimal.ZERO
-                _address.value = ""
-            } catch (e: Exception) {
-                Log.e("appointmentClear(AppointmentViewModel)", e.message.toString())
+            runCatching {
+                appointmentService.registerAppointment( 1, //TODO: groupId
+                    AppointmentRequest(
+                        name.value!!,
+                        summary.value!!,
+                        appointmentTime.value!!,
+                        latitude.value!!,
+                        longitude.value!!,
+                        address.value!!
+                    )
+                )
+            }.onSuccess {
+                if(it.success == true){
+                    Log.d(TAG, "registerAppointment(): success")
+                    _toastMsg.value = "약속이 생성되었어요!"
+                    appointmentClear()
+                } else {
+                    Log.d(TAG, "registerAppointment(): fail")
+                    _toastMsg.value = it.error.errorMessage
+                }
+            }.onFailure {
+                Log.d(TAG, "registerAppointment(): ${it.message}")
+                it.printStackTrace()
             }
         }
     }
 
-    fun registerAppointment1(title: String, summary: String?){
-        viewModelScope.launch{
-            try {
-                _title.value = title
-                _summary?.value= summary
-            } catch (e: Exception){
-                Log.e("registerAppointment1(AppointmentViewModel)", e.message.toString())
-            }
-        }
-    }
-
-    fun registerAppointment2(longitude: BigDecimal, latitude: BigDecimal, address: String){
-        viewModelScope.launch{
-            try {
-                _longitude.value = longitude
-                _latitude.value = latitude
-                _address.value = address
-            } catch(e: Exception){
-                Log.e("registerAppointment2(AppointmentViewModel)", e.message.toString())
-            }
-        }
-    }
-
-    fun registerAppointment3(appointmentTime: LocalDateTime){
+    fun deleteAppointment(appointmentId: Int) {
         viewModelScope.launch {
-            try {
-                _appointmentTime.value = appointmentTime
-            } catch (e: Exception) {
-                Log.e("registerAppointment3(AppointmentViewModel)", e.message.toString())
+            runCatching {
+                appointmentService.deleteAppointment(appointmentId)
+            }.onSuccess {
+                if (it.success == true) {
+                    Log.d(TAG, "deleteAppointment(): success")
+                    _toastMsg.value = "약속이 삭제되었어요!"
+                } else {
+                    Log.d(TAG, "deleteAppointment(): fail")
+                    _toastMsg.value = it.error.errorMessage
+                }
+            }.onFailure {
+                Log.d(TAG, "deleteAppointment(): ${it.message}")
+                it.printStackTrace()
+            }
+        }
+    }
+
+    fun participateAppointment(appointmentId: Int) {
+        viewModelScope.launch {
+            runCatching {
+                appointmentService.participateAppointment(appointmentId)
+            }.onSuccess {
+                if(it.success == true) {
+                    Log.d(TAG, "participateAppointment(): success")
+                    _toastMsg.value = "약속에 참여했어요!"
+                } else {
+                    Log.d(TAG, "participateAppointment(): fail")
+                    _toastMsg.value = it.error.errorMessage
+                }
+            }.onFailure {
+                Log.d(TAG, "participateAppointment(): fail")
+                _toastMsg.value = it.message
+            }
+        }
+    }
+
+    fun leaveAppointment(appointmentId: Int) {
+        viewModelScope.launch {
+            runCatching {
+                appointmentService.leaveAppointment(appointmentId)
+            }.onSuccess {
+                if (it.success == true) {
+                    Log.d(TAG, "leaveAppointment(): success")
+                    _toastMsg.value = "약속에서 탈퇴했어요!"
+                } else {
+                    Log.d(TAG, "leaveAppointment(): fail")
+                    _toastMsg.value = it.error.errorMessage
+                }
+            }.onFailure {
+                Log.d(TAG, "leaveAppointment: ${it.message}")
+                it.printStackTrace()
             }
         }
     }

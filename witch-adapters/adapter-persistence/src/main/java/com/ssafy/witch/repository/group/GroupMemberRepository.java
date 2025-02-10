@@ -6,6 +6,7 @@ import com.ssafy.witch.mapper.group.GroupMemberMapper;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Repository
@@ -37,4 +38,11 @@ public class GroupMemberRepository implements GroupMemberPort {
   public boolean isLeaderByUserIdAndGroupId(String userId, String groupId) {
     return groupMemberJpaRepository.isLeaderByUserIdAndGroupId(userId, groupId);
   }
+
+  @Transactional
+  @Override
+  public void deleteMember(String userId, String groupId) {
+    groupMemberJpaRepository.deleteByUserIdAndGroupId(userId, groupId);
+  }
+
 }

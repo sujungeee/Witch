@@ -9,6 +9,7 @@ import com.ssafy.witch.data.model.response.MyAppointmentResponse
 import com.ssafy.witch.data.remote.RetrofitUtil
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.appointmentService
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 class HomeViewModel : ViewModel() {
     private val _appointmentList = MutableLiveData<MyAppointmentResponse>()
@@ -22,7 +23,7 @@ class HomeViewModel : ViewModel() {
 
         viewModelScope.launch {
             runCatching {
-                appointmentService.getMyAppointments()
+                appointmentService.getMyAppointments(LocalDateTime.now().year, LocalDateTime.now().month.value)
             }.onSuccess {
                 if (it.success) {
                     it.data?.let { appointments ->

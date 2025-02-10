@@ -77,17 +77,17 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    fun openFragment(index: Int) {
-        moveFragment(index)
+    fun openFragment(index: Int, id: String = "") {
+        moveFragment(index, id)
     }
 
-    private fun moveFragment(index:Int){
+    private fun moveFragment(index:Int, id: String = "") {
         val transaction = supportFragmentManager.beginTransaction()
         when(index){
             1 -> transaction.replace(R.id.main_flayout, HomeFragment())
             2 -> transaction.replace(R.id.main_flayout, GroupListFragment())
             3 -> transaction.replace(R.id.main_flayout, MyPageFragment())
-            5 -> transaction.replace(R.id.main_flayout, GroupFragment())
+            5 -> transaction.replace(R.id.main_flayout, GroupFragment.newInstance("groupId", id))
                 .addToBackStack(null)
             6 -> transaction.replace(R.id.main_flayout, GroupCreateFragment())
                 .addToBackStack(null)

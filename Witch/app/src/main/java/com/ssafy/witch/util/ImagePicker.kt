@@ -12,14 +12,15 @@ class ImagePicker(
     private val fragment: Fragment,
     private val onImageSelected: (Uri) -> Unit
 ) {
-    private val requestPermissionLauncher =
-        fragment.registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                openGallery()
-            } else {
-                Toast.makeText(fragment.requireContext(), "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
-            }
+    private val requestPermissionLauncher = fragment.registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            openGallery()
+        } else {
+            Toast.makeText(fragment.requireContext(), "권한을 허용해주세요.", Toast.LENGTH_SHORT).show()
         }
+    }
 
     private val pickImageLauncher = fragment.registerForActivityResult(
         ActivityResultContracts.GetContent()

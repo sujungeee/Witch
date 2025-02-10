@@ -5,9 +5,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.ssafy.witch.data.model.response.GroupApproval
+import com.ssafy.witch.data.model.response.GroupJoinListResponse.JoinRequest
 import com.ssafy.witch.databinding.GroupApprovalMemberItemBinding
 
-class GroupApprovalListAdapter(val groupApprovalList: List<GroupApproval>, var itemClickListener: OnItemClickListener) : RecyclerView.Adapter<GroupApprovalListAdapter.GroupMemberListViewHolder>() {
+class GroupApprovalListAdapter(val groupApprovalList: List<JoinRequest>, var itemClickListener: OnItemClickListener) : RecyclerView.Adapter<GroupApprovalListAdapter.GroupMemberListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GroupMemberListViewHolder {
         val binding = GroupApprovalMemberItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -38,11 +39,11 @@ class GroupApprovalListAdapter(val groupApprovalList: List<GroupApproval>, var i
 
 
             binding.groupApprovalMemberItemBtnApprove.setOnClickListener {
-                itemClickListener.onApprove(groupApprovalList[position].user.userId)
+                itemClickListener.onApprove(groupApprovalList[position].joinRequestId)
             }
 
             binding.groupApprovalMemberItemBtnReject.setOnClickListener {
-                itemClickListener.onReject(groupApprovalList[position].user.userId)
+                itemClickListener.onReject(groupApprovalList[position].joinRequestId)
             }
 
             binding.groupApprovalMemberItemTvProfileName.isSelected = true

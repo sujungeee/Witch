@@ -83,6 +83,11 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
             startWorkManager()
 
+            arguments?.let {
+                userStatus = it.getInt("userStatus")
+                appointmentStatus = it.getInt("appointmentStatus")
+            }
+
             snackList= listOf(
                 SnackItem(1, R.drawable.example_snack),
                 SnackItem(1, R.drawable.example_snack),
@@ -380,6 +385,15 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
                     postDelayed(this, 1000)
                 }
+            }
+        }
+
+        companion object {
+            fun newInstance(value: String) {
+                val args = Bundle()
+                args.putString("id", value)
+                val fragment = MapFragment()
+                fragment.arguments = args
             }
         }
 }

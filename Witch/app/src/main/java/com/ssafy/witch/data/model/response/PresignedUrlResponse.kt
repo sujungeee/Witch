@@ -4,5 +4,5 @@ import com.google.gson.annotations.SerializedName
 
 data class PresignedUrl(
     @SerializedName("presignedUrl")  var presignedUrl: String,
-    @SerializedName("objectKey")  var objectKey: String
+    @SerializedName("objectKey")  var objectKey: String?
 )

@@ -4,6 +4,8 @@ import static com.fasterxml.jackson.databind.node.JsonNodeType.BOOLEAN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.willDoNothing;
 import static org.mockito.BDDMockito.willThrow;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.delete;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
@@ -41,9 +43,15 @@ class GroupLeaveControllerTest extends RestDocsTestSupport {
         willDoNothing().given(leaveGroupUseCase).leaveGroup(any(LeaveGroupCommand.class));
 
         mvc.perform(delete("/groups/{groupId}/members/me", GROUP_ID)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer sample.access.token")
+                )
                 .andExpect(status().isOk())
                 .andDo(restDocs.document(
+                        requestHeaders(
+                                headerWithName("Authorization")
+                                        .description("JWT access token")
+                        ),
                         pathParameters(
                                 parameterWithName("groupId").description("탈퇴할 모임 식별자")
                         ),
@@ -75,9 +83,12 @@ class GroupLeaveControllerTest extends RestDocsTestSupport {
                 .leaveGroup(any(LeaveGroupCommand.class));
 
         mvc.perform(delete("/groups/{groupId}/members/me", GROUP_ID)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", "Bearer sample.access.token")
+                )
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("error.errorCode").value(ErrorCode.NOT_JOINED_MEETING.getErrorCode()))
+                .andExpect(jsonPath("error.errorCode")
+                        .value(ErrorCode.NOT_JOINED_MEETING.getErrorCode()))
                 .andDo(restDocs.document());
     }
 
@@ -89,7 +100,9 @@ class GroupLeaveControllerTest extends RestDocsTestSupport {
                 .leaveGroup(any(LeaveGroupCommand.class));
 
         mvc.perform(delete("/groups/{groupId}/members/me", GROUP_ID)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", "Bearer sample.access.token")
+                )
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("error.errorCode").value(ErrorCode.UNAUTHORIZED_GROUP_ACCESS.getErrorCode()))
                 .andDo(restDocs.document());

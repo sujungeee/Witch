@@ -8,9 +8,9 @@ import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseActivity
 import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.databinding.ActivityLoginBinding
-import com.ssafy.witch.Auth.JoinFragment
-import com.ssafy.witch.Auth.LoginFragment
-import com.ssafy.witch.Auth.LoginFragmentViewModel
+import com.ssafy.witch.ui.auth.JoinFragment
+import com.ssafy.witch.ui.auth.LoginFragment
+import com.ssafy.witch.ui.auth.LoginFragmentViewModel
 import kotlinx.coroutines.launch
 
 

@@ -1,9 +1,11 @@
 package com.ssafy.witch.ui.mypage
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity.RESULT_OK
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.database.Cursor
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
@@ -17,36 +19,30 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.ssafy.witch.R
+import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentMyPageBinding
 import com.ssafy.witch.databinding.FragmentProfileEditBinding
+import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.group.EditViewModel
 import com.ssafy.witch.ui.group.GroupViewModel
+import com.ssafy.witch.util.ImagePicker
+import kotlinx.coroutines.launch
 import java.io.File
 
 
 private const val TAG = "ProfileEditFragment"
 class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentProfileEditBinding::bind, R.layout.fragment_profile_edit) {
     private val viewModel: EditViewModel by viewModels()
-    private var imageUri: Uri? = null
-
-    private val requestPermissionLauncher: ActivityResultLauncher<String> =
-        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-            if (isGranted) {
-                Log.d(TAG, "onRequestPermissionsResult: 권한 허용")
-                openGallery()
-            } else {
-                Log.d(TAG, "onRequestPermissionsResult: 권한 거부")
-                Toast.makeText(requireContext(), "권한을 허용해주세요.", Toast.LENGTH_SHORT).show()
-            }
-        }
+    private lateinit var imagePickerUtil: ImagePicker
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initView()
-
 
     }
 
@@ -55,6 +51,11 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
     }
 
     fun initView(){
+
+        binding.profileEditFgEtNickname.setText(ApplicationClass.sharedPreferencesUtil.getUser().nickname)
+        Glide.with(binding.root)
+            .load(ApplicationClass.sharedPreferencesUtil.getUser().profileImageUrl)
+            .into(binding.profileEditFgIvProfileImage)
 
         initImage()
 
@@ -72,39 +73,43 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
         }
 
         binding.profileEditFgBtnPhotoChange.setOnClickListener {
-            viewModel.getPresignedUrl("profile")
+            lifecycleScope.launch {
+                viewModel.uploadImage("profile", requireContext() as ContentActivity)
+            }
+        }
+
+        imagePickerUtil = ImagePicker(this) { uri ->
+            viewModel.setFile(uri)
+            binding.profileEditFgIvProfileImage.setImageURI(uri)
         }
 
         binding.profileEditFgBtnImageUpload.setOnClickListener {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "initView: permission granted")
-                openGallery()
-            } else {
-                Log.d(TAG, "initView: 권한 없음")
-                requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
-            }
+            imagePickerUtil.checkPermissionAndOpenGallery()
         }
 
     }
 
 
-    private fun openGallery() {
-        val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-        pickImageLauncher.launch(gallery)
+
+    @SuppressLint("Range")
+    fun getPathFromUri(uri: Uri): String {
+        val projection = arrayOf(MediaStore.Images.Media.DATA)
+        val cursor = requireActivity().contentResolver.query(uri, projection, null, null, null)
+        cursor!!.moveToNext()
+        val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
+
+        cursor.close()
+        return path
     }
-    private val pickImageLauncher: ActivityResultLauncher<Intent> =
-        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
-            if (result.resultCode == RESULT_OK) {
-                val data: Intent? = result.data
-                data?.data?.let {
-                    imageUri = it
-                    it.path?.let { path ->
-                        val file = File(path)
-                        viewModel.setFile(file)
-                        Log.d(TAG, "pickImageLauncher: $file")
-                    }
-                    binding.profileEditFgIvProfileImage.setImageURI(imageUri)
-                }
-            }
-        }
+
+    @SuppressLint("Range")
+    private fun getPath(uri: Uri): String {
+        val cursor: Cursor? = requireContext().contentResolver.query(uri, null, null, null, null )
+        cursor?.moveToNext()
+        val path: String? = cursor?.getString(cursor.getColumnIndex("_data"))
+
+        cursor?.close()
+
+        return path?:""
+    }
 }

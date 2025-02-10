@@ -21,27 +21,27 @@ class LocationWorker(context: Context, params: WorkerParameters): CoroutineWorke
         Log.d(TAG, "LocationWorker started")
 
         // 실시간 위치를 보내기 위한 약속 시간 확인
-        runCatching {
-            appointmentService.getMyAppointments(LocalDateTime.now().year, LocalDateTime.now().month.value)
-        }.onSuccess {
-            if (it.success == true) {
-                Log.d(TAG, "doWork(): success")
-                it.data?.appointments?.let { appointments ->
-                    for (appointment in appointments) {
-                        val remainingTime = Duration.between(LocalDateTime.now(), appointment.appointmentTime).toMinutes()
-
-                        if (remainingTime in 0..30) {
-                            scheduleAlarm(applicationContext, remainingTime)
-                            return@onSuccess
-                        }
-                    }
-                }
-            } else {
-                Log.d(TAG, "doWork(): fail")
-            }
-        }.onFailure {
-            Log.d(TAG, "doWork(): ${it.message}")
-        }
+//        runCatching {
+//            appointmentService.getMyAppointments(LocalDateTime.now().year, LocalDateTime.now().month.value)
+//        }.onSuccess {
+//            if (it.success == true) {
+//                Log.d(TAG, "doWork(): success")
+//                it.data?.appointments?.let { appointments ->
+//                    for (appointment in appointments) {
+//                        val remainingTime = Duration.between(LocalDateTime.now(), appointment.appointmentTime).toMinutes()
+//
+//                        if (remainingTime in 0..30) {
+//                            scheduleAlarm(applicationContext, remainingTime)
+//                            return@onSuccess
+//                        }
+//                    }
+//                }
+//            } else {
+//                Log.d(TAG, "doWork(): fail")
+//            }
+//        }.onFailure {
+//            Log.d(TAG, "doWork(): ${it.message}")
+//        }
 
         return Result.success()
     }

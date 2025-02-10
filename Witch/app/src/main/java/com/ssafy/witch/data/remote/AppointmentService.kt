@@ -12,11 +12,13 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface AppointmentService {
+
     @GET("/appointments/me")
     suspend fun getMyAppointments(
         @Query("year") year: Int,
         @Query("month") month: Int
     ): BaseResponse<MyAppointmentResponse>
+
 
     @GET("/groups/{groupId}/appointments")
     suspend fun getGroupAppointmentList(

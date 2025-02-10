@@ -33,16 +33,16 @@ class GroupApprovalListAdapter(val groupApprovalList: List<GroupApproval>, var i
 
             Glide
                 .with(binding.root)
-                .load(groupApprovalList[position].user.profileImage)
+                .load(groupApprovalList[position].user.profileImageUrl)
                 .into(binding.groupApprovalMemberItemIvProfileImage)
 
 
             binding.groupApprovalMemberItemBtnApprove.setOnClickListener {
-                itemClickListener.onApprove(groupApprovalList[position].user.id)
+                itemClickListener.onApprove(groupApprovalList[position].user.userId)
             }
 
             binding.groupApprovalMemberItemBtnReject.setOnClickListener {
-                itemClickListener.onReject(groupApprovalList[position].user.id)
+                itemClickListener.onReject(groupApprovalList[position].user.userId)
             }
 
             binding.groupApprovalMemberItemTvProfileName.isSelected = true

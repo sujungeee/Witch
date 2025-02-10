@@ -27,7 +27,7 @@ class ApplicationClass : Application() {
     // 코틀린의 전역변수 문법
     companion object {
         //ends with '/'
-        val API_URL = "http://192.168.100.138:8080/"
+        val API_URL = "http://192.168.100.189:8080/"
 
         lateinit var sharedPreferencesUtil: SharedPreferencesUtil
         lateinit var retrofit: Retrofit

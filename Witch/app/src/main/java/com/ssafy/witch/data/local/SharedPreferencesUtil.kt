@@ -4,7 +4,6 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.ssafy.witch.data.model.dto.JoinUser
 import com.ssafy.witch.data.model.dto.User
 import java.time.LocalDateTime
 
@@ -24,6 +23,8 @@ class SharedPreferencesUtil (context : Context) {
 
     val KEY_EMAIL = "email"
     val KEY_NICK = "nickname"
+    val KEY_PROFILE_IMAGE = "profileImageUrl"
+    val KET_USERID= "userId"
 
     //블랙리스트 구현 필요?
 
@@ -99,24 +100,28 @@ class SharedPreferencesUtil (context : Context) {
     }
 
     //사용자 정보 저장, user dto 생성하기
-    fun addJoinUser(user: JoinUser) {
+    fun addUser(user: User) {
         val editor =  preference.edit()
+        editor.putString(KET_USERID, user.userId)
         editor.putString(KEY_EMAIL, user.email)
         editor.putString(KEY_NICK, user.nickname)
+        editor.putString(KEY_PROFILE_IMAGE, user.profileImageUrl)
         editor.apply()
     }
 
-    fun getJoinUser(): JoinUser {
+    fun getUser(): User {
         val email = preference.getString(KEY_EMAIL, "")
         if(email != "") {
             val nickname = preference.getString(KEY_NICK, "")
-            return JoinUser("", email!!, nickname!!, "")
+            val profileImage = preference.getString(KEY_PROFILE_IMAGE, "")
+            val userId = preference.getString(KET_USERID, "")
+            return User(userId!!, email!!, nickname!!, profileImage!!)
         } else{
-          return JoinUser()
+          return User()
         }
     }
 
-    fun deleteJoinUser(){
+    fun deleteUser(){
         //preference 지우기
         val editor = preference.edit()
         editor.clear()

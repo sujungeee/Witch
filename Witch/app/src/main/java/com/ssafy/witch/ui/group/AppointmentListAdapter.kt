@@ -5,7 +5,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.witch.data.model.dto.AppointmentListItem
-import com.ssafy.witch.data.model.dto.GroupListItem
 import com.ssafy.witch.databinding.GroupAppointmentListItemBinding
 import com.ssafy.witch.databinding.GroupListItemBinding
 import com.ssafy.witch.databinding.HomeAppointmentListItemBinding

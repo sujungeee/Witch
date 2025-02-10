@@ -52,6 +52,8 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
 
         val dialog = Dialog(requireContext())
         dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
 
         dialogBinding.dlBtnNo.setOnClickListener {
             dialog.dismiss()
@@ -59,7 +61,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
         dialogBinding.dlBtnYes.setOnClickListener {
             ApplicationClass.sharedPreferencesUtil.clearToken()
             // 회원탈퇴와 달리 로컬 저장 데이터만 삭제
-            ApplicationClass.sharedPreferencesUtil.deleteJoinUser()
+            ApplicationClass.sharedPreferencesUtil.deleteUser()
 
             // 로그인 액티비티로 전환 (기존 스택 모두 클리어)
             val intent = Intent(requireContext(), LoginActivity::class.java).apply {

@@ -5,7 +5,7 @@
     android:fillViewport="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Auth.JoinFragment">
+    tools:context=".ui.auth.JoinFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -61,6 +61,7 @@
                 android:layout_width="60dp"
                 android:layout_height="25dp"
                 android:layout_marginHorizontal="10dp"
+                android:layout_marginEnd="12dp"
                 android:background="@drawable/square_btn"
                 android:backgroundTint="#D9D9D9"
                 android:clickable="true"
@@ -68,8 +69,9 @@
                 android:text="중복체크"
                 android:textColor="@color/witch_black"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintEnd_toEndOf="@+id/join_fg_et_email"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.529" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -302,6 +304,7 @@
                 android:layout_width="60dp"
                 android:layout_height="25dp"
                 android:layout_marginHorizontal="10dp"
+                android:layout_marginEnd="12dp"
                 android:background="@drawable/square_btn"
                 android:backgroundTint="#D9D9D9"
                 android:clickable="true"
@@ -309,7 +312,7 @@
                 android:text="중복체크"
                 android:textColor="@color/witch_black"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintEnd_toEndOf="@+id/join_fg_et_nick"
                 app:layout_constraintTop_toTopOf="parent" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>

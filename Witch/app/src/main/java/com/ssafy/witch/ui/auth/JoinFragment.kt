@@ -1,4 +1,4 @@
-package com.ssafy.witch.Auth
+package com.ssafy.witch.ui.auth
 
 import android.content.Context
 import android.os.Bundle

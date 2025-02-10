@@ -126,7 +126,6 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         val dialog = Dialog(requireContext())
         dialog.setContentView(dialogBinding.root)
         binding.groupFgLlGroupMember.setOnClickListener {
-
             dialogBinding.dialogGroupMembersMasterBtnClose.setOnClickListener {
                 dialog.dismiss()
             }

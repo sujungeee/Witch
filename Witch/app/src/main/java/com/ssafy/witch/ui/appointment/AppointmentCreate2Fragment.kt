@@ -171,7 +171,7 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
                 .position(appointmentLocation)
                 .title(selectedPlace.placeName)
                 .icon(BitmapDescriptorFactory.fromBitmap(scaledplaceMarker)))
-            
+
             dialogBuilder.dismiss()
         }
 

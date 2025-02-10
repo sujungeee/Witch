@@ -9,7 +9,7 @@ import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.databinding.ActivityMainBinding
 import com.ssafy.witch.ui.group.GroupCreateFragment
 import com.ssafy.witch.ui.group.GroupEditFragment
-import com.ssafy.witch.Auth.LoginFragmentViewModel
+import com.ssafy.witch.ui.auth.LoginFragmentViewModel
 import com.ssafy.witch.ui.group.GroupFragment
 import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment

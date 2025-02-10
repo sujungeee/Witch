@@ -41,4 +41,9 @@ public class UserRepository implements ValidateUserPort, UserPort {
     return userJpaRepository.findById(userId)
         .map(userEntityMapper::toDomain);
   }
+
+  @Override
+  public void delete(User user) {
+    userJpaRepository.delete(userEntityMapper.toEntity(user));
+  }
 }

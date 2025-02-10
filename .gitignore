@@ -293,3 +293,4 @@ gradle-app.setting
 .jqwik-database
 /witch-apps/app-api/src/main/resources/static/docs/index.html
 /infrastructure/localstack/
+/.idea/runConfigurations/

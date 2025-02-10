@@ -164,7 +164,8 @@ class GroupJoinControllerTest extends RestDocsTestSupport {
         )
         .andExpect(status().isBadRequest())
         .andExpect(
-            jsonPath("error.errorCode").value(ErrorCode.GROUP_JOIN_REQUEST_NOT_EXISTS.getErrorCode()))
+            jsonPath("error.errorCode")
+                .value(ErrorCode.GROUP_JOIN_REQUEST_NOT_EXISTS.getErrorCode()))
         .andDo(restDocs.document());
   }
 

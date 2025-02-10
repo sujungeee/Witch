@@ -1,6 +1,7 @@
 package com.ssafy.witch.repository.group;
 
 import com.ssafy.witch.group.GroupReadPort;
+import com.ssafy.witch.group.model.GroupDetailProjection;
 import com.ssafy.witch.group.model.GroupWithLeaderProjection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -15,5 +16,10 @@ public class GroupReadRepository implements GroupReadPort {
   @Override
   public List<GroupWithLeaderProjection> readGroupsWithLeaderByUserId(String userId) {
     return groupJpaRepository.findGroupListReadModelsByUserId(userId);
+  }
+
+  @Override
+  public GroupDetailProjection readGroupDetail(String userId, String groupId) {
+    return groupJpaRepository.readGroupDetail(userId, groupId);
   }
 }

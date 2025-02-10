@@ -1,9 +1,12 @@
 package com.ssafy.witch.controller.group;
 
-import static com.fasterxml.jackson.databind.node.JsonNodeType.BOOLEAN;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
+import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -15,8 +18,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.ssafy.witch.controller.group.mapper.GroupResponseMapper;
 import com.ssafy.witch.exception.ErrorCode;
 import com.ssafy.witch.exception.group.GroupNotFoundException;
+import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.Group;
 import com.ssafy.witch.group.GroupReadUseCase;
+import com.ssafy.witch.group.output.GroupDetailOutput;
 import com.ssafy.witch.group.output.GroupWithLeaderListOutput;
 import com.ssafy.witch.group.output.GroupWithLeaderOutput;
 import com.ssafy.witch.mock.user.WithMockWitchUser;
@@ -121,9 +126,14 @@ class GroupReadControllerTest extends RestDocsTestSupport {
 
     mvc.perform(get("/groups/me")
             .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
         )
         .andExpect(status().isOk())
         .andDo(restDocs.document(
+            requestHeaders(
+                headerWithName("Authorization")
+                    .description("JWT access token")
+            ),
             responseFields(
                 fieldWithPath("success")
                     .type(BOOLEAN)
@@ -152,4 +162,92 @@ class GroupReadControllerTest extends RestDocsTestSupport {
             )
         ));
   }
+
+  @WithMockWitchUser
+  @Test
+  void get_group_detail_200() throws Exception {
+
+    String groupId = "example-group-id";
+
+    GroupDetailOutput output = new GroupDetailOutput(
+        groupId,
+        "모임이름",
+        "http://group.image.url.example",
+        true,
+        5
+    );
+
+    given(groupReadUseCase.getGroupDetail(any(), any())).willReturn(output);
+
+    mvc.perform(get("/groups/{groupId}", groupId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isOk())
+        .andDo(restDocs.document(
+            requestHeaders(
+                headerWithName("Authorization")
+                    .description("JWT access token")
+            ),
+            responseFields(
+                fieldWithPath("success")
+                    .type(BOOLEAN)
+                    .description("성공 여부"),
+                fieldWithPath("data..groupId")
+                    .type(STRING)
+                    .description("모임 식별키"),
+                fieldWithPath("data..name")
+                    .type(STRING)
+                    .description("모임 이름"),
+                fieldWithPath("data..groupImageUrl")
+                    .type(STRING)
+                    .description("모임 이미지 URL"),
+                fieldWithPath("data.isLeader")
+                    .type(BOOLEAN)
+                    .description("조회자 모임 리더 여부"),
+                fieldWithPath("data.cntLateArrival")
+                    .type(NUMBER)
+                    .description("조회자 모임 내 지각 횟수")
+            )
+        ));
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_group_detail_400_group_not_exists() throws Exception {
+
+    String groupId = "example-group-id";
+
+    given(groupReadUseCase.getGroupDetail(any(), any()))
+        .willThrow(new GroupNotFoundException());
+
+    mvc.perform(get("/groups/{groupId}", groupId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("error.errorCode")
+            .value(ErrorCode.GROUP_NOT_EXIST.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_group_detail_400_not_group_member() throws Exception {
+
+    String groupId = "example-group-id";
+
+    given(groupReadUseCase.getGroupDetail(any(), any()))
+        .willThrow(new UnauthorizedGroupAccessException());
+
+    mvc.perform(get("/groups/{groupId}", groupId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("error.errorCode")
+            .value(ErrorCode.UNAUTHORIZED_GROUP_ACCESS.getErrorCode()))
+        .andDo(restDocs.document());
+  }
 }
+

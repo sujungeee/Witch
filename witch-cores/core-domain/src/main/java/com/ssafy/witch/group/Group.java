@@ -28,4 +28,8 @@ public class Group {
   public void changeGroupName(String name) {
     this.name = name;
   }
+
+  public void changeGroupImage(String groupImageUrl) {
+    this.groupImageUrl = groupImageUrl;
+  }
 }

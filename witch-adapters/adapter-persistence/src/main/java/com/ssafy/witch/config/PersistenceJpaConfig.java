@@ -1,5 +1,6 @@
 package com.ssafy.witch.config;
 
+import com.querydsl.jpa.JPQLTemplates;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.ssafy.witch.entity.EntityModule;
 import com.ssafy.witch.repository.RepositoryModule;
@@ -20,6 +21,6 @@ public class PersistenceJpaConfig {
 
   @Bean
   public JPAQueryFactory jpaQueryFactory(EntityManager entityManager) {
-    return new JPAQueryFactory(entityManager);
+    return new JPAQueryFactory(JPQLTemplates.DEFAULT, entityManager);
   }
 }

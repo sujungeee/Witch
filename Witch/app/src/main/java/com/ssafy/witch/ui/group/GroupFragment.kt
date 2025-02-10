@@ -9,12 +9,14 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.AppointmentListItem
+import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.data.model.response.GroupApproval
-import com.ssafy.witch.data.model.dto.GroupMember
 import com.ssafy.witch.data.model.dto.User
+import com.ssafy.witch.data.model.response.GroupJoinListResponse.JoinRequest
 import com.ssafy.witch.databinding.DialogGroupMembersBinding
 import com.ssafy.witch.databinding.FragmentGroupBinding
 import com.ssafy.witch.ui.ContentActivity
@@ -28,17 +30,19 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
     private val viewModel: GroupViewModel by viewModels()
 
     private lateinit var appointmentListAdapter: AppointmentListAdapter
-    private lateinit var appointmentList: List<AppointmentListItem>
+    private lateinit var appointmentList: List<MyAppointment>
 
     private lateinit var groupMemberListAdapter: GroupMemberListAdapter
-    private lateinit var groupMemberList: List<GroupMember>
+    private lateinit var groupMemberList: List<User>
 
-    private lateinit var groupApprovalListAdapter: GroupApprovalListAdapter
-    private lateinit var groupApprovalList: List<GroupApproval>
+    private lateinit var groupJoinListAdapter: GroupApprovalListAdapter
+    private lateinit var groupJoinList: List<JoinRequest>
 
     private lateinit var dialogBinding: DialogGroupMembersBinding
 
     private lateinit var mainActivity: MainActivity
+
+    private var groupId = ""
 
 
     private var isGroupLeader by Delegates.notNull<Boolean>()
@@ -46,9 +50,10 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         mainActivity = requireActivity() as MainActivity
-        isGroupLeader=true
+
         initView()
         initAdapter()
+        initObserver()
 
         binding.groupFgIvAppointmentCreate.setOnClickListener {
             val contentActivity = Intent(requireContext(), ContentActivity::class.java)
@@ -61,22 +66,47 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             val contentActivity = Intent(requireContext(), ContentActivity::class.java)
             contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             contentActivity.putExtra("openFragment", 2)
+            contentActivity.putExtra("id", groupId)
             startActivity(contentActivity)
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+
 
     fun initView(){
-        distinctGroupLeader()
+
         initMemberDialog()
         initOutDialog()
         binding.groupFgIbGroupEdit.setOnClickListener {
             mainActivity.openFragment(7)
         }
 
+        viewModel.getGroup(groupId)
+        viewModel.getGroupAppointments(groupId)
+    }
+
+
+    fun initObserver(){
+        viewModel.group.observe(viewLifecycleOwner, {
+            Glide.with(binding.root)
+                .load(viewModel.group.value?.groupImageUrl)
+                .into(binding.groupFgIvGroupImg)
+            isGroupLeader=viewModel.group.value?.isLeader!!
+            distinctGroupLeader()
+            binding.groupFgTvName.text = viewModel.group.value?.name
+            binding.groupFgTvLateCount.text=viewModel.group.value?.cntLateArrival.toString()
+        })
+
+        viewModel.groupAppointments.observe(viewLifecycleOwner, {
+            appointmentList=it
+            binding.groupFgTvTotalAppointment.text=it.size.toString()
+            binding.groupFgRvAppointmentList.adapter = AppointmentListAdapter(appointmentList) { id ->
+                val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+                contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                contentActivity.putExtra("openFragment", 9)
+                startActivity(contentActivity)
+            }
+        })
     }
 
     fun distinctGroupLeader(){
@@ -111,7 +141,7 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             else {
                 dialog.findViewById<TextView>(R.id.group_out_dl_tv_title).text="모임을 나가시겠습니까?"
                 dialog.findViewById<View>(R.id.group_out_dl_btn_yes).setOnClickListener {
-                    viewModel.groupOut()
+                    viewModel.groupOut(groupId, mainActivity)
                     mainActivity.openFragment(2)
                     dialog.dismiss()
                 }
@@ -155,41 +185,28 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
     }
     @SuppressLint("NewApi")
     fun initAdapter(){
-        appointmentList = listOf(
-            AppointmentListItem(1, "알고리즘 스터디", LocalDateTime.now(), "APROVED"),
-            AppointmentListItem(2, "맛집탐방",  LocalDateTime.now(), "APROVED"),
-            AppointmentListItem(3, "멋쟁이 알고리즘",  LocalDateTime.now(), "INACTIVE"),
-            AppointmentListItem(4, "알고리즘",  LocalDateTime.now(), "INACTIVE"),
-            AppointmentListItem(5, "멋쟁이",  LocalDateTime.now(), "APROVED")
-        )
-        binding.groupFgRvAppointmentList.adapter = AppointmentListAdapter(appointmentList) { id ->
-            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
-            contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            contentActivity.putExtra("openFragment", 9)
-            startActivity(contentActivity)
-        }
-
         viewModel.tabState.observe(viewLifecycleOwner, {
             when(it){
                 "APPROVAL" -> {
-                    groupApprovalList= listOf(
-                        GroupApproval("1", User( "1", "dkdkdk@naver.com","남dasdasdasㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇㅁㄴㅇ수정", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4TzKVPcjY-234LOSKvXiXIXNtElEueYgT6w&s")),
-                        GroupApproval("2", User( "2", "dkdkdk@naver.com","김덕윤", "")),
-                        GroupApproval("3", User( "3", "dkdkdk@naver.com","권경탁", "")),
-                        GroupApproval("4", User( "4", "dkdkdk@naver.com","채용수", "")),
-                        GroupApproval("5", User( "5", "dkdkdk@naver.com","태성원", ""))
-                    )
+                    viewModel.getGroupJoinList(groupId)
 
+                    viewModel.groupJoinList.observe(viewLifecycleOwner, {
+                        groupJoinList=it
+                        dialogBinding.dialogGroupMembersMasterRvApproval.adapter=GroupApprovalListAdapter(groupJoinList, object : GroupApprovalListAdapter.OnItemClickListener {
+                            override fun onApprove(id: String) {
+                                // 승인
+                                viewModel.approveJoinRequest(id)
+                            }
 
-                    dialogBinding.dialogGroupMembersMasterRvApproval.adapter=GroupApprovalListAdapter(groupApprovalList, object : GroupApprovalListAdapter.OnItemClickListener {
-                        override fun onApprove(id: String) {
-                            // 승인
-                        }
-
-                        override fun onReject(id: String) {
-                            // 거절
-                        }
+                            override fun onReject(id: String) {
+                                // 거절
+                                viewModel.rejectJoinRequest(id)
+                            }
+                        })
                     })
+
+
+
                     dialogBinding.dialogGroupMembersMasterVMember.setBackgroundColor(resources.getColor(R.color.witch_gray))
                     dialogBinding.dialogGroupMembersMasterVApproval.setBackgroundColor(resources.getColor(R.color.witch_green))
                     dialogBinding.dialogGroupMembersMasterRvMembers.visibility = View.GONE
@@ -198,15 +215,15 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
                     dialogBinding.dialogGroupMembersMasterTvTitleMember.setTextColor(resources.getColor(R.color.witch_white))
                 }
                 "MEMBER" -> {
-                    groupMemberList = listOf(
-                        GroupMember("1", "남수정", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQqAp9Wxo5LUydg5cOZLdpAAZvVy7p3D_EqICjh9f25C8z2wkZQS2wGGF1Ues7LnoffNTs&usqp=CAU", true),
-                        GroupMember("2", "김덕윤", "https://pds.joongang.co.kr/news/component/htmlphoto_mmdata/201706/23/b71449f8-e830-45a0-bb4d-7b1a328e19f2.jpg", false),
-                        GroupMember("3", "권경탁", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSyPkxMuo6NOHcNx-aO-wOo3eyVnB2oTq-ZwA&s", false),
-                        GroupMember("4", "채용수", "https://newsimg-hams.hankookilbo.com/2022/10/19/7576de8e-e4f6-4827-9f17-cfefe4be052f.jpg", false),
-                        GroupMember("5", "태성원", "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS4TzKVPcjY-234LOSKvXiXIXNtElEueYgT6w&s", false)
-                    )
+                    viewModel.getGroupMemberList(groupId)
 
-                    dialogBinding.dialogGroupMembersMasterRvMembers.adapter = GroupMemberListAdapter(groupMemberList)
+                    viewModel.groupMember.observe(viewLifecycleOwner, {
+                        groupMemberList=it
+                        dialogBinding.dialogGroupMembersMasterRvMembers.adapter = GroupMemberListAdapter(groupMemberList)
+                    })
+
+
+
                     dialogBinding.dialogGroupMembersMasterVMember.setBackgroundColor(resources.getColor(R.color.witch_green))
                     dialogBinding.dialogGroupMembersMasterVApproval.setBackgroundColor(resources.getColor(R.color.witch_gray))
 
@@ -218,6 +235,26 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             }
         }
         )
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+
+        arguments?.let {
+            groupId = it.getString("groupId").toString()
+        }
+    }
+
+
+    companion object {
+        @JvmStatic
+        fun newInstance(key:String, value:String) =
+            GroupFragment().apply {
+                arguments = Bundle().apply {
+                    putString(key, value)
+                }
+            }
     }
 
 }

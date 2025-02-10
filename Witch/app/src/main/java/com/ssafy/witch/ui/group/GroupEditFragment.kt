@@ -26,6 +26,7 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
     private val viewModel: EditViewModel by viewModels()
     private var imageUri: Uri? = null
     private lateinit var imagePickerUtil: ImagePicker
+    private var groupId = ""
 
 
 
@@ -35,7 +36,7 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
 
         binding.groupEditFgBtnPhotoChange.setOnClickListener {
             lifecycleScope.launch {
-                viewModel.uploadImage("edit", requireContext() as ContentActivity)
+                viewModel.uploadImage("edit", requireContext() as ContentActivity, groupId)
             }
         }
 
@@ -52,6 +53,22 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            groupId = it.getString("groupId").toString()
+        }
+
     }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(key:String, value:String) =
+            GroupEditFragment().apply {
+                arguments = Bundle().apply {
+                    putString(key, value)
+                }
+            }
+    }
+
 
 }

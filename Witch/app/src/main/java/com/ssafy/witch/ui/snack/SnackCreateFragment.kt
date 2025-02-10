@@ -25,6 +25,7 @@ import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.DialogSnackTextBinding
 import com.ssafy.witch.databinding.FragmentSnackCreateBinding
 import com.ssafy.witch.ui.ContentActivity
+import com.ssafy.witch.ui.group.GroupEditFragment
 import com.ssafy.witch.ui.group.SnackRecord
 import com.ssafy.witch.util.ImagePicker
 import kotlinx.coroutines.launch
@@ -37,6 +38,7 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
 
     private lateinit var contentActivity: ContentActivity
     private lateinit var imagePickerUtil: ImagePicker
+    private var appointmentId = ""
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -324,6 +326,25 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
         val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, bitmap, "Title", null)
         return Uri.parse(path)
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        arguments?.let {
+            appointmentId = it.getString("appointmentId").toString()
+        }
+
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(key:String, value:String) =
+            GroupEditFragment().apply {
+                arguments = Bundle().apply {
+                    putString(key, value)
+                }
+            }
     }
 
 

@@ -12,6 +12,12 @@ class ImagePicker(
     private val fragment: Fragment,
     private val onImageSelected: (Uri) -> Unit
 ) {
+    private val permission = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.TIRAMISU) {
+        Manifest.permission.READ_MEDIA_IMAGES
+    } else {
+        Manifest.permission.READ_EXTERNAL_STORAGE
+    }
+
     private val requestPermissionLauncher = fragment.registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
@@ -29,10 +35,10 @@ class ImagePicker(
     }
 
     fun checkPermissionAndOpenGallery() {
-        if (ContextCompat.checkSelfPermission(fragment.requireContext(), Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED) {
+        if (ContextCompat.checkSelfPermission(fragment.requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
             openGallery()
         } else {
-            requestPermissionLauncher.launch(Manifest.permission.READ_MEDIA_IMAGES)
+            requestPermissionLauncher.launch(permission)
         }
     }
 

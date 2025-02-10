@@ -4,6 +4,7 @@ import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.response.MyAppointmentResponse
 import okhttp3.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface AppointmentService {
@@ -12,6 +13,12 @@ interface AppointmentService {
     suspend fun getMyAppointments(
         @Query("year") year: Int,
         @Query("month") month: Int
+    ): BaseResponse<MyAppointmentResponse>
+
+
+    @GET("/groups/{groupId}/appointments")
+    suspend fun getGroupAppointments(
+        @Path("groupId") groupId: String,
     ): BaseResponse<MyAppointmentResponse>
 
 }

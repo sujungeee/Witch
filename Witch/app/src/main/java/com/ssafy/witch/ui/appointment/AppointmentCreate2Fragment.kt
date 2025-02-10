@@ -11,11 +11,12 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -46,7 +47,7 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
     FragmentAppointmentCreate2Binding::bind, R.layout.fragment_appointment_create2),
     OnMapReadyCallback {
 
-    private val appointmentViewModel: AppointmentViewModel by viewModels()
+    private val appointmentViewModel: AppointmentViewModel by activityViewModels()
 
     private lateinit var placesClient: PlacesClient
     private lateinit var placesList: MutableList<AppointmentPlacesItem>
@@ -127,11 +128,10 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
             if (binding.appointmentFgTvInitialize.visibility == View.VISIBLE) {
                 showCustomToast("약속 장소를 선택해주세요!")
             } else {
-                appointmentViewModel.registerAppointment2(
-                    choiceLatLng.longitude.toBigDecimal(),
-                    choiceLatLng.latitude.toBigDecimal(),
-                    binding.appointmentFgTvAppointmentAddress.text.toString()
-                )
+                appointmentViewModel.setLongitude(choiceLatLng.longitude)
+                appointmentViewModel.setLatitude(choiceLatLng.latitude)
+                appointmentViewModel.setAddress(binding.appointmentFgTvAppointmentAddress.text.toString())
+
                 (requireActivity() as ContentActivity).openFragment(8)
             }
         }
@@ -160,7 +160,11 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
             choiceLatLng = LatLng(selectedPlace.placeLatitude.toDouble(), selectedPlace.placeLongitude.toDouble())
             binding.appointmentFgTvAppointmentPlaceName.text = selectedPlace.placeName
             binding.appointmentFgTvAppointmentAddress.text = selectedPlace.placeAddress
-            binding.appointmentFgTvAppointmentPhoneNumber.text = selectedPlace.placePhoneNumber
+            if (selectedPlace.placePhoneNumber == "0null") {
+                binding.appointmentFgTvAppointmentPhoneNumber.text = ""
+            } else {
+                binding.appointmentFgTvAppointmentPhoneNumber.text = selectedPlace.placePhoneNumber
+            }
 
             val appointmentLocation = LatLng(selectedPlace.placeLatitude.toDouble(), selectedPlace.placeLongitude.toDouble())
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(appointmentLocation, 15f))
@@ -171,7 +175,7 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
                 .position(appointmentLocation)
                 .title(selectedPlace.placeName)
                 .icon(BitmapDescriptorFactory.fromBitmap(scaledplaceMarker)))
-            
+
             dialogBuilder.dismiss()
         }
 
@@ -184,22 +188,6 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
         binding.appointmentFgTvAppointmentAddress.visibility = View.VISIBLE
         binding.appointmentFgTvAppointmentPhoneNumber.visibility = View.VISIBLE
         binding.appointmentFgTvInitialize.visibility = View.GONE
-    }
-
-    override fun onMapReady(googleMap: GoogleMap) {
-        map = googleMap
-        requestLocationPermissions()
-    }
-
-    private fun requestLocationPermissions() {
-        if (ContextCompat.checkSelfPermission(requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(requireActivity(),
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                LOCATION_PERMISSION_REQUEST_CODE)
-        } else {
-            startLocationUpdates()
-        }
     }
 
     lateinit var mylocation: Location
@@ -219,6 +207,30 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
         }
     }
 
+    private val requestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                startLocationUpdates()
+            } else {
+                Toast.makeText(requireContext(), "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private fun requestLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            startLocationUpdates()
+        }
+    }
+
+    override fun onMapReady(googleMap: GoogleMap) {
+        map = googleMap
+        requestLocationPermissions()
+    }
+
     fun getBitmapFromVectorDrawable(context: Context, drawableId: Int) : Bitmap {
         val drawable = ContextCompat.getDrawable(context, drawableId)
             ?: return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
@@ -232,18 +244,5 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
         drawable.draw(canvas)
 
         return bitmap
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-            if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startLocationUpdates()
-            } else {
-                Toast.makeText(requireContext(), "위치 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show()
-            }
-        }
     }
 }

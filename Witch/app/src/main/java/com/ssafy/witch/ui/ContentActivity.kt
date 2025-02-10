@@ -22,24 +22,25 @@ class ContentActivity  : BaseActivity<ActivityContentBinding>(ActivityContentBin
         super.onCreate(savedInstanceState)
 
         val fragmentIdx = intent.getIntExtra("openFragment", -1)
+        val id = intent.getStringExtra("id") ?: ""
         if (fragmentIdx != -1) {
-            openFragment(fragmentIdx)
+            openFragment(fragmentIdx, id)
             intent.removeExtra("openFragment")
         }
     }
 
-    fun openFragment(index: Int) {
-        moveFragment(index)
+    fun openFragment(index: Int, id : String = ""){
+        moveFragment(index , id)
     }
 
-    private fun moveFragment(index:Int){
+    private fun moveFragment(index:Int, id : String = ""){
         val transaction = supportFragmentManager.beginTransaction()
         when(index){
             1 -> transaction.replace(R.id.content_flayout, GroupCreateFragment())
-            2 -> transaction.replace(R.id.content_flayout, GroupEditFragment())
+            2 -> transaction.replace(R.id.content_flayout, GroupEditFragment.newInstance("groupId", id))
             3 -> transaction.replace(R.id.content_flayout, ProfileEditFragment())
-            4 -> transaction.replace(R.id.content_flayout, SnackFragment())
-            5 -> transaction.replace(R.id.content_flayout, SnackCreateFragment())
+            4 -> transaction.replace(R.id.content_flayout, SnackFragment.newInstance("snackId", id))
+            5 -> transaction.replace(R.id.content_flayout, SnackCreateFragment.newInstance("appointmentId", id))
             6 -> transaction.replace(R.id.content_flayout, AppointmentCreate1Fragment())
             7 -> transaction.replace(R.id.content_flayout, AppointmentCreate2Fragment())
                 .addToBackStack(null)

@@ -88,28 +88,4 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
         }
 
     }
-
-
-
-    @SuppressLint("Range")
-    fun getPathFromUri(uri: Uri): String {
-        val projection = arrayOf(MediaStore.Images.Media.DATA)
-        val cursor = requireActivity().contentResolver.query(uri, projection, null, null, null)
-        cursor!!.moveToNext()
-        val path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA))
-
-        cursor.close()
-        return path
-    }
-
-    @SuppressLint("Range")
-    private fun getPath(uri: Uri): String {
-        val cursor: Cursor? = requireContext().contentResolver.query(uri, null, null, null, null )
-        cursor?.moveToNext()
-        val path: String? = cursor?.getString(cursor.getColumnIndex("_data"))
-
-        cursor?.close()
-
-        return path?:""
-    }
 }

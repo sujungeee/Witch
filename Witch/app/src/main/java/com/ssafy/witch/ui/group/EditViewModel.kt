@@ -56,14 +56,17 @@ class EditViewModel : ViewModel() {
         _name.value = name
     }
 
-    suspend fun uploadImage(screen: String, context: ContentActivity) {
+    suspend fun uploadImage(screen: String, context: ContentActivity, groupId: String = "") {
         runCatching {
-            val presignedUrl = getPresignedUrl(screen)
-            val response = uploadImgS3(presignedUrl.presignedUrl, context )
-
+            var response=true
+            var presignedUrl = PresignedUrl("",null)
+            if (file.value != null) {
+            presignedUrl = getPresignedUrl(screen)
+            response = uploadImgS3(presignedUrl.presignedUrl, context)
+            }
             if (response) {
                 when (screen) {
-                    "edit" -> editGroupImage(presignedUrl.objectKey)
+                    "edit" -> editGroupImage(groupId,presignedUrl.objectKey)
                     "create" -> createGroup(groupName.value!!, presignedUrl.objectKey, context)
                     "profile" -> editProfileImage(presignedUrl.objectKey)
                 }
@@ -136,7 +139,7 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun createGroup(groupName: String, groupImageObjectKey: String, context: ContentActivity) {
+    fun createGroup(groupName: String, groupImageObjectKey: String?, context: ContentActivity) {
         viewModelScope.launch {
             runCatching {
                 groupService.createGroup(GroupInfo(groupName, groupImageObjectKey))
@@ -150,10 +153,10 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editGroupImage(objectKey: String) {
+    fun editGroupImage(groupId:String,objectKey: String?) {
         viewModelScope.launch {
             runCatching {
-                groupService.editGroupImage(objectKey)
+                groupService.editGroupImage(groupId,objectKey)
             }.onSuccess {
                 if (it.success) {
                     Log.d(TAG, "editGroupImage: 성공><")
@@ -166,10 +169,10 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editGroupName(groupName: String) {
+    fun editGroupName(groupId: String,groupName: String) {
         viewModelScope.launch {
             runCatching {
-                groupService.editGroupName(groupName)
+                groupService.editGroupName(groupId,groupName)
             }.onSuccess {
                 if (it.success) {
                     Log.d(TAG, "editGroupName: 성공><")
@@ -182,7 +185,7 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editProfileImage(objectKey: String) {
+    fun editProfileImage(objectKey: String?) {
         viewModelScope.launch {
             runCatching {
                 userService.editProfileImage(objectKey)

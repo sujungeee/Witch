@@ -44,7 +44,7 @@ class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupLi
 
         viewModel.groupList.observe(viewLifecycleOwner) {
             binding.groupListFgRvGroupList.adapter = GroupListAdapter(it) { id ->
-                (requireActivity() as MainActivity).openFragment(5)
+                (requireActivity() as MainActivity).openFragment(5, id)
             }
         }
 

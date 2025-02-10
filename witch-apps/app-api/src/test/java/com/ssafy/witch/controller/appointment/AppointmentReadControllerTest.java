@@ -6,7 +6,9 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.restdocs.headers.HeaderDocumentation.headerWithName;
 import static org.springframework.restdocs.headers.HeaderDocumentation.requestHeaders;
 import static org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders.get;
+import static org.springframework.restdocs.payload.JsonFieldType.ARRAY;
 import static org.springframework.restdocs.payload.JsonFieldType.BOOLEAN;
+import static org.springframework.restdocs.payload.JsonFieldType.NUMBER;
 import static org.springframework.restdocs.payload.JsonFieldType.STRING;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.restdocs.payload.PayloadDocumentation.responseFields;
@@ -18,12 +20,16 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.ssafy.witch.appointment.AppointmentStatus;
 import com.ssafy.witch.appointment.ReadAppointmentUseCase;
+import com.ssafy.witch.appointment.output.AppointmentDetailOutput;
 import com.ssafy.witch.appointment.output.AppointmentListOutput;
+import com.ssafy.witch.appointment.output.AppointmentMemberOutput;
 import com.ssafy.witch.appointment.output.AppointmentOutput;
 import com.ssafy.witch.appointment.output.AppointmentWithGroupListOutput;
 import com.ssafy.witch.appointment.output.AppointmentWithGroupOutput;
 import com.ssafy.witch.controller.appointment.mapper.AppointmentResponseMapper;
 import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
+import com.ssafy.witch.exception.appointment.UnauthorizedAppointmentAccessException;
 import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.output.GroupOutput;
@@ -227,6 +233,137 @@ class AppointmentReadControllerTest extends RestDocsTestSupport {
         .andExpect(status().isBadRequest())
         .andExpect(jsonPath("error.errorCode").value(
             ErrorCode.REQUIRED_FIELD_MISSING_OR_INVALID.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_appointment_detail_200() throws Exception {
+
+    String appointmentId = "example-appointment-id";
+
+    AppointmentDetailOutput output = new AppointmentDetailOutput(
+        appointmentId,
+        "약속 이름",
+        AppointmentStatus.SCHEDULED,
+        "약속 요약",
+        LocalDateTime.of(2030, 5, 20, 18, 0, 0),
+        "서울특별시 종로구 세종대로 172 광화문광장",
+        37.574187,
+        126.976882,
+        List.of(
+            new AppointmentMemberOutput(
+                "example-user-id-1",
+                "닉네임1",
+                "http://profile.image.example1",
+                true),
+            new AppointmentMemberOutput(
+                "example-user-id-2",
+                "닉네임2",
+                "http://profile.image.example2",
+                false)
+        )
+    );
+
+    given(readAppointmentUseCase.getAppointmentDetail(any(), any()))
+        .willReturn(output);
+
+    mvc.perform(get("/appointments/{appointmentId}", appointmentId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isOk())
+        .andDo(restDocs.document(
+            pathParameters(
+                parameterWithName("appointmentId")
+                    .description("조회하고자 하는 약속 식별자")
+            ),
+            requestHeaders(
+                headerWithName("Authorization")
+                    .description("JWT access token")
+            ),
+            responseFields(
+                fieldWithPath("success")
+                    .type(BOOLEAN)
+                    .description("성공 여부"),
+                fieldWithPath("data..appointmentId")
+                    .type(STRING)
+                    .description("약속 식별자"),
+                fieldWithPath("data.name")
+                    .type(STRING)
+                    .description("약속 이름"),
+                fieldWithPath("data.appointmentStatus")
+                    .type(STRING)
+                    .description("약속 상태"),
+                fieldWithPath("data.summary")
+                    .type(STRING)
+                    .description("약속 요약"),
+                fieldWithPath("data.appointmentTime")
+                    .type(STRING)
+                    .description("약속 시간"),
+                fieldWithPath("data.address")
+                    .type(STRING)
+                    .description("약속 주소"),
+                fieldWithPath("data.latitude")
+                    .type(NUMBER)
+                    .description("약속 위도"),
+                fieldWithPath("data.longitude")
+                    .type(NUMBER)
+                    .description("약속 경도"),
+                fieldWithPath("data.members")
+                    .type(ARRAY)
+                    .description("약속 참여자"),
+                fieldWithPath("data.members.[].userId")
+                    .type(STRING)
+                    .description("사용자 식별자"),
+                fieldWithPath("data.members.[].nickname")
+                    .type(STRING)
+                    .description("사용자 닉네임"),
+                fieldWithPath("data.members.[].profileImageUrl")
+                    .type(STRING)
+                    .description("사용자 프로필 이미지 URL"),
+                fieldWithPath("data.members.[].isLeader")
+                    .type(BOOLEAN)
+                    .description("사용자 약속 리더 여부")
+            )
+        ));
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_appointment_detail_400_appointment_not_exists() throws Exception {
+
+    String appointmentId = "example-appointment-id";
+
+    given(readAppointmentUseCase.getAppointmentDetail(any(), any()))
+        .willThrow(new AppointmentNotFoundException());
+
+    mvc.perform(get("/appointments/{appointmentId}", appointmentId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("error.errorCode").value(ErrorCode.NON_EXISTENT_APPOINTMENT.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_appointment_detail_400_not_appointment_member() throws Exception {
+
+    String appointmentId = "example-appointment-id";
+
+    given(readAppointmentUseCase.getAppointmentDetail(any(), any()))
+        .willThrow(new UnauthorizedAppointmentAccessException());
+
+    mvc.perform(get("/appointments/{appointmentId}", appointmentId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("error.errorCode").value(
+            ErrorCode.UNAUTHORIZED_APPOINTMENT_ACCESS.getErrorCode()))
         .andDo(restDocs.document());
   }
 }

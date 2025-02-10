@@ -1,5 +1,7 @@
 package com.ssafy.witch.group;
 
+import com.ssafy.witch.group.model.GroupJoinRequestProjection;
+import java.util.List;
 import java.util.Optional;
 
 public interface GroupJoinRequestPort {
@@ -11,4 +13,6 @@ public interface GroupJoinRequestPort {
   Optional<GroupJoinRequest> findById(String groupJoinRequestId);
 
   void deleteById(String groupJoinRequestId);
+
+  List<GroupJoinRequestProjection> readGroupJoinRequestsByGroupId(String groupId);
 }

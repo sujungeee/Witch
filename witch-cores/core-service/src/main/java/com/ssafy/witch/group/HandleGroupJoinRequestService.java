@@ -2,9 +2,14 @@ package com.ssafy.witch.group;
 
 import com.ssafy.witch.exception.group.AlreadyJoinedGroupException;
 import com.ssafy.witch.exception.group.GroupJoinRequestNotFoundException;
+import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.command.ApproveGroupJoinRequestCommand;
+import com.ssafy.witch.group.command.GetGroupJoinRequestListCommand;
 import com.ssafy.witch.group.command.RejectGroupJoinRequestCommand;
+import com.ssafy.witch.group.mapper.GroupJoinRequestListOutputMapper;
+import com.ssafy.witch.group.model.GroupJoinRequestProjection;
+import com.ssafy.witch.group.output.GroupJoinRequestListOutput;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +22,8 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
 
   private final GroupJoinRequestPort groupJoinRequestPort;
   private final GroupMemberPort groupMemberPort;
+  private final GroupPort groupPort;
+  private final GroupJoinRequestListOutputMapper groupJoinRequestListOutputMapper;
 
   @Value("${witch.group.max-participants-count}")
   private int maxGroupParticipantsCount;
@@ -81,6 +88,29 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
 
     if (isParticipant) {
       throw new AlreadyJoinedGroupException();
+    }
+  }
+
+  @Override
+  public GroupJoinRequestListOutput getGroupJoinRequestList(GetGroupJoinRequestListCommand command) {
+
+    String userId = command.getUserId();
+    String groupId = command.getGroupId();
+
+    //존재 하는 모임 확인
+    validateExistsGroup(groupId);
+    //권한 확인
+    validateLeaderAuthorization(userId, groupId);
+
+    //해당 모임에 대한 가입 신청 사용자 목록 조회
+    List<GroupJoinRequestProjection> projections = groupJoinRequestPort.readGroupJoinRequestsByGroupId(groupId);
+
+    return groupJoinRequestListOutputMapper.toOutput(projections);
+  }
+
+  private void validateExistsGroup(String groupId) {
+    if (!groupPort.existsById(groupId)) {
+      throw new GroupNotFoundException();
     }
   }
 }

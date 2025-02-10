@@ -28,6 +28,6 @@ interface UserService {
 
     @PATCH("users/me/profile-image")
     suspend fun editProfileImage(
-        @Body objectKey: String
+        @Body objectKey: String?
     ) : BaseResponse<String>
 }

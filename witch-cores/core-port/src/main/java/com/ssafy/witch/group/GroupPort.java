@@ -1,5 +1,7 @@
 package com.ssafy.witch.group;
 
+import com.ssafy.witch.appointment.Appointment;
+
 import java.util.Optional;
 
 public interface GroupPort {
@@ -10,4 +12,5 @@ public interface GroupPort {
 
   boolean existsById(String groupId);
 
+  void delete(Group group);
 }

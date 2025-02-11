@@ -1,6 +1,9 @@
 package com.ssafy.witch.group;
 
+import com.ssafy.witch.appointment.AppointmentMember;
+
 import java.util.List;
+import java.util.Optional;
 
 public interface GroupMemberPort {
 
@@ -13,4 +16,8 @@ public interface GroupMemberPort {
   boolean isLeaderByUserIdAndGroupId(String userId, String groupId);
 
   void deleteMember(String userId, String groupId);
+
+  void deleteAllByGroupId(String groupId);
+
+  Optional<GroupMember> findByUserIdAndGroupId(String userId, String groupId);
 }

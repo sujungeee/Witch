@@ -21,6 +21,7 @@ import com.ssafy.witch.exception.auth.InvalidRefreshTokenException;
 import com.ssafy.witch.jwt.JwtProperties;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.jwt.response.TokenResponse;
+import com.ssafy.witch.notification.UpdateFcmTokenUseCase;
 import com.ssafy.witch.support.docs.SecurityRestDocsTestSupport;
 import java.util.HashMap;
 import java.util.Map;
@@ -49,6 +50,8 @@ import org.springframework.stereotype.Controller;
 )
 public class TokenReissueDocsTest extends SecurityRestDocsTestSupport {
 
+  @MockBean
+  private UpdateFcmTokenUseCase updateFcmTokenUseCase;
 
   @MockBean
   private UserDetailsService userDetailsService;

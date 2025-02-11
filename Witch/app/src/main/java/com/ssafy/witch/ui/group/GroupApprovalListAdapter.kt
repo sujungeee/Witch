@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.ssafy.witch.data.model.response.GroupApproval
 import com.ssafy.witch.data.model.response.GroupJoinListResponse.JoinRequest
 import com.ssafy.witch.databinding.GroupApprovalMemberItemBinding
 

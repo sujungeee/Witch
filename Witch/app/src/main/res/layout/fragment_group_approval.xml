@@ -10,7 +10,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="250dp"
+        android:layout_height="wrap_content"
         android:backgroundTint="@color/witch_black"
         android:layout_marginStart="48dp"
         android:layout_marginEnd="48dp"
@@ -25,22 +25,34 @@
             style="@style/pt_semibold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="24dp"
-            android:layout_marginTop="20dp"
-            android:text="D211"
+            android:layout_marginTop="30dp"
+            android:text="모임 가입 요청"
             android:textColor="@color/witch_white"
-            android:textSize="32sp"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
+
+        <ImageView
+            android:id="@+id/group_approval_fg_iv_group_image"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginTop="15dp"
+            android:background="@drawable/circle_shape"
+            android:src="@drawable/snack_cookie"
+            android:backgroundTint="@color/witch_white"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/appointment_approval_fg_tv_group_name" />
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/appointment_approval_fg_cl_line_1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/appointment_approval_fg_tv_group_name">
+            app:layout_constraintTop_toBottomOf="@+id/group_approval_fg_iv_group_image">
 
             <ImageView
                 android:id="@+id/imageView4"
@@ -56,34 +68,14 @@
                 style="@style/pt_semibold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="모임장 "
+                android:layout_marginStart="2dp"
+                android:layout_marginTop="2dp"
+                android:text="모임장이 요청을 수락하면 "
                 android:textColor="@color/witch_white"
                 android:textSize="13sp"
-                android:layout_marginTop="2dp"
-                android:layout_marginStart="2dp"
                 app:layout_constraintStart_toEndOf="@+id/imageView4"
                 app:layout_constraintTop_toTopOf="parent" />
 
-            <TextView
-                android:id="@+id/appointment_approval_fg_tv_group_leader"
-                style="@style/pt_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="남수정"
-                android:textSize="13sp"
-                android:textColor="@color/witch_green"
-                app:layout_constraintStart_toEndOf="@+id/textView17"
-                app:layout_constraintTop_toTopOf="@+id/textView17" />
-
-            <TextView
-                style="@style/pt_medium"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="님이 요청을 수락하면"
-                android:textSize="13sp"
-                android:textColor="@color/witch_white"
-                app:layout_constraintStart_toEndOf="@+id/appointment_approval_fg_tv_group_leader"
-                app:layout_constraintTop_toTopOf="@+id/appointment_approval_fg_tv_group_leader" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -97,7 +89,7 @@
             app:layout_constraintTop_toBottomOf="@+id/appointment_approval_fg_cl_line_1">
 
             <TextView
-                android:id="@+id/appointment_approval_fg_tv_group_ex_name"
+                android:id="@+id/group_approval_fg_tv_group_ex_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="D211"
@@ -113,8 +105,8 @@
                 android:text=" 모임에"
                 android:textColor="@color/witch_white"
                 android:textSize="13sp"
-                app:layout_constraintStart_toEndOf="@+id/appointment_approval_fg_tv_group_ex_name"
-                app:layout_constraintTop_toTopOf="@+id/appointment_approval_fg_tv_group_ex_name" />
+                app:layout_constraintStart_toEndOf="@+id/group_approval_fg_tv_group_ex_name"
+                app:layout_constraintTop_toTopOf="@+id/group_approval_fg_tv_group_ex_name" />
 
 
         </androidx.constraintlayout.widget.ConstraintLayout>
@@ -124,26 +116,29 @@
             style="@style/pt_semibold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
             android:text="가입이 완료됩니다."
             android:textColor="@color/witch_white"
             android:textSize="13sp"
-            android:layout_marginTop="2dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/appointment_approval_fg_cl_line_2" />
 
         <Button
-            android:layout_width="wrap_content"
-            android:layout_height="36dp"
+            android:id="@+id/group_approval_fg_btn_request"
             style="@style/pt_semibold"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="30dp"
+            android:layout_marginTop="15dp"
             android:backgroundTint="@color/witch_green"
             android:text="참여 요청하기"
-            android:textSize="13sp"
             android:textColor="@color/witch_black"
-            android:layout_marginBottom="28dp"
+            android:textSize="13sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textView18" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

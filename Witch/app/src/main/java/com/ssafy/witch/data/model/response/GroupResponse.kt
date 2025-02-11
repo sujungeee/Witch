@@ -6,4 +6,6 @@ data class GroupResponse(
     val groupImageUrl: String,
     val isLeader: Boolean,
     val name: String
-)
+){
+    constructor(groupId: String, groupImageUrl: String,name: String): this(0, groupId, groupImageUrl, false, name)
+}

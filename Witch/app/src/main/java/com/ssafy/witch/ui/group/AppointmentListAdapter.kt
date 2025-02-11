@@ -1,10 +1,10 @@
 package com.ssafy.witch.ui.group
 
 import android.annotation.SuppressLint
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.ssafy.witch.data.model.dto.AppointmentListItem
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.databinding.GroupAppointmentListItemBinding
 import com.ssafy.witch.databinding.GroupListItemBinding
@@ -32,7 +32,7 @@ class AppointmentListAdapter(val appointmentList: List<MyAppointment>, val itemC
     inner class AppointmentListViewHolder(private val binding: GroupAppointmentListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("NewApi")
         fun bind(position: Int) {
-            if (appointmentList[position].status == "APROVED") {
+            if (appointmentList[position].isMyAppointment) {
                 binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.VISIBLE
             } else {
                 binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.GONE
@@ -44,11 +44,24 @@ class AppointmentListAdapter(val appointmentList: List<MyAppointment>, val itemC
             binding.groupAppointmentLiTvDate.text = time.year.toString() + "-" +time.monthValue.toString() + "-" + time.dayOfMonth.toString()
             binding.groupAppointmentLiTvTime.text =time.hour.toString() + ":" +time.minute.toString()
 
-            if (appointmentList[position].isMyAppointment){
-                binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.VISIBLE
-            }else{
-                binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.GONE
-            }
+
+            binding.groupAppointmentLiTvAppointmentActive.text =
+                when(appointmentList[position].status){
+                    "ONGOING" -> "진행중"
+                    "SCHEDULED" -> "예정"
+                    "FINISHED" -> "종료"
+                    else -> ""
+                }
+
+
+            binding.groupAppointmentLiTvAppointmentActive.setBackgroundColor(
+                when(appointmentList[position].status){
+                    "ONGOING" -> binding.root.context.getColor(android.R.color.holo_red_light)
+                    "SCHEDULED" -> binding.root.context.getColor(android.R.color.holo_green_light)
+                    "FINISHED" -> binding.root.context.getColor(android.R.color.darker_gray)
+                    else -> binding.root.context.getColor(android.R.color.darker_gray)
+                }
+)
 
 
             binding.groupAppointmentListItem.setOnClickListener {

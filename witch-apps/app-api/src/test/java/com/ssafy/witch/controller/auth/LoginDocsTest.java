@@ -18,6 +18,7 @@ import com.ssafy.witch.config.SecurityConfig;
 import com.ssafy.witch.jwt.JwtProperties;
 import com.ssafy.witch.jwt.JwtService;
 import com.ssafy.witch.jwt.response.TokenResponse;
+import com.ssafy.witch.notification.UpdateFcmTokenUseCase;
 import com.ssafy.witch.support.docs.SecurityRestDocsTestSupport;
 import com.ssafy.witch.user.WitchUserDetails;
 import java.util.List;
@@ -59,16 +60,22 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
   @MockBean
   private JwtProperties jwtProperties;
 
+  @MockBean
+  private UpdateFcmTokenUseCase fcmTokenUseCase;
+
   @Test
   void login_200() throws Exception {
 
     String userId = "user-id";
     String email = "test@test.com";
     String password = "sample_password";
+    String fcmToken = "sample_fcm-token";
     List<String> roles = List.of("USER");
 
     Map<String, String> loginRequest
-        = Map.of("email", email, "password", password);
+        = Map.of("email", email,
+        "password", password,
+        "fcmToken", fcmToken);
 
     given(userDetailsService.loadUserByUsername(any())).willReturn(WitchUserDetails.builder()
         .userId(userId)
@@ -103,7 +110,11 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
                     .description("사용자 이메일"),
                 fieldWithPath("password")
                     .type(STRING)
-                    .description("사용자 패스워드")
+                    .description("사용자 패스워드"),
+
+                fieldWithPath("fcmToken")
+                    .type(STRING)
+                    .description("등록할 FCM TOKEN")
             ),
             responseFields(
                 fieldWithPath("success")
@@ -136,20 +147,14 @@ class LoginDocsTest extends SecurityRestDocsTestSupport {
 
     String email = "test@test.com";
     String password = "sample_password";
+    String fcmToken = "sample_fcm-token";
 
     Map<String, String> loginRequest
-        = Map.of("email", email, "password", password);
+        = Map.of("email", email,
+        "password", password,
+        "fcmToken", fcmToken);
 
     given(userDetailsService.loadUserByUsername(any())).willThrow(UsernameNotFoundException.class);
-
-    given(jwtService.create(any(), any(), any())).willReturn(TokenResponse.create(
-        "access.token.example",
-        3600L,
-        "refresh.token.example",
-        36000L,
-        3600L
-    ));
-
     mvc.perform(
             post("/auth/login")
                 .contentType(APPLICATION_JSON)

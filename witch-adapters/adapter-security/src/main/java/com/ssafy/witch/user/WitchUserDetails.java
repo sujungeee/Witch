@@ -31,4 +31,10 @@ public class WitchUserDetails implements UserDetails {
   public String getUsername() {
     return email;
   }
+
+  public List<String> getRoles() {
+    return getAuthorities().stream()
+        .map(GrantedAuthority::toString)
+        .toList();
+  }
 }

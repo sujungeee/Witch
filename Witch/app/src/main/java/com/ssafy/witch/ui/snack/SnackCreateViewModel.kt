@@ -152,7 +152,7 @@ class SnackCreateViewModel : ViewModel() {
 
 
     suspend fun uploadSnackToS3(imagePresignedUrl: PresignedUrl, audioPresignedUrl: PresignedUrl, imageUri: Uri, audioUri: Uri?, context: Context) :Boolean {
-        var requestBody1 = RequestBody.create("audio/mpeg".toMediaType(), File(context.cacheDir, "upload_audio.mp3"))
+        var requestBody1 = RequestBody.create("audio/mp3".toMediaType(), File(context.cacheDir, "upload_audio.mp3"))
         return suspendCoroutine { continuation ->
             viewModelScope.launch {
                 val imageFile = getFileFromUri(context, imageUri)
@@ -160,7 +160,7 @@ class SnackCreateViewModel : ViewModel() {
 
                 if (audioUri != null && audioUri != Uri.EMPTY) {
                     val audioFile = getFileFromUri(context, audioUri)
-                    requestBody1 = audioFile.asRequestBody("audio/mpeg".toMediaType())
+                    requestBody1 = audioFile.asRequestBody("audio/mp3".toMediaType())
                 }
 
                 runCatching {

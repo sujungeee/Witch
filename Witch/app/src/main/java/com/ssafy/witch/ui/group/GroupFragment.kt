@@ -83,8 +83,8 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             mainActivity.openFragment(7)
         }
 
-        viewModel.getGroup(groupId)
-        viewModel.getGroupAppointments(groupId)
+//        viewModel.getGroup(groupId)
+
     }
 
 
@@ -253,6 +253,12 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
                     putString(key, value)
                 }
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getGroup(groupId)
+        viewModel.getGroupAppointments(groupId)
     }
 
 }

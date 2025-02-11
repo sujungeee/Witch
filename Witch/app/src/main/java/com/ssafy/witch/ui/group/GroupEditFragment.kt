@@ -33,6 +33,10 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        binding.groupEditFgBtnNameChange.setOnClickListener{
+            viewModel.editGroupName(groupId, binding.groupEditFgEtNickname.text.toString())
+        }
+
 
         binding.groupEditFgBtnPhotoChange.setOnClickListener {
             lifecycleScope.launch {

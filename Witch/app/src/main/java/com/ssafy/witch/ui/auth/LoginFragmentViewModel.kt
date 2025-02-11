@@ -37,7 +37,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
 
             // LoginService에 있다
             runCatching {
-                authService.login(Login(email, password))
+                authService.login(Login(email,"", password))
             }.onSuccess { response ->
                 //response 를 받아서 _User 에 담아주면 됨
                 if (response.success) {

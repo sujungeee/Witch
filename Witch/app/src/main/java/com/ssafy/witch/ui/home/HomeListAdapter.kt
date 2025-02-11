@@ -3,6 +3,7 @@ package com.ssafy.witch.ui.home
 import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isGone
 import androidx.recyclerview.widget.RecyclerView
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.data.model.response.MyAppointmentResponse
@@ -34,6 +35,7 @@ class HomeListAdapter(val appointmentList: List<MyAppointment>,val itemClickList
             binding.homeLiTvAppointmentGroup.text=appointmentList[position].group.name
             binding.homeLiTvAppointmentTime.text= time.hour.toString()+"시 "+ time.minute.toString() + "분"
             binding.homeLiTvAppointmentName.text=appointmentList[position].name
+            binding.homeLiTvAppointmentActive.isGone = appointmentList[position].status != "ONGOING"
 
             binding.homeAppointmentListItem.setOnClickListener {
                 itemClickListener.onItemClick(appointmentList[position].appointmentId)

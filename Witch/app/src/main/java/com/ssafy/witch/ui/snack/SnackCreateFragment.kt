@@ -340,7 +340,7 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
     companion object {
         @JvmStatic
         fun newInstance(key:String, value:String) =
-            GroupEditFragment().apply {
+            SnackCreateFragment().apply {
                 arguments = Bundle().apply {
                     putString(key, value)
                 }

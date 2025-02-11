@@ -38,16 +38,16 @@ interface AppointmentService {
 
     @POST("/appointments/{appointmentId}/members")
     suspend fun participateAppointment(
-        @Path("appointmentId") appointmentId: Int
+        @Path("appointmentId") appointmentId: String
     ): Response<BaseResponse<Boolean>>
 
     @DELETE("/appointments/{appointmentId}/members/me")
     suspend fun leaveAppointment(
-        @Path("appointmentId") appointmentId: Int
+        @Path("appointmentId") appointmentId: String
     ): Response<BaseResponse<Boolean>>
 
     @DELETE("/appointments/{appointmentId}")
     suspend fun deleteAppointment(
-        @Path("appointmentId") appointmentId: Int
+        @Path("appointmentId") appointmentId: String
     ): Response<BaseResponse<Boolean>>
 }

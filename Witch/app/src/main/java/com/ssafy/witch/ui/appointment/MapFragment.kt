@@ -254,9 +254,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
             appointmentChangeDlBtnYes.setOnClickListener {
                 when(userStatus) {
-                    1 -> appointmentViewModel.deleteAppointment(1)
-                    2 -> appointmentViewModel.participateAppointment(1)
-                    3 -> appointmentViewModel.leaveAppointment(1)
+                    1 -> appointmentViewModel.deleteAppointment(appointmentId)
+                    2 -> appointmentViewModel.participateAppointment(appointmentId)
+                    3 -> appointmentViewModel.leaveAppointment(appointmentId)
                 }
                 dialogBuilder.dismiss()
             }

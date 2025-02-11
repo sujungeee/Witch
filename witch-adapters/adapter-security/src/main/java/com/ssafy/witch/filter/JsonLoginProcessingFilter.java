@@ -2,6 +2,7 @@ package com.ssafy.witch.filter;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.ssafy.witch.authentication.FcmTokenWebAuthenticationDetails;
 import jakarta.servlet.ServletInputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -22,6 +23,7 @@ public class JsonLoginProcessingFilter extends AbstractAuthenticationProcessingF
 
   public static final String DEFAULT_USERNAME_KEY = "email";
   public static final String DEFAULT_PASSWORD_KEY = "password";
+  public static final String DEFAULT_FCM_TOKEN_KEY = "fcmToken";
 
   private static final AntPathRequestMatcher DEFAULT_ANT_PATH_REQUEST_MATCHER =
       new AntPathRequestMatcher("/auth/login", "POST");
@@ -30,6 +32,7 @@ public class JsonLoginProcessingFilter extends AbstractAuthenticationProcessingF
 
   private String usernameParameter = DEFAULT_USERNAME_KEY;
   private String passwordParameter = DEFAULT_PASSWORD_KEY;
+  private String fcmCodeParameter = DEFAULT_FCM_TOKEN_KEY;
 
   private boolean postOnly = true;
 
@@ -59,11 +62,15 @@ public class JsonLoginProcessingFilter extends AbstractAuthenticationProcessingF
 
     String username = obtainParameter(usernameParameter, usernamePasswordMap);
     String password = obtainParameter(passwordParameter, usernamePasswordMap);
+    String fcmToken = obtainParameter(fcmCodeParameter, usernamePasswordMap);
+
+    FcmTokenWebAuthenticationDetails details =
+        new FcmTokenWebAuthenticationDetails(request, fcmToken);
 
     UsernamePasswordAuthenticationToken authRequest =
         UsernamePasswordAuthenticationToken.unauthenticated(username, password);
 
-    this.setDetails(request, authRequest);
+    this.setDetails(details, authRequest);
     return getAuthenticationManager().authenticate(authRequest);
   }
 
@@ -76,9 +83,9 @@ public class JsonLoginProcessingFilter extends AbstractAuthenticationProcessingF
     return value;
   }
 
-  protected void setDetails(HttpServletRequest request,
+  protected void setDetails(FcmTokenWebAuthenticationDetails details,
       UsernamePasswordAuthenticationToken authRequest) {
-    authRequest.setDetails(this.authenticationDetailsSource.buildDetails(request));
+    authRequest.setDetails(details);
   }
 
   public void postOnly(boolean postOnly) {
@@ -101,5 +108,10 @@ public class JsonLoginProcessingFilter extends AbstractAuthenticationProcessingF
   public void setPasswordParameter(String passwordParameter) {
     Assert.hasText(passwordParameter, "Password parameter must not be empty or null");
     this.passwordParameter = passwordParameter;
+  }
+
+  public void setFcmCodeParameter(String fcmCodeParameter) {
+    Assert.hasText(fcmCodeParameter, "FCM Code parameter must not be empty or null");
+    this.fcmCodeParameter = fcmCodeParameter;
   }
 }

@@ -46,4 +46,20 @@ public class Appointment {
         address
     );
   }
+
+  public void startScheduledAppointment() {
+    if (status != AppointmentStatus.SCHEDULED) {
+      throw new IllegalStateException("약속 시간 전 약속 상태는 SCHEDULED여야 합니다");
+    }
+
+    this.status = AppointmentStatus.ONGOING;
+  }
+
+  public void endOngoingAppointment() {
+    if (status != AppointmentStatus.ONGOING) {
+      throw new IllegalStateException("약속 종료 전 약속 상태는 ONGOING이여야 합니다");
+    }
+
+    this.status = AppointmentStatus.FINISHED;
+  }
 }

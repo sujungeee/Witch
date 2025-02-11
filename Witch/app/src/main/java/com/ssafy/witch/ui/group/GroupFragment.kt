@@ -12,9 +12,7 @@ import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.data.model.dto.AppointmentListItem
 import com.ssafy.witch.data.model.dto.MyAppointment
-import com.ssafy.witch.data.model.response.GroupApproval
 import com.ssafy.witch.data.model.dto.User
 import com.ssafy.witch.data.model.response.GroupJoinListResponse.JoinRequest
 import com.ssafy.witch.databinding.DialogGroupMembersBinding
@@ -81,7 +79,7 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             mainActivity.openFragment(7)
         }
 
-        viewModel.getGroup(groupId)
+//        viewModel.getGroup(groupId)
         viewModel.getGroupAppointments(groupId)
     }
 
@@ -255,6 +253,11 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
                     putString(key, value)
                 }
             }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewModel.getGroup(groupId)
     }
 
 }

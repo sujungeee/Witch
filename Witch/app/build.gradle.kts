@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -90,4 +91,9 @@ dependencies {
 
     // WorkManager 사용
     implementation("androidx.work:work-runtime-ktx:2.9.1")
+
+    // fcm 사용
+    implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
+    implementation ("com.google.firebase:firebase-messaging-ktx")
+
 }

@@ -5,21 +5,20 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a9837a62-4250-451d-a1c3-f1c1471a59a0" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/assets/fly_witch.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/login/JoinFragment.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/login/LoginFragment.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/LoginActivity.kt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/res/layout/activity_login.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/res/layout/fragment_join.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Witch/app/src/main/res/layout/fragment_login.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Witch/.idea/deploymentTargetSelector.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/.idea/deploymentTargetSelector.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Witch/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Witch/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/build.gradle.kts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/base/ApplicationClass.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/base/ApplicationClass.kt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/res/values/strings.xml" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/res/values/strings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/data/remote/AppointmentService.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/data/remote/AppointmentService.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/ContentActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/ContentActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/MainActivity.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/MainActivity.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentCreate1Fragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentCreate1Fragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentCreate2Fragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentCreate2Fragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentCreate3Fragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentCreate3Fragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/AppointmentViewModel.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/MapFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/appointment/MapFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/auth/LoginFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/auth/LoginFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/group/GroupFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/group/GroupFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/group/GroupListFragment.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/group/GroupListFragment.kt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/snack/SnackCreateViewModel.kt" beforeDir="false" afterPath="$PROJECT_DIR$/Witch/app/src/main/java/com/ssafy/witch/ui/snack/SnackCreateViewModel.kt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -48,9 +47,9 @@
     "RunOnceActivity.readMode.enableVisualFormatting": "true",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
-    "git-widget-placeholder": "origin/aos",
+    "git-widget-placeholder": "feature/S12P11D211-111",
     "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/SSAFY/Documents/SSAFY/03_Smartstore_network_jetpack_starter"
+    "last_opened_file_path": "C:/git/S12P11D211/Witch"
   }
 }]]></component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />

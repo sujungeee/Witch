@@ -173,7 +173,7 @@ class AppointmentViewModel: ViewModel() {
         }
     }
 
-    fun deleteAppointment(appointmentId: Int) {
+    fun deleteAppointment(appointmentId: String) {
         viewModelScope.launch {
             runCatching {
                 appointmentService.deleteAppointment(appointmentId)
@@ -196,7 +196,7 @@ class AppointmentViewModel: ViewModel() {
         }
     }
 
-    fun participateAppointment(appointmentId: Int) {
+    fun participateAppointment(appointmentId: String) {
         viewModelScope.launch {
             runCatching {
                 appointmentService.participateAppointment(appointmentId)
@@ -219,7 +219,7 @@ class AppointmentViewModel: ViewModel() {
         }
     }
 
-    fun leaveAppointment(appointmentId: Int) {
+    fun leaveAppointment(appointmentId: String) {
         viewModelScope.launch {
             runCatching {
                 appointmentService.leaveAppointment(appointmentId)

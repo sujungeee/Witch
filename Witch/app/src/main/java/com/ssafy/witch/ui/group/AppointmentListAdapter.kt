@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.witch.data.model.dto.AppointmentDetailItem
 import com.ssafy.witch.data.model.dto.AppointmentListItem
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.databinding.GroupAppointmentListItemBinding
@@ -12,7 +13,7 @@ import com.ssafy.witch.databinding.HomeAppointmentListItemBinding
 import com.ssafy.witch.util.TimeConverter
 import kotlin.math.abs
 
-class AppointmentListAdapter(val appointmentList: List<MyAppointment>, val itemClickListener:ItemClickListener) : RecyclerView.Adapter<AppointmentListAdapter.AppointmentListViewHolder>() {
+class AppointmentListAdapter(var appointmentList: List<MyAppointment>, val itemClickListener:ItemClickListener) : RecyclerView.Adapter<AppointmentListAdapter.AppointmentListViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): AppointmentListViewHolder {
         val binding = GroupAppointmentListItemBinding.inflate(LayoutInflater.from(parent.context), parent, false)
@@ -55,5 +56,10 @@ class AppointmentListAdapter(val appointmentList: List<MyAppointment>, val itemC
                 itemClickListener.onItemClick(appointmentList[position].appointmentId)
             }
         }
+    }
+
+    fun updateList(list: List<MyAppointment>) {
+        appointmentList = list
+        notifyDataSetChanged()
     }
 }

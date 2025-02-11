@@ -2,19 +2,22 @@ package com.ssafy.witch.ui.appointment
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import androidx.fragment.app.setFragmentResult
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentAppointmentCreate1Binding
 import com.ssafy.witch.ui.ContentActivity
 
+private const val TAG = "AppointmentCreate1Fragment_Witch"
 class AppointmentCreate1Fragment : BaseFragment<FragmentAppointmentCreate1Binding>(
     FragmentAppointmentCreate1Binding::bind, R.layout.fragment_appointment_create1){
 
-    private val appointmentViewModel: AppointmentViewModel by viewModels()
+    private val appointmentViewModel: AppointmentViewModel by activityViewModels()
+
+    private var groupId = ""
 
     @SuppressLint("ClickableViewAccessibility")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,12 +28,12 @@ class AppointmentCreate1Fragment : BaseFragment<FragmentAppointmentCreate1Bindin
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (appointmentViewModel.title.value != null) {
-            binding.appointmentFgEtName.setText(appointmentViewModel.title.value)
+        arguments?.let {
+            groupId = it.getString("groupId").toString()
         }
-        if (appointmentViewModel.summary.value != null) {
-            binding.appointmentFgEtSummary.setText(appointmentViewModel.summary.value)
-        }
+        appointmentViewModel.setGroupId(groupId)
+        Log.d(TAG, "onViewCreated: groupId: ${groupId}")
+
 
         binding.appointmentFgBtnNext.setOnClickListener {
             if (binding.appointmentFgEtName.length() == 0) {
@@ -40,16 +43,16 @@ class AppointmentCreate1Fragment : BaseFragment<FragmentAppointmentCreate1Bindin
             } else if (binding.appointmentFgEtSummary.length() > 50) {
                 showCustomToast("약속 요약은 50자 이내여야 합니다.")
             } else {
-                appointmentViewModel.registerAppointment1(
-                    binding.appointmentFgEtName.text.toString(),
-                    binding.appointmentFgEtSummary.text.toString()
-                )
-                (requireActivity() as ContentActivity).openFragment(7)
+                appointmentViewModel.setName(binding.appointmentFgEtName.text.toString())
+                appointmentViewModel.setSummary(binding.appointmentFgEtSummary.text.toString())
+
+                (requireActivity() as ContentActivity).openFragment(7, "")
             }
         }
 
         binding.appointmentFgBtnBack.setOnClickListener {
             requireActivity().finish()
+            appointmentViewModel.appointmentClear()
         }
 
 
@@ -84,5 +87,15 @@ class AppointmentCreate1Fragment : BaseFragment<FragmentAppointmentCreate1Bindin
             }
             false
         }
+    }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(key:String, value:String) =
+            AppointmentCreate1Fragment().apply {
+                arguments = Bundle().apply {
+                    putString(key, value)
+                }
+            }
     }
 }

@@ -9,6 +9,7 @@ import com.ssafy.witch.filter.RefreshTokenRenewFilter;
 import com.ssafy.witch.handler.ErrorResponseAuthenticationFailureHandler;
 import com.ssafy.witch.handler.JwtAuthenticationSuccessHandler;
 import com.ssafy.witch.jwt.JwtService;
+import com.ssafy.witch.notification.UpdateFcmTokenUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -36,6 +37,8 @@ public class SecurityConfig {
   private final JwtService jwtService;
 
   private final AuthenticationConfiguration authenticationConfiguration;
+
+  private final UpdateFcmTokenUseCase fcmTokenUseCase;
 
   @Bean
   public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -94,7 +97,7 @@ public class SecurityConfig {
 
   @Bean
   public AuthenticationSuccessHandler authenticationSuccessHandler() {
-    return new JwtAuthenticationSuccessHandler(jwtService, objectMapper);
+    return new JwtAuthenticationSuccessHandler(jwtService, objectMapper, fcmTokenUseCase);
   }
 
   @Bean

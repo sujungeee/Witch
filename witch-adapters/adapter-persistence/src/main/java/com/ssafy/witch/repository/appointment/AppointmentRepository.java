@@ -50,6 +50,20 @@ public class AppointmentRepository implements AppointmentPort, AppointmentReadPo
     appointmentJpaRepository.delete(appointmentMapper.toEntity(appointment));
   }
 
+  @Override
+  public List<Appointment> findAllByAppointmentTime(LocalDateTime appointmentTime) {
+    return appointmentJpaRepository.findByAppointmentTime(appointmentTime)
+        .stream()
+        .map(appointmentMapper::toDomain)
+        .toList();
+  }
+
+  @Override
+  public void saveAll(List<Appointment> appointments) {
+    appointmentJpaRepository.saveAll(
+        appointments.stream().map(appointmentMapper::toEntity).toList());
+  }
+
 
   @Override
   public List<AppointmentProjection> getAppointments(String userId, String groupId) {

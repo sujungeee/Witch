@@ -1,10 +1,10 @@
 package com.ssafy.witch;
 
-import lombok.Getter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
-@Getter
+@EnableScheduling
 @SpringBootApplication
 public class WitchApiApplication {
 

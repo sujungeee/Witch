@@ -26,7 +26,7 @@ class SharedPreferencesUtil (context : Context) {
     val KEY_PROFILE_IMAGE = "profileImageUrl"
     val KET_USERID= "userId"
 
-    //블랙리스트 구현 필요?
+    //fcm-token 저장 필요시 구현
 
     // AES-256 암호화된 SharedPreferences 생성
     //// security-crypto 라이브러리 APP 단위 빌드그레이들 플러그인 추가

@@ -6,11 +6,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.messaging.FirebaseMessaging
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.data.model.dto.Login
 import com.ssafy.witch.data.model.dto.RefreshToken
-import com.ssafy.witch.data.model.dto.User
 import com.ssafy.witch.data.remote.AuthService
 import com.ssafy.witch.data.remote.RetrofitUtil
 import kotlinx.coroutines.Dispatchers
@@ -19,11 +19,11 @@ import kotlinx.coroutines.launch
 private const val TAG = "LoginFragmentViewModel"
 class LoginFragmentViewModel(application: Application): AndroidViewModel(application) {
 
-    //뷰모델에서만 쓰는 것
-    private val _joinUser = MutableLiveData<User>()
-    //뷰모델 외 사용 가능한 public 선언
-    val joinUser:LiveData<User>
-        get() = _joinUser
+//    //뷰모델에서만 쓰는 것
+//    private val _joinUser = MutableLiveData<User>()
+//    //뷰모델 외 사용 가능한 public 선언
+//    val joinUser:LiveData<User>
+//        get() = _joinUser
 
     val sharedPreferencesUtil = SharedPreferencesUtil(application.applicationContext)
 
@@ -35,38 +35,44 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
 
             val authService = ApplicationClass.retrofit.create(AuthService::class.java)
 
-            // LoginService에 있다
-            runCatching {
-                authService.login(Login(email,"", password))
-            }.onSuccess { response ->
-                //response 를 받아서 _User 에 담아주면 됨
-                if (response.success) {
-                   if (response != null && response.success && response.data != null) {
-                       //JWT 토큰 및 만료 시간 저장
-                       sharedPreferencesUtil.saveTokens(
-                           response.data.accessToken,
-                           response.data.accessTokenExpiresIn,
-                           response.data.refreshToken,
-                           response.data.refreshTokenExpiresIn
-                       )
+            FirebaseMessaging.getInstance().token.addOnCompleteListener {
+                if (it.isSuccessful) {
+                    val fcmToken = it.result ?: ""
+                    Log.d(TAG, "login fcmtoken: $fcmToken")
 
-                       Log.d(TAG, "login: ${response.data.accessToken}")
-                       // LiveData 업데이트 -> 기본이미지 링크 업로드 필요
-                       _joinUser.postValue(User(response.data.accessToken, response.data.refreshToken, email, ""))
+                    // FCM 토큰 발급 완료 후 API 호출
+                    viewModelScope.launch {
+                        runCatching {
+                            authService.login(Login(email, fcmToken, password))
+                        }.onSuccess { response ->
+                            if (response.success) {
+                                response.data?.let { data ->
+                                    sharedPreferencesUtil.saveTokens(
+                                        data.accessToken,
+                                        data.accessTokenExpiresIn,
+                                        data.refreshToken,
+                                        data.refreshTokenExpiresIn
+                                    )
+                                    Log.d(TAG, "login: ${data.accessToken}")
+                                    onResult(true, data.accessToken)
 
-                       //로그인 성공
-                       onResult(true, response.data.accessToken)
-                   }else {
-                       // 실패 시 기본 메시지 또는 errorMessage 사용
-                       onResult(false, response?.data?.toString() ?: "알 수 없는 오류 발생")
-                   }
+                                    // LiveData 업데이트 -> 기본이미지 링크 업로드 필요
+//                                  _joinUser.postValue(User(response.data.accessToken, response.data.refreshToken, email, ""))
+
+                                } ?: run {
+                                    onResult(false, "알 수 없는 오류 발생")
+                                }
+                            } else {
+                                onResult(false, response.error.errorMessage)
+                            }
+                        }.onFailure { exception ->
+                            onResult(false, exception.message ?: "로그인 중 오류 발생")
+                        }
+                    }
                 } else {
-                    val errorMessage = response.error.errorMessage
-                    onResult(false, errorMessage)
+                    Log.e(TAG, "Failed to get FCM token", it.exception)
+                    onResult(false, "FCM 토큰 발급 실패")
                 }
-            }.onFailure { exception ->
-                // 로그인 실패면 실패 결과와 에러 메시지 보내기
-                onResult(false, exception.message ?: "로그인 중 오류 발생")
             }
         }
     }

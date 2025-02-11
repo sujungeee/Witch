@@ -21,7 +21,6 @@ import android.widget.Button
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import androidx.work.Constraints
@@ -29,19 +28,14 @@ import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
-import com.google.android.gms.location.LocationCallback
-import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.Priority
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
@@ -53,20 +47,24 @@ import com.ssafy.witch.ui.ContentActivity
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 import java.util.concurrent.TimeUnit
 
 private const val TAG = "MapFragment_Witch"
 class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),
     OnMapReadyCallback {
-        private var userStatus = -1
-        private var appointmentStatus = -1
+        private var userStatus = 3
+        private var appointmentStatus = ""
+
+        private var appointmentId = ""
 
         private val appointmentViewModel: AppointmentViewModel by activityViewModels()
         private val mapViewModel: MapViewModel by activityViewModels()
+
         private lateinit var participantsAdapter: AppointmentDetailParticipantsAdapter
+        private val participantsList = mutableListOf<AppointmentDetailItem.Participants>()
         private lateinit var appointmentSnackAdapter: AppointmentSnackAdatper
         private lateinit var snackList: List<SnackItem>
-        private lateinit var participantList: List<AppointmentDetailItem.Participants>
 
         private lateinit var timer: TimerHandler
         private lateinit var map: GoogleMap
@@ -83,11 +81,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
             startWorkManager()
 
-            arguments?.let {
-                userStatus = it.getInt("userStatus")
-                appointmentStatus = it.getInt("appointmentStatus")
-            }
-
             snackList= listOf(
                 SnackItem(1, R.drawable.example_snack),
                 SnackItem(1, R.drawable.example_snack),
@@ -99,21 +92,17 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                 SnackItem(1, R.drawable.example_snack),
                 SnackItem(1, R.drawable.example_snack)
             )
-
-            participantList= listOf(
-                AppointmentDetailItem.Participants(1, "홍길동", "dd1", true, false),
-                AppointmentDetailItem.Participants(2, "권길동", "dd2", false, false),
-                AppointmentDetailItem.Participants(3, "김길동", "dd3", false, false),
-                AppointmentDetailItem.Participants(4, "남길동", "dd4", false, false),
-                AppointmentDetailItem.Participants(5, "임길동", "dd5", false, false),
-                AppointmentDetailItem.Participants(6, "채길동", "dd6", false, false),
-                AppointmentDetailItem.Participants(7, "태길동", "dd7", false, false),
-            )
         }
 
         @SuppressLint("ClickableViewAccessibility")
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
+
+            appointmentViewModel.getMyInfo()
+
+            arguments?.let {
+                appointmentId = it.getString("appointmentId").toString()
+            }
 
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             val mapFragment =
@@ -123,13 +112,8 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             val bottomSheetView = view.findViewById<View>(R.id.bottom_sheet_layout)
             _bottomSheetBinding = BottomSheetLayoutBinding.bind(bottomSheetView)
 
-            initView()
-            initAdapter()
-
-            appointmentStatus= 1
-            userStatus= 1 // 1: 약속장 약속 삭제, 2: 약속 모임원 약속 참여 3. 약속 모임원 약속 탈퇴
-            showBottomSheetLayout(appointmentStatus)
-            setUserStatus(userStatus, appointmentStatus)
+            initAppointmentObserver()
+            initSnackObserver()
 
             binding.mapAcTvAppointmentName.isSelected = true
             bottomSheetBinding.mapFgTvBottomAppointmentSummary.isSelected= true
@@ -144,13 +128,26 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                 setDialog(userStatus)
             }
 
-            binding.mapAcIvSnack.setOnClickListener { // 진저 브레드
+            binding.mapAcIvSnack.setOnClickListener {
                 createSnack(userStatus, appointmentStatus)
             }
 
-            bottomSheetBinding.mapFgIvBottomAdd.setOnClickListener { // 스낵 영역 내에 있는 스낵 버튼
+            bottomSheetBinding.mapFgIvBottomAdd.setOnClickListener {
                 createSnack(userStatus, appointmentStatus)
             }
+
+            bottomSheetBinding.mapFgCbAppointmentIsLate.setOnCheckedChangeListener { _, isChecked ->
+                val lateParticipants = if (isChecked) {
+//                    appointmentViewModel.appointmentInfo.value?.participants?.filter { it.is_late } ?: emptyList()
+                    appointmentViewModel.appointmentInfo.value?.participants ?: emptyList()
+
+                } else {
+                    appointmentViewModel.appointmentInfo.value?.participants ?: emptyList()
+                }
+
+//                participantsAdapter.updateList(lateParticipants)
+            }
+
         }
 
         private fun startWorkManager() {
@@ -169,18 +166,68 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             )
         }
 
-        private fun initView() {
-            setTimer()
+        private fun initAppointmentObserver() {
+            appointmentViewModel.userId.observe(viewLifecycleOwner) {
+
+                appointmentViewModel.getAppointmentInfo(appointmentId)
+                appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
+                    setTimer(LocalDateTime.parse(it.appointmentTime))
+
+                    binding.mapAcTvAppointmentName.text = it.name
+                    bottomSheetBinding.mapFgTvBottomAppointmentSummary.text = it.summary
+                    bottomSheetBinding.mapFgTvBottomAppointmentLocation.text = it.address
+                    bottomSheetBinding.mapFgTvBottomAppointmentLeader.text = it.name
+                    bottomSheetBinding.mapFgTvBottomAppointmentTime.text = LocalDateTime.parse(it.appointmentTime).format(
+                        DateTimeFormatter.ofPattern("M월 d일 a h시 mm분", Locale.KOREAN))
+
+
+                    for(participant in it.participants) {
+                        if(participant.isLeader) { // 모임장인 경우
+
+                            Glide.with(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile.context)
+                                .load(participant.profileImageUrl)
+                                .circleCrop()
+                                .into(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile)
+
+                            bottomSheetBinding.mapFgTvBottomAppointmentLeader.text = participant.nickname
+//                            if(participant.is_late) {
+//                                bottomSheetBinding.mapFgTvBottomLeaderLate.visibility = View.VISIBLE
+//                            }
+                            if (participant.userId == appointmentViewModel.userId.value) {
+                                userStatus = 1
+                            }
+                        } else { // 모임원인 경우
+                            participantsList.add(participant)
+
+                            if (participant.userId == appointmentViewModel.userId.value) {
+                                userStatus = 2
+                            }
+                        }
+                    }
+                    
+                    // TODO: appointmentStatus 해결
+//                    setUserStatus(userStatus, it.appointmentStatus)
+                    setUserStatus(userStatus, appointmentStatus)
+                    showBottomSheetLayout(appointmentStatus)
+
+                    participantsAdapter= AppointmentDetailParticipantsAdapter(participantsList)
+                    bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
+                }
+            }
         }
 
-        private fun createSnack(userStatus: Int, appointmentStatus: Int) {
-            if (appointmentStatus == 2 && (userStatus == 1 || userStatus == 2)) {
-                val contentActivity = Intent(requireContext(), ContentActivity::class.java)
-                contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                contentActivity.putExtra("openFragment", 5)
-                startActivity(contentActivity)
+        private fun initSnackObserver() {
+            appointmentSnackAdapter= AppointmentSnackAdatper(snackList) { position ->
+                (requireActivity() as ContentActivity).openFragment(4)
+            }
+            bottomSheetBinding.mapFgRvBottomSnack.adapter= appointmentSnackAdapter
+        }
+
+        private fun createSnack(userStatus: Int, appointmentStatus: String) {
+            if (appointmentStatus == "ONGOING" && (userStatus == 1 || userStatus == 2)) {
+                (requireActivity() as ContentActivity).openFragment(5)
             } else {
-                if (appointmentStatus == 1 || appointmentStatus == 3) {
+                if (appointmentStatus == "SCHEDULED" || appointmentStatus == "FINISHED") {
                     showCustomToast("약속 진행 상태가 아닙니다.")
                 }
                 if (userStatus == 3) {
@@ -206,7 +253,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             val appointmentChangeDlBtnNo = dialogView.findViewById<Button>(R.id.dl_btn_no)
 
             appointmentChangeDlBtnYes.setOnClickListener {
-                when(userStatus) { // TODO
+                when(userStatus) {
                     1 -> appointmentViewModel.deleteAppointment(1)
                     2 -> appointmentViewModel.participateAppointment(1)
                     3 -> appointmentViewModel.leaveAppointment(1)
@@ -219,10 +266,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-        private fun setUserStatus(userStatus: Int, appointmentStatus: Int) {
+        private fun setUserStatus(userStatus: Int, appointmentStatus: String) {
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.circle_btn) as GradientDrawable
 
-            if (appointmentStatus != 2) {
+            if (appointmentStatus == "ONGOING" || appointmentStatus == "FINISHED") {
                 binding.mapAcTvAppointmentStatus.visibility = View.GONE
             } else {
                 when (userStatus) {
@@ -244,24 +291,14 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-        private fun showBottomSheetLayout(appointmentStatus: Int) {
-            if (appointmentStatus == 1) { // 스낵 보여주기
+        private fun showBottomSheetLayout(appointmentStatus: String) {
+            if (appointmentStatus == "ONGOING") { // 스낵 보여주기
                 bottomSheetBinding.mapFgClBottomSnack.visibility= View.VISIBLE
-            } else if (appointmentStatus == 2) { // 약속 전
+            } else if (appointmentStatus == "SCHEDULED") { // 약속 전
                 bottomSheetBinding.mapFgClBottomSnack.visibility= View.GONE
-            } else if (appointmentStatus == 3) { // 약속 끝난 이후
-                bottomSheetBinding.mapFgClBottomSnack.visibility= View.VISIBLE
+            } else if (appointmentStatus == "FINISHED") { // 약속 끝난 이후
+                bottomSheetBinding.mapFgClBottomSnack.visibility= View.GONE
             }
-        }
-
-        fun initAdapter(){
-            appointmentSnackAdapter= AppointmentSnackAdatper(snackList) { position ->
-                (requireActivity() as ContentActivity).openFragment(4)
-            }
-            bottomSheetBinding.mapFgRvBottomSnack.adapter= appointmentSnackAdapter
-
-            participantsAdapter= AppointmentDetailParticipantsAdapter(participantList)
-            bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
         }
 
         lateinit var mylocation: Location
@@ -320,21 +357,15 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             return bitmap
         }
 
-        override fun onResume() {
-            super.onResume()
-            setTimer()
-        }
-
         @SuppressLint("SetTextI18n")
-        private fun setTimer() {
-            val dateTimeString = "2025-02-06T16:45"
-            val targetDateTime = LocalDateTime.parse(dateTimeString, DateTimeFormatter.ISO_LOCAL_DATE_TIME)
-
-            val duration = Duration.between(LocalDateTime.now(), targetDateTime).seconds
+        private fun setTimer(appointmentTime: LocalDateTime) {
+            val duration = Duration.between(LocalDateTime.now(), appointmentTime).seconds
             mapViewModel.setRemainderTime(duration)
+
             if (duration < 0) { // 이미 끝난 약속
                 binding.mapAcTvRemainderTime.text = "0분 0초"
                 binding.mapAcSbRemainderTime.progress = 0
+                appointmentStatus = "FINISHED" // TODO: delete
             } else if (duration in 0..3600) { // 약속 시간 한 시간 이내
                 timer = TimerHandler()
                 timer.startTimer(duration)
@@ -342,12 +373,15 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                     binding.mapAcTvRemainderTime.text = remainingTime?.let { parseSeconds(it) }
                     binding.mapAcSbRemainderTime.progress = remainingTime?.toInt() ?: 0
                 }
+                appointmentStatus = "ONGOING" // TODO: delete
             } else if (duration < 3600 * 24) { // 약속 시간 하루 이내
-                binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), targetDateTime).toHours().toString() + "시간"
+                binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), appointmentTime).toHours().toString() + "시간"
                 binding.mapAcSbRemainderTime.progress = 3600
+                appointmentStatus = "SCHEDULED" // TODO: delete
             } else { // 약속 시간 하루 초과
-                binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), targetDateTime).abs().toDays().toString() + "일"
+                binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), appointmentTime).abs().toDays().toString() + "일"
                 binding.mapAcSbRemainderTime.progress = 3600
+                appointmentStatus = "SCHEDULED" // TODO: delete
             }
         }
     
@@ -388,12 +422,13 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-        companion object {
-            fun newInstance(value: String) {
-                val args = Bundle()
-                args.putString("id", value)
-                val fragment = MapFragment()
-                fragment.arguments = args
+    companion object {
+        @JvmStatic
+        fun newInstance(key:String, value:String) =
+            MapFragment().apply {
+                arguments = Bundle().apply {
+                    putString(key, value)
+                }
             }
-        }
+    }
 }

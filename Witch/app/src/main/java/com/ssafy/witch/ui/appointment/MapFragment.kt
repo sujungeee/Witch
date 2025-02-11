@@ -13,24 +13,29 @@ import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.os.Bundle
-import android.view.LayoutInflater
+import android.os.Handler
+import android.os.Looper
+import android.util.Log
 import android.view.View
-import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
+import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
@@ -39,18 +44,29 @@ import com.ssafy.witch.data.model.dto.SnackItem
 import com.ssafy.witch.databinding.BottomSheetLayoutBinding
 import com.ssafy.witch.databinding.FragmentMapBinding
 import com.ssafy.witch.ui.ContentActivity
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import java.util.concurrent.TimeUnit
 
+private const val TAG = "MapFragment_Witch"
 class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),
     OnMapReadyCallback {
-        private var userStatus = -1
-        private var appointmentStatus = -1
+        private var userStatus = 3
+        private var appointmentStatus = ""
 
-        private val viewModel: MapViewModel by viewModels()
+        private var appointmentId = ""
+
+        private val appointmentViewModel: AppointmentViewModel by activityViewModels()
+        private val mapViewModel: MapViewModel by activityViewModels()
+
         private lateinit var participantsAdapter: AppointmentDetailParticipantsAdapter
+        private val participantsList = mutableListOf<AppointmentDetailItem.Participants>()
         private lateinit var appointmentSnackAdapter: AppointmentSnackAdatper
         private lateinit var snackList: List<SnackItem>
-        private lateinit var participantList: List<AppointmentDetailItem.Participants>
 
+        private lateinit var timer: TimerHandler
         private lateinit var map: GoogleMap
         private lateinit var fusedLocationClient: FusedLocationProviderClient
         private val LOCATION_PERMISSION_REQUEST_CODE = 1
@@ -63,6 +79,8 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
 
+            startWorkManager()
+
             snackList= listOf(
                 SnackItem(1, R.drawable.example_snack),
                 SnackItem(1, R.drawable.example_snack),
@@ -74,36 +92,28 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                 SnackItem(1, R.drawable.example_snack),
                 SnackItem(1, R.drawable.example_snack)
             )
-
-            participantList= listOf(
-                AppointmentDetailItem.Participants(1, "홍길동", "dd1", true),
-                AppointmentDetailItem.Participants(2, "권길동", "dd2", false),
-                AppointmentDetailItem.Participants(3, "김길동", "dd3", false),
-                AppointmentDetailItem.Participants(4, "남길동", "dd4", false),
-                AppointmentDetailItem.Participants(5, "임길동", "dd5", false),
-                AppointmentDetailItem.Participants(6, "채길동", "dd6", false),
-                AppointmentDetailItem.Participants(7, "태길동", "dd7", false),
-            )
         }
 
         @SuppressLint("ClickableViewAccessibility")
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
 
-            val bottomSheetView = view.findViewById<View>(R.id.bottom_sheet_layout)
-            _bottomSheetBinding = BottomSheetLayoutBinding.bind(bottomSheetView)
+            appointmentViewModel.getMyInfo()
+
+            arguments?.let {
+                appointmentId = it.getString("appointmentId").toString()
+            }
 
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             val mapFragment =
                 childFragmentManager.findFragmentById(R.id.map_ac_fg) as SupportMapFragment
             mapFragment.getMapAsync(this)
 
-            initAdapter()
+            val bottomSheetView = view.findViewById<View>(R.id.bottom_sheet_layout)
+            _bottomSheetBinding = BottomSheetLayoutBinding.bind(bottomSheetView)
 
-            appointmentStatus= 1
-            userStatus= 1
-            showBottomSheetLayout(appointmentStatus)
-            setUserStatus(userStatus, appointmentStatus)
+            initAppointmentObserver()
+            initSnackObserver()
 
             binding.mapAcTvAppointmentName.isSelected = true
             bottomSheetBinding.mapFgTvBottomAppointmentSummary.isSelected= true
@@ -118,23 +128,106 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                 setDialog(userStatus)
             }
 
-            binding.mapAcIvSnack.setOnClickListener { // 진저 브레드
+            binding.mapAcIvSnack.setOnClickListener {
                 createSnack(userStatus, appointmentStatus)
             }
 
-            bottomSheetBinding.mapFgIvBottomAdd.setOnClickListener { // 스낵 영역 내에 있는 스낵 버튼
+            bottomSheetBinding.mapFgIvBottomAdd.setOnClickListener {
                 createSnack(userStatus, appointmentStatus)
+            }
+
+            bottomSheetBinding.mapFgCbAppointmentIsLate.setOnCheckedChangeListener { _, isChecked ->
+                val lateParticipants = if (isChecked) {
+//                    appointmentViewModel.appointmentInfo.value?.participants?.filter { it.is_late } ?: emptyList()
+                    appointmentViewModel.appointmentInfo.value?.participants ?: emptyList()
+
+                } else {
+                    appointmentViewModel.appointmentInfo.value?.participants ?: emptyList()
+                }
+
+//                participantsAdapter.updateList(lateParticipants)
+            }
+
+        }
+
+        private fun startWorkManager() {
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
+
+            val workRequest = PeriodicWorkRequestBuilder<LocationWorker>(30, TimeUnit.MINUTES)
+                .setConstraints(constraints)
+                .build()
+
+            WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
+                "LocationWork",
+                ExistingPeriodicWorkPolicy.KEEP,
+                workRequest
+            )
+        }
+
+        private fun initAppointmentObserver() {
+            appointmentViewModel.userId.observe(viewLifecycleOwner) {
+
+                appointmentViewModel.getAppointmentInfo(appointmentId)
+                appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
+                    setTimer(LocalDateTime.parse(it.appointmentTime))
+
+                    binding.mapAcTvAppointmentName.text = it.name
+                    bottomSheetBinding.mapFgTvBottomAppointmentSummary.text = it.summary
+                    bottomSheetBinding.mapFgTvBottomAppointmentLocation.text = it.address
+                    bottomSheetBinding.mapFgTvBottomAppointmentLeader.text = it.name
+                    bottomSheetBinding.mapFgTvBottomAppointmentTime.text = LocalDateTime.parse(it.appointmentTime).format(
+                        DateTimeFormatter.ofPattern("M월 d일 a h시 mm분", Locale.KOREAN))
+
+
+                    for(participant in it.participants) {
+                        if(participant.isLeader) { // 모임장인 경우
+
+                            Glide.with(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile.context)
+                                .load(participant.profileImageUrl)
+                                .circleCrop()
+                                .into(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile)
+
+                            bottomSheetBinding.mapFgTvBottomAppointmentLeader.text = participant.nickname
+//                            if(participant.is_late) {
+//                                bottomSheetBinding.mapFgTvBottomLeaderLate.visibility = View.VISIBLE
+//                            }
+                            if (participant.userId == appointmentViewModel.userId.value) {
+                                userStatus = 1
+                            }
+                        } else { // 모임원인 경우
+                            participantsList.add(participant)
+
+                            if (participant.userId == appointmentViewModel.userId.value) {
+                                userStatus = 2
+                            }
+                        }
+                    }
+                    
+                    // TODO: appointmentStatus 해결
+//                    setUserStatus(userStatus, it.appointmentStatus)
+                    setUserStatus(userStatus, appointmentStatus)
+                    showBottomSheetLayout(appointmentStatus)
+
+                    participantsAdapter= AppointmentDetailParticipantsAdapter(participantsList)
+                    bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
+                }
             }
         }
 
-        private fun createSnack(userStatus: Int, appointmentStatus: Int) {
-            if (appointmentStatus == 2 && (userStatus == 1 || userStatus == 2)) {
-                val contentActivity = Intent(requireContext(), ContentActivity::class.java)
-                contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                contentActivity.putExtra("openFragment", 5)
-                startActivity(contentActivity)
+        private fun initSnackObserver() {
+            appointmentSnackAdapter= AppointmentSnackAdatper(snackList) { position ->
+                (requireActivity() as ContentActivity).openFragment(4)
+            }
+            bottomSheetBinding.mapFgRvBottomSnack.adapter= appointmentSnackAdapter
+        }
+
+        private fun createSnack(userStatus: Int, appointmentStatus: String) {
+            if (appointmentStatus == "ONGOING" && (userStatus == 1 || userStatus == 2)) {
+                (requireActivity() as ContentActivity).openFragment(5)
             } else {
-                if (appointmentStatus == 1 || appointmentStatus == 3) {
+                if (appointmentStatus == "SCHEDULED" || appointmentStatus == "FINISHED") {
                     showCustomToast("약속 진행 상태가 아닙니다.")
                 }
                 if (userStatus == 3) {
@@ -160,8 +253,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             val appointmentChangeDlBtnNo = dialogView.findViewById<Button>(R.id.dl_btn_no)
 
             appointmentChangeDlBtnYes.setOnClickListener {
-                when(userStatus) { // TODO
-
+                when(userStatus) {
+                    1 -> appointmentViewModel.deleteAppointment(1)
+                    2 -> appointmentViewModel.participateAppointment(1)
+                    3 -> appointmentViewModel.leaveAppointment(1)
                 }
                 dialogBuilder.dismiss()
             }
@@ -171,10 +266,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-        private fun setUserStatus(userStatus: Int, appointmentStatus: Int) {
+        private fun setUserStatus(userStatus: Int, appointmentStatus: String) {
             val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.circle_btn) as GradientDrawable
 
-            if (appointmentStatus != 2) {
+            if (appointmentStatus == "ONGOING" || appointmentStatus == "FINISHED") {
                 binding.mapAcTvAppointmentStatus.visibility = View.GONE
             } else {
                 when (userStatus) {
@@ -196,39 +291,13 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-        private fun showBottomSheetLayout(appointmentStatus: Int) {
-            if (appointmentStatus == 1) { // 스낵 보여주기
+        private fun showBottomSheetLayout(appointmentStatus: String) {
+            if (appointmentStatus == "ONGOING") { // 스낵 보여주기
                 bottomSheetBinding.mapFgClBottomSnack.visibility= View.VISIBLE
-            } else if (appointmentStatus == 2) { // 약속 전
+            } else if (appointmentStatus == "SCHEDULED") { // 약속 전
                 bottomSheetBinding.mapFgClBottomSnack.visibility= View.GONE
-            } else if (appointmentStatus == 3) { // 약속 끝난 이후
-                bottomSheetBinding.mapFgClBottomSnack.visibility= View.VISIBLE
-            }
-        }
-
-        fun initAdapter(){
-            appointmentSnackAdapter= AppointmentSnackAdatper(snackList) { position ->
-                (requireActivity() as ContentActivity).openFragment(4)
-            }
-            bottomSheetBinding.mapFgRvBottomSnack.adapter= appointmentSnackAdapter
-
-            participantsAdapter= AppointmentDetailParticipantsAdapter(participantList)
-            bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
-        }
-
-        override fun onMapReady(googleMap: GoogleMap) {
-            map = googleMap
-            requestLocationPermissions()
-        }
-
-        private fun requestLocationPermissions() {
-            if (ContextCompat.checkSelfPermission(requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(requireActivity(),
-                    arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                    LOCATION_PERMISSION_REQUEST_CODE)
-            } else {
-                startLocationUpdates()
+            } else if (appointmentStatus == "FINISHED") { // 약속 끝난 이후
+                bottomSheetBinding.mapFgClBottomSnack.visibility= View.GONE
             }
         }
 
@@ -243,17 +312,34 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                         mylocation.latitude = location.latitude
                         mylocation.longitude = location.longitude
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
-
-                        val userMarkerBitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.marker)
-                        val scaledUserMarker = Bitmap.createScaledBitmap(userMarkerBitmap, 100, 100, false)
-                        map.addMarker(MarkerOptions()
-                            .position(userLocation)
-                            .title("내 위치")
-                            .icon(BitmapDescriptorFactory.fromBitmap(scaledUserMarker)))
                     } else {
                     }
                 }
             }
+        }
+
+        private val requestPermissionLauncher =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                if (isGranted) {
+                    startLocationUpdates()
+                } else {
+                    Toast.makeText(requireContext(), "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+
+        private fun requestLocationPermissions() {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED
+            ) {
+                requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+            } else {
+                startLocationUpdates()
+            }
+        }
+
+        override fun onMapReady(googleMap: GoogleMap) {
+            map = googleMap
+            requestLocationPermissions()
         }
 
         fun getBitmapFromVectorDrawable(context: Context, drawableId: Int) : Bitmap {
@@ -271,21 +357,78 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             return bitmap
         }
 
-        override fun onRequestPermissionsResult(
-            requestCode: Int, permissions: Array<out String>, grantResults: IntArray
-        ) {
-            super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-            if (requestCode == LOCATION_PERMISSION_REQUEST_CODE) {
-                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    startLocationUpdates()
-                } else {
-                    Toast.makeText(requireContext(), "위치 권한이 거부되었습니다.", Toast.LENGTH_SHORT).show()
+        @SuppressLint("SetTextI18n")
+        private fun setTimer(appointmentTime: LocalDateTime) {
+            val duration = Duration.between(LocalDateTime.now(), appointmentTime).seconds
+            mapViewModel.setRemainderTime(duration)
+
+            if (duration < 0) { // 이미 끝난 약속
+                binding.mapAcTvRemainderTime.text = "0분 0초"
+                binding.mapAcSbRemainderTime.progress = 0
+                appointmentStatus = "FINISHED" // TODO: delete
+            } else if (duration in 0..3600) { // 약속 시간 한 시간 이내
+                timer = TimerHandler()
+                timer.startTimer(duration)
+                mapViewModel.remainderTime.observe(viewLifecycleOwner) { remainingTime ->
+                    binding.mapAcTvRemainderTime.text = remainingTime?.let { parseSeconds(it) }
+                    binding.mapAcSbRemainderTime.progress = remainingTime?.toInt() ?: 0
                 }
+                appointmentStatus = "ONGOING" // TODO: delete
+            } else if (duration < 3600 * 24) { // 약속 시간 하루 이내
+                binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), appointmentTime).toHours().toString() + "시간"
+                binding.mapAcSbRemainderTime.progress = 3600
+                appointmentStatus = "SCHEDULED" // TODO: delete
+            } else { // 약속 시간 하루 초과
+                binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), appointmentTime).abs().toDays().toString() + "일"
+                binding.mapAcSbRemainderTime.progress = 3600
+                appointmentStatus = "SCHEDULED" // TODO: delete
             }
+        }
+    
+        private fun parseSeconds(seconds: Long): String {
+            val minutes = (seconds % 3600) / 60
+            val remainingSeconds = seconds % 60
+            return "${minutes}분 ${remainingSeconds}초"
         }
 
         override fun onDestroyView() {
             super.onDestroyView()
             _bottomSheetBinding = null
         }
+
+        @SuppressLint("HandlerLeak")
+        inner class TimerHandler : Handler(Looper.getMainLooper()) {
+            private var remainingTime: Long = 0
+            private var isRunning = false
+
+            fun startTimer(initialTime: Long) {
+                isRunning = true
+                remainingTime = initialTime
+                removeCallbacksAndMessages(null)
+                post(timerRunnable)
+            }
+
+            private val timerRunnable = object : Runnable {
+                override fun run() {
+                    if (!isRunning) return
+
+                    if (remainingTime > 0) {
+                        remainingTime -= 1
+                        mapViewModel.setRemainderTime(remainingTime)
+                    }
+
+                    postDelayed(this, 1000)
+                }
+            }
+        }
+
+    companion object {
+        @JvmStatic
+        fun newInstance(key:String, value:String) =
+            MapFragment().apply {
+                arguments = Bundle().apply {
+                    putString(key, value)
+                }
+            }
+    }
 }

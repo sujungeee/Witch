@@ -64,7 +64,7 @@
                 android:fontFamily="@font/pretendard_semibold"
                 android:text="09 : 12"
                 android:textColor="@color/witch_green"
-                android:textSize="36sp"
+                android:textSize="34sp"
                 android:layout_marginStart="30dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/map_ac_tv_appointment_name" />
@@ -88,8 +88,8 @@
                 android:id="@+id/map_ac_sb_remainder_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:max="100"
-                android:progress="40"
+                android:max="3600"
+                android:progress="0"
                 android:progressTint="@color/witch_green"
                 android:thumb="@drawable/clock"
                 android:layout_marginTop="4dp"
@@ -102,7 +102,7 @@
                 android:id="@+id/map_frame_2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="6dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -132,8 +132,8 @@
                     <FrameLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
                         android:layout_marginStart="-8dp"
+                        android:layout_marginTop="8dp"
                         app:layout_constraintStart_toEndOf="@+id/map_ac_iv_snack"
                         app:layout_constraintTop_toTopOf="@+id/map_ac_iv_snack">
 

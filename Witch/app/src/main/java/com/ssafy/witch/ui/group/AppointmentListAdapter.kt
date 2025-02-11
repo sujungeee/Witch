@@ -32,7 +32,7 @@ class AppointmentListAdapter(val appointmentList: List<MyAppointment>, val itemC
     inner class AppointmentListViewHolder(private val binding: GroupAppointmentListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("NewApi")
         fun bind(position: Int) {
-            if (appointmentList[position].isMyAppointment) {
+            if (appointmentList[position].status == "APROVED") {
                 binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.VISIBLE
             } else {
                 binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.GONE

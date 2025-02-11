@@ -5,21 +5,28 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Button
+import androidx.fragment.app.activityViewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentAppointmentCreate3Binding
-import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
+private const val TAG = "AppointmentCreate3Fragment_Witch"
 class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Binding>(
     FragmentAppointmentCreate3Binding::bind, R.layout.fragment_appointment_create3){
 
     private var today: Long= 0
     private lateinit var minute: String
+    private lateinit var hour: String
+    private val appointmentViewModel: AppointmentViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,11 +43,7 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
             } else if (binding.appointmentFgTvTimeChoice.text == "시간을 선택하세요") {
                 showCustomToast("시간을 설정해주세요!")
             } else {
-                if (minute.toInt() % 10 == 0) {
-                    setDialog()
-                } else {
-                    showCustomToast("10분 단위로 시간을 설정해주세요!")
-                }
+                setDialog()
             }
         }
 
@@ -65,24 +68,33 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
         }
     }
 
+    private fun changeLocalDateTime(): LocalDateTime{
+        val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.KOREAN)
+        val localDate = java.time.LocalDate.parse(binding.appointmentFgTvDateChoice.text, dateFormatter)
+
+        val hour = hour.toInt()
+        val minute = minute.toInt()
+
+        return LocalDateTime.of(localDate, java.time.LocalTime.of(hour, minute))
+    }
+
     private fun showTimePickerDialog() {
         val builder= MaterialTimePicker.Builder()
         builder.setTheme(R.style.CustomTimePickerDialog)
         builder.setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
         val picker= builder.build()
 
-
         picker.addOnPositiveButtonClickListener {
-            var hour= String.format("%02d", picker.hour)
+            hour= String.format("%02d", picker.hour)
             minute= String.format("%02d", picker.minute)
             var state= "오전/오후"
             if (hour.toInt() >= 12) {
                 state= "오후"
-                hour= (hour.toInt() - 12).toString()
+                binding.appointmentFgTvTimeChoice.text = state + " " + (hour.toInt() - 12).toString() + "시 " + minute + "분"
             } else {
                 state= "오전"
+                binding.appointmentFgTvTimeChoice.text = state + " " + hour + "시 " + minute + "분"
             }
-            binding.appointmentFgTvTimeChoice.text = state + " " + hour + "시 " + minute + "분"
         }
         picker.addOnNegativeButtonClickListener {
 
@@ -118,14 +130,18 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
         val appointmentCreateDlBtnNo = dialogView.findViewById<Button>(R.id.dl_btn_no)
 
         appointmentCreateDlBtnYes.setOnClickListener {
-            // 약속 생성 가능 시 생성
-            showCustomToast("약속이 생성되었어요!")
-            val mainActivity = Intent(requireContext(), MainActivity::class.java)
-            mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            mainActivity.putExtra("moveFragment", 5)
-            startActivity(mainActivity)
-
-            dialogBuilder.dismiss()
+            appointmentViewModel.setAppointmentTime(changeLocalDateTime().toString())
+            appointmentViewModel.registerAppointment()
+            appointmentViewModel.toastMsg.observe(viewLifecycleOwner) { msg ->
+                showCustomToast(msg)
+                if (msg == "약속이 생성되었어요!") {
+                    val mainActivity = Intent(requireContext(), MainActivity::class.java)
+                    mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                    mainActivity.putExtra("moveFragment", 5)
+                    startActivity(mainActivity)
+                    dialogBuilder.dismiss()
+                }
+            }
         }
 
         appointmentCreateDlBtnNo.setOnClickListener {

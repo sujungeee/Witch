@@ -1,24 +1,25 @@
 package com.ssafy.witch.data.model.dto
 
+import com.google.gson.annotations.SerializedName
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
 data class AppointmentDetailItem(
-    var appointment_id: Int,
-    var appointment_name: String,
-    var appointment_summary: String,
-    var appointment_time: LocalDateTime,
-    var appointment_address: String,
+    var appointmentId: String,
+    var name: String,
+    var appointmentStatus: String,
+    var summary: String,
+    var appointmentTime: String,
+    var address: String,
     var latitude: BigDecimal,
     var longitude: BigDecimal,
-    var participants_counts: Int,
-    var is_user_leader: Boolean,
-    var status: String
+    @SerializedName("members") var participants: List<Participants>
 ) {
     data class Participants (
-        var user_id:Int,
+        var userId: String,
         var nickname:String,
-        var profile_image_url:String,
-        var is_leader: Boolean
+        var profileImageUrl:String,
+        var isLeader: Boolean,
+//        var is_late: Boolean
     )
 }

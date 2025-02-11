@@ -7,6 +7,7 @@ import com.ssafy.witch.data.model.response.GroupListResponse
 import com.ssafy.witch.data.model.response.GroupMemberResponse
 import com.ssafy.witch.data.model.response.GroupResponse
 import com.ssafy.witch.data.model.response.PresignedUrl
+import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.Field
@@ -28,7 +29,7 @@ interface GroupService {
     @GET("/groups/name/is-unique")
     suspend fun checkGroupName(
         @Query("name") name: String
-    ) : BaseResponse<Boolean>
+    ) : Response<BaseResponse<Boolean>>
 
     // 모임 생성
     @POST("groups")
@@ -92,17 +93,15 @@ interface GroupService {
         @Body objectKey: String?
     ) : BaseResponse<String>
 
+    @GET("groups/{groupId}/preview")
+    suspend fun getGroupPreview(
+        @Path("groupId") groupId: String
+    ) : BaseResponse<GroupResponse>
 
-
-
-
-
-
-
-
-
-
-
+    @POST("groups/{groupId}/join-requests")
+    suspend fun requestJoinGroup(
+        @Path("groupId") groupId: String
+    ) : BaseResponse<String>
 
 
 }

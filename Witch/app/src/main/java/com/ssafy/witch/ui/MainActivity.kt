@@ -33,11 +33,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
 
+//        ApplicationClass.sharedPreferencesUtil.clearToken()
         // ViewModel 초기화 (토큰 재발급 함수 사용)
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
         // 앱 시작 시 또는 액티비티 진입 시 토큰 유효성 체크
-        checkTokenValidity()
+//        checkTokenValidity()
 
         val fragmentIdx = intent.getIntExtra("moveFragment", -1)
         if (fragmentIdx != -1) {
@@ -120,6 +121,7 @@ class MainActivity : AppCompatActivity() {
                 // 우선 액세스 토큰 재발급 시도
                 loginViewModel.reissueAccessToken { reissueSuccess ->
                     if (reissueSuccess) {
+                        navigateToLogin()
                         // 재발급 성공: 새로운 액세스 토큰으로 진행
                     } else {
                         // 만약 액세스 토큰 재발급이 실패하면, refresh token 재발급(renew) 시도

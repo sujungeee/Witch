@@ -9,14 +9,11 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.data.remote.AppointmentService
 import com.ssafy.witch.databinding.FragmentAppointmentCreate3Binding
-import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter

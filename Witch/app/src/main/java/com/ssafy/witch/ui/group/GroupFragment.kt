@@ -6,26 +6,23 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.TextView
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.data.model.dto.AppointmentListItem
 import com.ssafy.witch.data.model.dto.MyAppointment
-import com.ssafy.witch.data.model.response.GroupApproval
 import com.ssafy.witch.data.model.dto.User
 import com.ssafy.witch.data.model.response.GroupJoinListResponse.JoinRequest
 import com.ssafy.witch.databinding.DialogGroupMembersBinding
 import com.ssafy.witch.databinding.FragmentGroupBinding
 import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
-import com.ssafy.witch.ui.appointment.MapFragment
-import java.time.LocalDateTime
 import kotlin.properties.Delegates
 
-
+private const val TAG = "GroupFragment_Witch"
 class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::bind, R.layout.fragment_group) {
     private val viewModel: GroupViewModel by viewModels()
 
@@ -51,6 +48,10 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         super.onViewCreated(view, savedInstanceState)
         mainActivity = requireActivity() as MainActivity
 
+        arguments?.let {
+            groupId = it.getString("groupId").toString()
+        }
+
         initView()
         initAdapter()
         initObserver()
@@ -59,6 +60,7 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             val contentActivity = Intent(requireContext(), ContentActivity::class.java)
             contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
             contentActivity.putExtra("openFragment", 6)
+            contentActivity.putExtra("id", groupId)
             startActivity(contentActivity)
         }
 
@@ -98,12 +100,13 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         })
 
         viewModel.groupAppointments.observe(viewLifecycleOwner, {
-            appointmentList=it
+            appointmentList = it
             binding.groupFgTvTotalAppointment.text=it.size.toString()
             binding.groupFgRvAppointmentList.adapter = AppointmentListAdapter(appointmentList) { id ->
                 val contentActivity = Intent(requireContext(), ContentActivity::class.java)
                 contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                 contentActivity.putExtra("openFragment", 9)
+                contentActivity.putExtra("id", id)
                 startActivity(contentActivity)
             }
         })
@@ -239,11 +242,6 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-        arguments?.let {
-            groupId = it.getString("groupId").toString()
-        }
     }
 
 

@@ -14,10 +14,8 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.gms.location.FusedLocationProviderClient
@@ -43,6 +41,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 
+private const val TAG = "AppointmentCreate2Fragment_Witch"
 class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Binding>(
     FragmentAppointmentCreate2Binding::bind, R.layout.fragment_appointment_create2),
     OnMapReadyCallback {
@@ -131,8 +130,7 @@ class AppointmentCreate2Fragment : BaseFragment<FragmentAppointmentCreate2Bindin
                 appointmentViewModel.setLongitude(choiceLatLng.longitude)
                 appointmentViewModel.setLatitude(choiceLatLng.latitude)
                 appointmentViewModel.setAddress(binding.appointmentFgTvAppointmentAddress.text.toString())
-
-                (requireActivity() as ContentActivity).openFragment(8)
+                (requireActivity() as ContentActivity).openFragment(8, "")
             }
         }
 

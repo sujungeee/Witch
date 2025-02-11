@@ -5,9 +5,14 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import com.ssafy.witch.base.BaseResponse
+import com.ssafy.witch.data.model.dto.AppointmentDetailItem
 import com.ssafy.witch.data.model.dto.request.AppointmentRequest
-import com.ssafy.witch.data.model.response.MyAppointmentResponse
+import com.ssafy.witch.data.model.response.ErrorResponse
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.appointmentService
+import com.ssafy.witch.data.remote.RetrofitUtil.Companion.userService
 import kotlinx.coroutines.launch
 
 private const val TAG = "AppointmentViewModel_Witch"
@@ -16,9 +21,17 @@ class AppointmentViewModel: ViewModel() {
     val toastMsg: LiveData<String>
         get() = _toastMsg
 
-    private val _appointmentList = MutableLiveData<MyAppointmentResponse?>()
-    val appointmentList: LiveData<MyAppointmentResponse?>
-        get() = _appointmentList
+    private val _appointmentInfo = MutableLiveData<AppointmentDetailItem>()
+    val appointmentInfo: LiveData<AppointmentDetailItem>
+        get() = _appointmentInfo
+
+    private val _groupId = MutableLiveData<String>()
+    val groupId: LiveData<String>
+        get() = _groupId
+
+    private val _userId = MutableLiveData<String>()
+    val userId: LiveData<String>
+        get() = _userId
 
     private val _name= MutableLiveData<String>()
     val name: LiveData<String>
@@ -53,6 +66,10 @@ class AppointmentViewModel: ViewModel() {
         _address.value = ""
     }
 
+    fun setGroupId(groupId: String) {
+        _groupId.value = groupId
+    }
+
     fun setName(name: String){
         _name.value = name
     }
@@ -68,6 +85,7 @@ class AppointmentViewModel: ViewModel() {
     fun setLatitude(latitude: Double){
         _latitude.value = latitude
     }
+
     fun setLongitude(longitude: Double){
         _longitude.value = longitude
     }
@@ -76,10 +94,11 @@ class AppointmentViewModel: ViewModel() {
         _address.value = address
     }
 
-    fun registerAppointment(){
+    fun registerAppointment() {
         viewModelScope.launch {
             runCatching {
-                appointmentService.registerAppointment( 1, //TODO: groupId
+                appointmentService.registerAppointment(
+                    groupId.value!!,
                     AppointmentRequest(
                         name.value!!,
                         summary.value!!,
@@ -89,18 +108,67 @@ class AppointmentViewModel: ViewModel() {
                         address.value!!
                     )
                 )
-            }.onSuccess {
-                if(it.success == true){
-                    Log.d(TAG, "registerAppointment(): success")
-                    _toastMsg.value = "약속이 생성되었어요!"
-                    appointmentClear()
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    if (response.body()?.success == true) {
+                        _toastMsg.value = "약속이 생성되었어요!"
+                        appointmentClear()
+                    }
                 } else {
-                    Log.d(TAG, "registerAppointment(): fail")
-                    _toastMsg.value = it.error.errorMessage
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    _toastMsg.value = errorResponse?.error?.errorMessage
+                }
+            }.onFailure { e ->
+                Log.e(TAG, "registerAppointment() Exception: ${e.message}", e)
+            }
+        }
+    }
+
+    fun getAppointmentInfo(appointmentId: String) {
+        viewModelScope.launch {
+            runCatching {
+                appointmentService.getAppointmentInfo(appointmentId)
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    if (response.body()?.success == true) {
+                        _appointmentInfo.value = response.body()?.data!!
+                    }
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    _toastMsg.value = errorResponse?.error?.errorMessage
+                }
+            }.onFailure { e ->
+                Log.e(TAG, "getAppointmentInfo() Exception: ${e.message}", e)
+            }
+        }
+    }
+
+    fun getMyInfo() {
+        viewModelScope.launch {
+            runCatching {
+                userService.getProfile()
+            }.onSuccess {
+                if (it.success) {
+                    it.data?.let { user ->
+                        try {
+                            _userId.value = user.userId
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                } else {
+                    // 실패
                 }
             }.onFailure {
-                Log.d(TAG, "registerAppointment(): ${it.message}")
-                it.printStackTrace()
+
             }
         }
     }
@@ -109,17 +177,21 @@ class AppointmentViewModel: ViewModel() {
         viewModelScope.launch {
             runCatching {
                 appointmentService.deleteAppointment(appointmentId)
-            }.onSuccess {
-                if (it.success == true) {
-                    Log.d(TAG, "deleteAppointment(): success")
-                    _toastMsg.value = "약속이 삭제되었어요!"
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    if (response.body()?.success == true) {
+                        _toastMsg.value = "약속을 삭제하였습니다!"
+                    }
                 } else {
-                    Log.d(TAG, "deleteAppointment(): fail")
-                    _toastMsg.value = it.error.errorMessage
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    _toastMsg.value = errorResponse?.error?.errorMessage
                 }
-            }.onFailure {
-                Log.d(TAG, "deleteAppointment(): ${it.message}")
-                it.printStackTrace()
+            }.onFailure { e ->
+                Log.e(TAG, "deleteAppointment() Exception: ${e.message}", e)
             }
         }
     }
@@ -128,17 +200,21 @@ class AppointmentViewModel: ViewModel() {
         viewModelScope.launch {
             runCatching {
                 appointmentService.participateAppointment(appointmentId)
-            }.onSuccess {
-                if(it.success == true) {
-                    Log.d(TAG, "participateAppointment(): success")
-                    _toastMsg.value = "약속에 참여했어요!"
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    if (response.body()?.success == true) {
+                        _toastMsg.value = "약속에 참여했습니다!"
+                    }
                 } else {
-                    Log.d(TAG, "participateAppointment(): fail")
-                    _toastMsg.value = it.error.errorMessage
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    _toastMsg.value = errorResponse?.error?.errorMessage
                 }
-            }.onFailure {
-                Log.d(TAG, "participateAppointment(): fail")
-                _toastMsg.value = it.message
+            }.onFailure { e ->
+                Log.e(TAG, "participateAppointment() Exception: ${e.message}", e)
             }
         }
     }
@@ -147,17 +223,21 @@ class AppointmentViewModel: ViewModel() {
         viewModelScope.launch {
             runCatching {
                 appointmentService.leaveAppointment(appointmentId)
-            }.onSuccess {
-                if (it.success == true) {
-                    Log.d(TAG, "leaveAppointment(): success")
-                    _toastMsg.value = "약속에서 탈퇴했어요!"
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    if (response.body()?.success == true) {
+                        _toastMsg.value = "약속을 탈퇴했습니다!"
+                    }
                 } else {
-                    Log.d(TAG, "leaveAppointment(): fail")
-                    _toastMsg.value = it.error.errorMessage
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    _toastMsg.value = errorResponse?.error?.errorMessage
                 }
-            }.onFailure {
-                Log.d(TAG, "leaveAppointment: ${it.message}")
-                it.printStackTrace()
+            }.onFailure { e ->
+                Log.e(TAG, "leaveAppointment() Exception: ${e.message}", e)
             }
         }
     }

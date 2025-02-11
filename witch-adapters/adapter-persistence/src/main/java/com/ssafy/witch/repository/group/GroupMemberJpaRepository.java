@@ -17,4 +17,7 @@ public interface GroupMemberJpaRepository extends JpaRepository<GroupMemberEntit
 
   @Transactional
   void deleteByUserIdAndGroupId(String userId, String groupId);
+
+  @Transactional
+  void deleteAllByGroupId(String groupId);
 }

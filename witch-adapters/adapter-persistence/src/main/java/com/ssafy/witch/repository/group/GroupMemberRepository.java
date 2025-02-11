@@ -1,9 +1,13 @@
 package com.ssafy.witch.repository.group;
 
+
 import com.ssafy.witch.group.GroupMember;
 import com.ssafy.witch.group.GroupMemberPort;
+
 import com.ssafy.witch.mapper.group.GroupMemberMapper;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +19,7 @@ public class GroupMemberRepository implements GroupMemberPort {
   private final GroupMemberJpaRepository groupMemberJpaRepository;
 
   private final GroupMemberMapper mapper;
+
 
   @Override
   public GroupMember save(GroupMember groupMember) {
@@ -43,6 +48,19 @@ public class GroupMemberRepository implements GroupMemberPort {
   @Override
   public void deleteMember(String userId, String groupId) {
     groupMemberJpaRepository.deleteByUserIdAndGroupId(userId, groupId);
+  }
+
+
+
+  @Override
+  public void deleteAllByGroupId(String groupId) {
+    groupMemberJpaRepository.deleteAllByGroupId(groupId);
+  }
+
+  @Override
+  public Optional<GroupMember> findByUserIdAndGroupId(String userId, String groupId) {
+    return groupMemberJpaRepository.findByUserIdAndGroupId(userId, groupId)
+            .map(mapper::toDomain);
   }
 
 }

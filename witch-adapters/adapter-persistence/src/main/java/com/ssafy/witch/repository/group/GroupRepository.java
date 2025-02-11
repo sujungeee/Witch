@@ -13,6 +13,7 @@ import org.springframework.stereotype.Repository;
 public class GroupRepository implements GroupPort, ValidateGroupPort {
 
   private final GroupJpaRepository groupJpaRepository;
+  private final GroupMapper groupMapper;
 
   private final GroupMapper mapper;
 
@@ -36,5 +37,8 @@ public class GroupRepository implements GroupPort, ValidateGroupPort {
     return groupJpaRepository.existsByName(name);
   }
 
-
+  @Override
+  public void delete(Group group) {
+    groupJpaRepository.delete(groupMapper.toEntity(group));
+  }
 }

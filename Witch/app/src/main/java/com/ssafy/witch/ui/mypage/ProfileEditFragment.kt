@@ -18,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -60,9 +61,18 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
         initImage()
 
         binding.profileEditFgBtnNameChange.setOnClickListener {
-            viewModel.editProfileName(binding.profileEditFgEtNickname.text.toString())
+            viewModel.editProfileName(binding.profileEditFgEtNickname.text.toString(), requireContext() as ContentActivity)
         }
 
+        binding.profileEditFgBtnDuplCheck.setOnClickListener {
+            viewModel.checkdupl(binding.profileEditFgEtNickname.text.toString(), "profile", requireContext() as ContentActivity).apply {
+                binding.profileEditFgBtnNameChange.isEnabled = true
+            }
+        }
+
+        binding.profileEditFgEtNickname.doOnTextChanged { text, start, before, count ->
+            binding.profileEditFgBtnNameChange.isEnabled = false
+        }
     }
 
     fun initImage(){

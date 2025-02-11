@@ -70,7 +70,7 @@
         android:layout_marginHorizontal="30dp"
         android:layout_marginVertical="10dp"
         android:layout_marginTop="163dp"
-        android:backgroundTint="@color/witch_green"
+        android:backgroundTint="@color/button_color_selector"
         android:gravity="center"
         android:text="이름 변경"
         android:textColor="@color/witch_black"

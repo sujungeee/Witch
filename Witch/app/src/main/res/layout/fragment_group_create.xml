@@ -127,7 +127,7 @@
         android:layout_marginVertical="10dp"
         android:backgroundTint="@color/witch_green"
         android:gravity="center"
-        android:text="사진 변경"
+        android:text="모임 생성"
         android:textColor="@color/witch_black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

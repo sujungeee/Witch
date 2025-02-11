@@ -4,13 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ssafy.witch.data.model.dto.GroupInfo
+import com.ssafy.witch.data.model.dto.ObjectKey
 import com.ssafy.witch.data.model.response.PresignedUrl
+import com.ssafy.witch.data.remote.RetrofitUtil.Companion.authService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.groupService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.s3Service
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.userService
@@ -19,6 +22,7 @@ import com.ssafy.witch.ui.MainActivity
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -66,9 +70,9 @@ class EditViewModel : ViewModel() {
             }
             if (response) {
                 when (screen) {
-                    "edit" -> editGroupImage(groupId,presignedUrl.objectKey)
+                    "edit" -> editGroupImage(groupId,presignedUrl.objectKey, context)
                     "create" -> createGroup(groupName.value!!, presignedUrl.objectKey, context)
-                    "profile" -> editProfileImage(presignedUrl.objectKey)
+                    "profile" -> editProfileImage(presignedUrl.objectKey, context)
                 }
             } else {
                 throw Exception("업로드 실패")
@@ -153,13 +157,14 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editGroupImage(groupId:String,objectKey: String?) {
+    fun editGroupImage(groupId:String,objectKey: String?, context: ContentActivity) {
         viewModelScope.launch {
             runCatching {
                 groupService.editGroupImage(groupId,objectKey)
             }.onSuccess {
                 if (it.success) {
                     Log.d(TAG, "editGroupImage: 성공><")
+                    context.finish()
                 } else {
                     Log.d(TAG, "editGroupImage: ${it.error.errorMessage}")
                 }
@@ -185,13 +190,14 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editProfileImage(objectKey: String?) {
+    fun editProfileImage(objectKey: String?, context: ContentActivity) {
         viewModelScope.launch {
             runCatching {
-                userService.editProfileImage(objectKey)
+                userService.editProfileImage(ObjectKey(objectKey))
             }.onSuccess {
                 if (it.success) {
                     Log.d(TAG, "editProfileImage: 성공><")
+                    context.finish()
                 } else {
                     Log.d(TAG, "editProfileImage: ${it.error.errorMessage}")
                 }
@@ -201,12 +207,13 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editProfileName(name: String) {
+    fun editProfileName(name: String, context: ContentActivity) {
         viewModelScope.launch {
             runCatching {
                 userService.editProfileName(name)
             }.onSuccess {
                 if (it.success) {
+                    context.finish()
                     Log.d(TAG, "editProfileName: 성공><")
                 } else {
                     Log.d(TAG, "editProfileName: ${it.error.errorMessage}")
@@ -226,6 +233,33 @@ class EditViewModel : ViewModel() {
             }
         }
         return file
+    }
+
+    fun checkdupl(name:String, screen: String, context: ContentActivity){
+        viewModelScope.launch {
+            runCatching {
+                when(screen){
+                    "group" -> groupService.checkGroupName(name)
+                    "profile" -> userService.checkNicknameUnique(name)
+                    else -> throw Exception("잘못된 screen")
+                }
+            }.onSuccess {
+                if (it.isSuccessful) {
+                    if (it.body()!=null && it.body()!!.success) {
+                        Log.d(TAG, "checkdupl: 성공><")
+                        Toast.makeText(context, "사용 가능한 이름입니다.", Toast.LENGTH_SHORT).show()
+                    }
+                }else if(it.code()==400){
+                    it.body()?.let { body ->
+                        Toast.makeText(context, body.error.errorMessage, Toast.LENGTH_SHORT).show()
+                    }
+                    Log.d(TAG, "checkdupl: ${it.errorBody()?.string()}")
+                }
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
+
     }
 
 

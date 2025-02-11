@@ -18,8 +18,9 @@ import lombok.NoArgsConstructor;
 public class FcmTokenEntity {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.AUTO)
-  private Long fcm_token_id;
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(nullable = false, updatable = false)
+  private Long fcmTokenId;
 
   @JoinColumn(nullable = false, unique = true, updatable = false)
   private String userId;
@@ -27,11 +28,9 @@ public class FcmTokenEntity {
   @Column(nullable = false, unique = true, updatable = false)
   private String fcmToken;
 
-  public FcmTokenEntity(Long fcm_token_id, String userId, String fcmToken) {
-    this.fcm_token_id = fcm_token_id;
-
+  public FcmTokenEntity(Long fcmTokenId, String userId, String fcmToken) {
+    this.fcmTokenId = fcmTokenId;
     this.userId = userId;
     this.fcmToken = fcmToken;
   }
-
 }

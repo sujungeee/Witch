@@ -2,10 +2,12 @@ package com.ssafy.witch.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
+import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.databinding.ActivityMainBinding
 import com.ssafy.witch.ui.group.GroupCreateFragment
 import com.ssafy.witch.ui.group.GroupEditFragment
@@ -38,7 +40,7 @@ class MainActivity : AppCompatActivity() {
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
         // 앱 시작 시 또는 액티비티 진입 시 토큰 유효성 체크
-//        checkTokenValidity()
+        checkTokenValidity()
 
         val fragmentIdx = intent.getIntExtra("moveFragment", -1)
         if (fragmentIdx != -1) {
@@ -102,43 +104,39 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * 토큰 유효성을 확인하여, 액세스 토큰이 만료된 경우 리프레시 토큰으로 재발급 시도,
-     * 리프레시 토큰도 만료된 경우 로그인 화면으로 전환.
+     * 토큰 유효성을 확인하여 리프레시 토큰 만료된 경우 로그인 화면으로 전환.
      */
     private fun checkTokenValidity() {
-        val sharedPref = ApplicationClass.sharedPreferencesUtil
-        val accessTokenExpiresAt = sharedPref.getAccessTokenExpiresAt() ?: 0L
-        val refreshTokenExpiresAt = sharedPref.getRefreshTokenExpiresAt() ?: 0L
+        val sharedPref = SharedPreferencesUtil(application.applicationContext)
+        val accessTokenExpiresAt = sharedPref.getAccessTokenExpiresAt()
+        val refreshTokenExpiresAt = sharedPref.getRefreshTokenExpiresAt()
+        val refreshTokenIssuedAt = sharedPref.getRefreshTokenRenewAvailableSeconds()
         val currentTime = System.currentTimeMillis() / 1000
 
-        when {
-            // 액세스 토큰이 유효한 경우: 아무런 조치 없이 진행
-            accessTokenExpiresAt > currentTime -> {
-                // 토큰이 유효합니다.
-            }
-            // 액세스 토큰은 만료되었으나, refresh token은 유효한 경우
-            refreshTokenExpiresAt > currentTime -> {
-                // 우선 액세스 토큰 재발급 시도
-                loginViewModel.reissueAccessToken { reissueSuccess ->
-                    if (reissueSuccess) {
-                        navigateToLogin()
-                        // 재발급 성공: 새로운 액세스 토큰으로 진행
-                    } else {
-                        // 만약 액세스 토큰 재발급이 실패하면, refresh token 재발급(renew) 시도
-                        loginViewModel.renewRefreshToken { renewSuccess ->
-                            if (!renewSuccess) {
-                                // 재발급 실패 시, 로그아웃 처리 (로그인 화면으로 전환)
-                                navigateToLogin()
-                            }
-                        }
-                    }
+        Log.d(TAG, "현재 시간: $currentTime")
+
+        Log.d(TAG, "AccessToken 만료 시간: $accessTokenExpiresAt")
+        Log.d(TAG, "RefreshToken 만료 시간: $refreshTokenExpiresAt")
+        Log.d(TAG, "RefreshToken 갱신 가능 시간: $refreshTokenIssuedAt")
+
+        // Refresh Token 만료 확인 (7일 기준)
+        if (currentTime >= refreshTokenExpiresAt) {
+            Log.d(TAG, "Refresh Token 만료됨. 로그인 필요.")
+            navigateToLogin()
+            return
+        }
+
+        // Refresh Token 갱신 가능 여부 확인 (5일 이후)
+        val canRenew = currentTime > refreshTokenIssuedAt // 5일 후부터 가능
+        if (canRenew) {
+            loginViewModel.renewRefreshToken { success ->
+                if (!success) {
+                    Log.d(TAG, "Refresh Token 갱신 실패. 로그인 필요.")
+                    navigateToLogin()
                 }
             }
-            // 두 토큰 모두 만료된 경우
-            else -> {
-                // 바로 로그인 화면으로 이동
-                navigateToLogin()
-            }
+        } else {
+            Log.d(TAG, "Refresh Token 갱신 조건 미충족 (5일 미만)")
         }
     }
 

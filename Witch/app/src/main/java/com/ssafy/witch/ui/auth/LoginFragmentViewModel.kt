@@ -47,13 +47,27 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                         }.onSuccess { response ->
                             if (response.success) {
                                 response.data?.let { data ->
+                                    Log.d(TAG, "서버에서 받은 accessTokenExpiresIn: ${data.accessTokenExpiresIn}")
+                                    Log.d(TAG, "서버에서 받은 refreshTokenExpiresIn: ${data.refreshTokenExpiresIn}")
+
+                                    // 저장 전에 로깅
+                                    val currentTime = System.currentTimeMillis() / 1000
+                                    Log.d(TAG, "현재 시간: $currentTime")
+                                    Log.d(TAG, "계산된 AccessToken 만료 시간: ${currentTime + data.accessTokenExpiresIn}")
+                                    Log.d(TAG, "계산된 RefreshToken 만료 시간: ${currentTime + data.refreshTokenExpiresIn}")
+
                                     sharedPreferencesUtil.saveTokens(
                                         data.accessToken,
                                         data.accessTokenExpiresIn,
                                         data.refreshToken,
-                                        data.refreshTokenExpiresIn
+                                        data.refreshTokenExpiresIn,
+                                        data.refreshTokenRenewAvailableSeconds
                                     )
-                                    Log.d(TAG, "login: ${data.accessToken}")
+                                    Log.d(TAG, "access: ${data.accessToken}")
+                                    Log.d(TAG, "a-expire: ${data.accessTokenExpiresIn}")
+                                    Log.d(TAG, "refresh: ${data.refreshToken}")
+                                    Log.d(TAG, "r-expire: ${data.refreshTokenExpiresIn}")
+                                    Log.d(TAG, "login_avail: ${data.refreshTokenRenewAvailableSeconds}")
                                     onResult(true, data.accessToken)
 
                                     // LiveData 업데이트 -> 기본이미지 링크 업로드 필요
@@ -82,8 +96,11 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
         viewModelScope.launch {
             val refreshToken = sharedPreferencesUtil.getRefreshToken() ?: return@launch onResult(false)
 
+            Log.d(TAG, "reissueAccessToken_refreshToken: $refreshToken")
+
+            val authService = ApplicationClass.retrofit.create(AuthService::class.java)
             runCatching {
-                RetrofitUtil.authService.reissueAccessToken(RefreshToken(refreshToken))
+                authService.reissueAccessToken(RefreshToken(refreshToken))
             }.onSuccess { response ->
                 if (response.isSuccessful) {
                     val data = response.body()?.data
@@ -108,8 +125,10 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
         viewModelScope.launch {
             val refreshToken = sharedPreferencesUtil.getRefreshToken() ?: return@launch onResult(false)
 
+            Log.d(TAG, "renewRefreshToken_refreshToken: $refreshToken")
+            val authService = ApplicationClass.retrofit.create(AuthService::class.java)
             runCatching {
-                RetrofitUtil.authService.renewRefreshToken(RefreshToken(refreshToken))
+                authService.renewRefreshToken(RefreshToken(refreshToken))
             }.onSuccess { response ->
                 if (response.isSuccessful) {
                     val data = response.body()?.data
@@ -119,7 +138,8 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                             data.accessToken,
                             data.accessTokenExpiresIn,
                             data.refreshToken,
-                            data.refreshTokenExpiresIn
+                            data.refreshTokenExpiresIn,
+                            data.refreshTokenRenewAvailableSeconds
                         )
                         onResult(true)
                     } else {

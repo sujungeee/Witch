@@ -69,11 +69,11 @@ CREATE TABLE `snack`
 (
     `snack_id`              VARCHAR(36)   NOT NULL PRIMARY KEY,
     `appointment_id`        VARCHAR(36)   NOT NULL,
-    `appointment_member_id` VARCHAR(36)   NOT NULL,
+    `user_id` VARCHAR(36)   NOT NULL,
     `latitude`              DOUBLE        NOT NULL,
     `longitude`             DOUBLE        NOT NULL,
-    `picture_url`           VARCHAR(2000) NULL,
-    `sound_url`             VARCHAR(2000) NULL,
+    `snack_image_url`           VARCHAR(2000) NULL,
+    `snack_sound_url`             VARCHAR(2000) NULL,
     `created_at`            TIMESTAMP     NOT NULL,
     `modified_at`           TIMESTAMP     NOT NULL
 );

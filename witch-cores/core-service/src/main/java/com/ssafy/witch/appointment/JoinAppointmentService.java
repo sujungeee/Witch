@@ -1,7 +1,11 @@
 package com.ssafy.witch.appointment;
 
+import com.ssafy.witch.apoointment.AppointmentJoinEventPublishPort;
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
 import com.ssafy.witch.apoointment.AppointmentPort;
+import com.ssafy.witch.apoointment.AppointmentReadPort;
+import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
+import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.appointment.command.AppointmentJoinCommand;
 import com.ssafy.witch.exception.appointment.AlreadyJoinedAppointmentException;
 import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
@@ -20,6 +24,8 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
   private final AppointmentPort appointmentPort;
   private final GroupMemberPort groupMemberPort;
   private final AppointmentMemberPort appointmentMemberPort;
+  private final AppointmentJoinEventPublishPort appointmentJoinEventPublishPort;
+  private final AppointmentReadPort appointmentReadPort;
 
   @Transactional
   @Override
@@ -38,8 +44,13 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
     verifyIsAppointmentTimeConflict(userId, appointmentTime);
 
     AppointmentMember newMember = AppointmentMember.createNewMember(userId, appointmentId);
-
     appointmentMemberPort.save(newMember);
+
+    AppointmentDetailProjection appointmentDetailProjection = appointmentReadPort.getAppointmentDetail(
+        appointmentId);
+
+    appointmentJoinEventPublishPort.publish(
+        new AppointmentJoinEvent(userId, appointmentDetailProjection));
   }
 
   private void verifyIsAppointmentTimeConflict(String userId, LocalDateTime appointmentTime) {

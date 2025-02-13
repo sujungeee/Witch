@@ -256,12 +256,14 @@ class AppointmentReadControllerTest extends RestDocsTestSupport {
                 "example-user-id-1",
                 "닉네임1",
                 "http://profile.image.example1",
-                true),
+                true,
+                "fcm_token_example"),
             new AppointmentMemberOutput(
                 "example-user-id-2",
                 "닉네임2",
                 "http://profile.image.example2",
-                false)
+                false,
+                "fcm_token_example")
         )
     );
 

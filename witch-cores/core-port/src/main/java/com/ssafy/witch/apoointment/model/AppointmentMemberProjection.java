@@ -11,4 +11,5 @@ public class AppointmentMemberProjection {
   private String nickname;
   private String profileImageUrl;
   private boolean isLeader;
+  private String fcmToken;
 }

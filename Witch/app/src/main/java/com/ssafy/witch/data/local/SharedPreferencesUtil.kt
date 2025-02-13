@@ -54,23 +54,53 @@ class SharedPreferencesUtil (context : Context) {
     fun saveTokens(accessToken: String, accessTokenExpiresIn: Long, refreshToken: String, refreshTokenExpiresIn: Long, refreshTokenRenewAvailableSeconds: Long) {
         //현재시간 초단위로 기록
         val currentTime = System.currentTimeMillis() / 1000
-        preference.edit().apply {
-            putString(KEY_ACCESS_TOKEN, accessToken)
-            putLong(KEY_ACCESS_TOKEN_EXPIRES_AT, currentTime + accessTokenExpiresIn) // 현재 시간 + 만료 시간)
-            putString(KEY_REFRESH_TOKEN, refreshToken)
-            putLong(KEY_REFRESH_TOKEN_EXPIRES_AT, currentTime + refreshTokenExpiresIn)
-            // 리프레시 만료 시로부터 2일 이전부터 리프레시 토큰 재발급 가능하게 하는 시간
-            putLong(KEY_REFRESH_TOKEN_RENEW_AVAILABLE_SECONDS, currentTime + refreshTokenExpiresIn - refreshTokenRenewAvailableSeconds)
-            apply()
+        val editor = preference.edit()
+
+        // 기존 Access Token 및 만료 시간 삭제
+        editor.remove(KEY_ACCESS_TOKEN)
+        editor.remove(KEY_ACCESS_TOKEN_EXPIRES_AT)
+
+        // 새로운 Access Token 및 만료 시간 저장
+        editor.putString(KEY_ACCESS_TOKEN, accessToken)
+        editor.putLong(KEY_ACCESS_TOKEN_EXPIRES_AT, currentTime + accessTokenExpiresIn)
+
+        // Refresh Token 저장
+        editor.putString(KEY_REFRESH_TOKEN, refreshToken)
+        editor.putLong(KEY_REFRESH_TOKEN_EXPIRES_AT, currentTime + refreshTokenExpiresIn)
+        editor.putLong(KEY_REFRESH_TOKEN_RENEW_AVAILABLE_SECONDS, currentTime + refreshTokenExpiresIn - refreshTokenRenewAvailableSeconds)
+
+        // ✅ 동기적으로 즉시 반영
+        val isSuccess = editor.commit()
+
+        if (isSuccess) {
+            Log.d(TAG, "✅ Tokens 저장 완료")
+        } else {
+            Log.e(TAG, "❌ Tokens 저장 실패")
         }
     }
 
     fun saveAccessToken(accessToken: String, accessTokenExpiresIn: Long) {
+        Log.d(TAG, "🟢 새로운 Access Token 저장 시도: $accessToken")
+
         val currentTime = System.currentTimeMillis() / 1000
-        preference.edit().apply {
-            putString(KEY_ACCESS_TOKEN, accessToken)
-            putLong(KEY_ACCESS_TOKEN_EXPIRES_AT, currentTime + accessTokenExpiresIn)
-            apply()
+
+        val editor = preference.edit()
+
+        // 기존 Access Token 삭제
+        editor.remove(KEY_ACCESS_TOKEN)
+        editor.remove(KEY_ACCESS_TOKEN_EXPIRES_AT)
+
+        // 새로운 Access Token 및 만료 시간 저장
+        editor.putString(KEY_ACCESS_TOKEN, accessToken)
+        editor.putLong(KEY_ACCESS_TOKEN_EXPIRES_AT, currentTime + accessTokenExpiresIn)
+
+        // ✅ 즉시 반영
+        val isSuccess = editor.commit()
+
+        if (isSuccess) {
+            Log.d(TAG, "✅ Access Token 저장 완료: $accessToken")
+        } else {
+            Log.e(TAG, "❌ Access Token 저장 실패")
         }
     }
 

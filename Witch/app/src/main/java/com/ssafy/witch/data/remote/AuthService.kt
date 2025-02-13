@@ -23,7 +23,7 @@ interface AuthService {
 
     //액세스 토큰 재발급 API
     @POST("auth/token/reissue")
-    suspend fun reissueAccessToken(@Body request: RefreshToken): Response<AccessTokenResponse>
+    suspend fun reissueAccessToken(@Body request: RefreshToken): Response<BaseResponse<AccessTokenResponse>>
 
     //리프레시 토큰 재발급 API
     @POST("auth/token/renew")

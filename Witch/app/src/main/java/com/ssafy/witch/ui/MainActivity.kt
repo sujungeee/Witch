@@ -119,6 +119,13 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "RefreshToken 만료 시간: $refreshTokenExpiresAt")
         Log.d(TAG, "RefreshToken 갱신 가능 시간: $refreshTokenIssuedAt")
 
+        //access Token 만료 및 재발급 여부 확인 후 로그아웃 처리
+        if(currentTime >= accessTokenExpiresAt) {
+            Log.d(TAG, "Access Token 만료됨. 로그인 필요.")
+            navigateToLogin()
+            return
+        }
+
         // Refresh Token 만료 확인 (7일 기준)
         if (currentTime >= refreshTokenExpiresAt) {
             Log.d(TAG, "Refresh Token 만료됨. 로그인 필요.")
@@ -142,6 +149,10 @@ class MainActivity : AppCompatActivity() {
 
     //로그인 액티비티 이동 함수
     private fun navigateToLogin() {
+        //자동 로그아웃 시 토큰 다 날리기
+        val sharedPref = SharedPreferencesUtil(application.applicationContext)
+        sharedPref.clearToken()
+
         val intent = Intent(this, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }

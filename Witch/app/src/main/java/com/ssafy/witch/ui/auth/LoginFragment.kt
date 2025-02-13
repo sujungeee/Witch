@@ -73,7 +73,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(
         val accessTokenExpiresAt = viewModel.sharedPreferencesUtil.getAccessTokenExpiresAt()
         val refreshTokenExpiresAt = viewModel.sharedPreferencesUtil.getRefreshTokenExpiresAt()
 
-        if (accessTokenExpiresAt > getCurrentTime()) {
+        if (accessTokenExpiresAt >= getCurrentTime()) {
             navigateToMainActivity() //액세스 토큰이 유효하면 바로 로그인
         } else if (refreshTokenExpiresAt > getCurrentTime()) {
             viewModel.reissueAccessToken { success ->

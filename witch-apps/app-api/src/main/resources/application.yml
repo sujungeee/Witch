@@ -7,3 +7,4 @@ spring:
       - resource:adapter-security-properties.yml
       - resource:adapter-s3-properties.yml
       - resource:core-service-properties.yml
+      - resource:kafka-publisher-properties.yml

@@ -22,6 +22,7 @@ include("witch-adapters:adapter-generator")
 include("witch-adapters:adapter-event")
 include("witch-adapters:adapter-security")
 include("witch-adapters:adapter-s3")
+include("witch-adapters:adapter-kafka-publisher")
 
 include("witch-cores:core-domain")
 include("witch-cores:core-port")

@@ -1,15 +1,12 @@
 package com.ssafy.witch.data.model.response
 
-data class RefreshTokenResponse(
-    val success: Boolean,
-    val data: RefreshTokenData?
-)
+import com.google.gson.annotations.SerializedName
 
-data class RefreshTokenData(
-    val tokenType: String,
-    val accessToken: String,
-    val accessTokenExpiresIn: Long,
-    val refreshToken: String,
-    val refreshTokenExpiresIn: Long,
-    val refreshTokenRenewAvailableSeconds: Long
+data class RefreshTokenResponse(
+    @SerializedName("tokenType") val tokenType: String,
+    @SerializedName("accessToken") val accessToken: String,
+    @SerializedName("accessTokenExpiresIn") val accessTokenExpiresIn: Long,
+    @SerializedName("refreshToken") val refreshToken: String,
+    @SerializedName("refreshTokenExpiresIn") val refreshTokenExpiresIn: Long,
+    @SerializedName("refreshTokenRenewAvailableSeconds") val refreshTokenRenewAvailableSeconds: Long
 )

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.apoointment.AppointmentJoinEventPublishPort;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
+import com.ssafy.witch.event.AppointmentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -21,7 +22,8 @@ public class AppointmentJoinEventKafkaPublisher implements AppointmentJoinEventP
   @Override
   public void publish(AppointmentJoinEvent appointmentJoinEvent) {
     try {
-      kafkaTemplate.send("appointment", objectMapper.writeValueAsString(appointmentJoinEvent));
+      kafkaTemplate.send(AppointmentEvent.JOIN_APPOINTMENT,
+          objectMapper.writeValueAsString(appointmentJoinEvent));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
     }

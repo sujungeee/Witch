@@ -3,9 +3,12 @@ package com.ssafy.witch.apoointment.model;
 import com.ssafy.witch.appointment.AppointmentStatus;
 import java.time.LocalDateTime;
 import java.util.List;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @Getter
 public class AppointmentDetailProjection {

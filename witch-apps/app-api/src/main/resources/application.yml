@@ -8,3 +8,5 @@ spring:
       - resource:adapter-s3-properties.yml
       - resource:core-service-properties.yml
       - resource:kafka-publisher-properties.yml
+      - resource:kafka-subscriber-properties.yml
+      - resource:fcm-properties.yml

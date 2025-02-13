@@ -27,7 +27,7 @@ interface AuthService {
 
     //리프레시 토큰 재발급 API
     @POST("auth/token/renew")
-    suspend fun renewRefreshToken(@Body request: RefreshToken): Response<RefreshTokenResponse>
+    suspend fun renewRefreshToken(@Body request: RefreshToken): Response<BaseResponse<RefreshTokenResponse>>
 
 
     // 회원가입 API

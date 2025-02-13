@@ -28,14 +28,11 @@ class MainActivity : AppCompatActivity() {
     private val mainBinding : ActivityMainBinding by lazy{
         ActivityMainBinding.inflate(layoutInflater)
     }
-
-
-
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
 
-//        ApplicationClass.sharedPreferencesUtil.clearToken()
         // ViewModel 초기화 (토큰 재발급 함수 사용)
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
@@ -80,6 +77,15 @@ class MainActivity : AppCompatActivity() {
 
     }
 
+    override fun onResume() {
+        super.onResume()
+        // 프래그먼트 전환 시 토큰 유효성 체크
+        // 리프레쉬 토큰 갱신은 onResume에서 프로액티브하게 처리,  포그라운드 진입 시점에서, refresh token의 만료 또는 갱신 가능 조건을 미리 체크
+        Log.d(TAG, "onResume: 리프레쉬 토큰 체크")
+        checkTokenValidity()
+    }
+    
+
     fun openFragment(index: Int, id: String = "") {
         moveFragment(index, id)
     }
@@ -104,6 +110,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
+     * 리프레시 토큰 리뉴 가능 시간과 만료시간 사이에 입장시 리프레시 토큰 리뉴
      * 토큰 유효성을 확인하여 리프레시 토큰 만료된 경우 로그인 화면으로 전환.
      */
     private fun checkTokenValidity() {
@@ -114,17 +121,16 @@ class MainActivity : AppCompatActivity() {
         val currentTime = System.currentTimeMillis() / 1000
 
         Log.d(TAG, "현재 시간: $currentTime")
-
         Log.d(TAG, "AccessToken 만료 시간: $accessTokenExpiresAt")
         Log.d(TAG, "RefreshToken 만료 시간: $refreshTokenExpiresAt")
         Log.d(TAG, "RefreshToken 갱신 가능 시간: $refreshTokenIssuedAt")
 
         //access Token 만료 및 재발급 여부 확인 후 로그아웃 처리
-        if(currentTime >= accessTokenExpiresAt) {
-            Log.d(TAG, "Access Token 만료됨. 로그인 필요.")
-            navigateToLogin()
-            return
-        }
+//        if(currentTime >= accessTokenExpiresAt) {
+//            Log.d(TAG, "Access Token 만료됨. 로그인 필요.")
+//            navigateToLogin()
+//            return
+//        }
 
         // Refresh Token 만료 확인 (7일 기준)
         if (currentTime >= refreshTokenExpiresAt) {
@@ -134,13 +140,18 @@ class MainActivity : AppCompatActivity() {
         }
 
         // Refresh Token 갱신 가능 여부 확인 (5일 이후)
-        val canRenew = currentTime > refreshTokenIssuedAt // 5일 후부터 가능
+        val canRenew = (refreshTokenIssuedAt <= currentTime) && (currentTime < refreshTokenExpiresAt)  // 5일 후부터 7일 사이 까지 가능
         if (canRenew) {
             loginViewModel.renewRefreshToken { success ->
                 if (!success) {
                     Log.d(TAG, "Refresh Token 갱신 실패. 로그인 필요.")
                     navigateToLogin()
                 }
+                Log.d(TAG, "Refresh Token 재갱신 성공.")
+                Log.d(TAG, "현재 시간: $currentTime")
+                Log.d(TAG, "AccessToken 만료 시간 재갱신: $accessTokenExpiresAt")
+                Log.d(TAG, "RefreshToken 만료 시간 재갱신: $refreshTokenExpiresAt")
+                Log.d(TAG, "RefreshToken 갱신 가능 시간 재갱신 : $refreshTokenIssuedAt")
             }
         } else {
             Log.d(TAG, "Refresh Token 갱신 조건 미충족 (5일 미만)")

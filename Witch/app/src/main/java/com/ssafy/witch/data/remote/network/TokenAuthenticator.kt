@@ -15,23 +15,37 @@ import okhttp3.Response
 import okhttp3.Route
 
 class TokenAuthenticator(
-    private val sharedPreferencesUtil: SharedPreferencesUtil
+    private val sharedPreferencesUtil: SharedPreferencesUtil,
 ) : Authenticator {
 
     override fun authenticate(route: Route?, response: Response): Request? {
         // 무한 재시도를 방지 (최대 3회)
         if (getRetryCount(response) >= MAX_RETRY_COUNT) return null
 
-        // 저장된 Refresh Token 확인
+        val currentTime = System.currentTimeMillis() / 1000
+        val storedAccessToken = sharedPreferencesUtil.getAccessToken()
         val storedRefreshToken = sharedPreferencesUtil.getRefreshToken()
+        val accessTokenExpiresAt = sharedPreferencesUtil.getAccessTokenExpiresAt()
+        val refreshTokenExpiresAt = sharedPreferencesUtil.getRefreshTokenExpiresAt()
+        val refreshTokenIssuedAt = sharedPreferencesUtil.getRefreshTokenRenewAvailableSeconds()
+
+        // 리프레쉬토큰 시간 초과시 강제 로그아웃 실행
+        // 초기값 자동 로그인 방지
+        if((storedAccessToken != null) && (storedRefreshToken != null) && (refreshTokenExpiresAt != 0L) && (refreshTokenExpiresAt < currentTime)) {
+            Log.e(TAG, "❌ Refresh Token 시간 만료 → 로그인 필요")
+            forceLogout()
+            return null
+        }
+
+        // 저장된 Refresh Token 확인
         if (storedRefreshToken.isNullOrEmpty()) {
             Log.e(TAG, "❌ 저장된 Refresh Token 없음 → 로그인 필요")
             forceLogout()
             return null
         }
 
-        // 동기적으로 새 Access Token 재발급 요청
-        val newTokenResponse = runBlocking {
+        // 동기적으로 새 Access Token 재발급 요청, 액세스 토큰 재갱신은 중앙집중으로 처리
+        val accessTokenResponseBaseResponse = runBlocking {
             try {
                 val authService = ApplicationClass.retrofit.create(AuthService::class.java)
                 val tokenResponse = authService.reissueAccessToken(RefreshToken("Bearer $storedRefreshToken"))
@@ -43,9 +57,9 @@ class TokenAuthenticator(
         }
 
         // 재발급 성공 여부를 체크할 때 error 객체가 null인 경우 기본 값을 할당
-        if (newTokenResponse != null && newTokenResponse.success && newTokenResponse.data?.accessToken != null) {
-            val newAccessToken = newTokenResponse.data.accessToken
-            val expiresIn = newTokenResponse.data.accessTokenExpiresIn
+        if (accessTokenResponseBaseResponse != null && accessTokenResponseBaseResponse.success && accessTokenResponseBaseResponse.data?.accessToken != null) {
+            val newAccessToken = accessTokenResponseBaseResponse.data.accessToken
+            val expiresIn = accessTokenResponseBaseResponse.data.accessTokenExpiresIn
 
             sharedPreferencesUtil.saveAccessToken(newAccessToken, expiresIn)
             Log.d(TAG, "✅ 새 Access Token 발급 성공: $newAccessToken")
@@ -55,7 +69,7 @@ class TokenAuthenticator(
                 .build()
         } else {
             // error가 null인 경우, 내쪽에서 기본 ErrorResponse를 생성해서 사용
-            val errorResponse = newTokenResponse?.error ?: ErrorResponse(
+            val errorResponse = accessTokenResponseBaseResponse?.error ?: ErrorResponse(
                 errorCode = "NO_ERROR_CODE",
                 errorMessage = "No error details provided."
             )

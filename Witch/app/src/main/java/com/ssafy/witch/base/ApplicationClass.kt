@@ -32,6 +32,7 @@ class ApplicationClass : Application() {
 //        val API_URL = "http://dukcode.iptime.org/"
 
         lateinit var sharedPreferencesUtil: SharedPreferencesUtil
+        lateinit var retrofitLogin: Retrofit
         lateinit var retrofit: Retrofit
 
         // JWT Token Header 키 값
@@ -47,8 +48,25 @@ class ApplicationClass : Application() {
         instance = this
 
         sharedPreferencesUtil = SharedPreferencesUtil(applicationContext)
+
+        //로그인 시만 작업하는 레트로핏
+        // 1) 로그인 전용 (토큰 필요 없음)
+        val loginClient: OkHttpClient = OkHttpClient.Builder()
+            .readTimeout(5000, TimeUnit.MILLISECONDS)
+            .connectTimeout(5000, TimeUnit.MILLISECONDS)
+            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .build()
+
+        retrofitLogin = Retrofit.Builder()
+            .baseUrl(API_URL)
+            .client(loginClient)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+
+        // 메인에서 작업하는 레트로핏
         // 레트로핏 인스턴스를 생성하고, 레트로핏에 각종 설정값들을 지정해줍니다.
         // 연결 타임아웃시간은 5초로 지정이 되어있고, HttpLoggingInterceptor를 붙여서 어떤 요청이 나가고 들어오는지를 보여줍니다.
+        // 2) 로그인 후용 (TokenAuthenticator 적용)
         val client: OkHttpClient = OkHttpClient.Builder()
             .readTimeout(5000, TimeUnit.MILLISECONDS)
             .connectTimeout(5000, TimeUnit.MILLISECONDS)

@@ -3,16 +3,14 @@ package com.ssafy.witch.ui.auth
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.messaging.FirebaseMessaging
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.data.model.dto.Login
 import com.ssafy.witch.data.model.dto.RefreshToken
+import com.ssafy.witch.data.model.response.ErrorResponse
 import com.ssafy.witch.data.remote.AuthService
-import com.ssafy.witch.data.remote.RetrofitUtil
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -33,7 +31,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
         viewModelScope.launch(Dispatchers.IO) {
             // login 위해 retrofit 으로 가야 함
 
-            val authService = ApplicationClass.retrofit.create(AuthService::class.java)
+            val authServiceLogin = ApplicationClass.retrofitLogin.create((AuthService::class.java))
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener {
                 if (it.isSuccessful) {
@@ -43,7 +41,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                     // FCM 토큰 발급 완료 후 API 호출
                     viewModelScope.launch {
                         runCatching {
-                            authService.login(Login(email, fcmToken, password))
+                            authServiceLogin.login(Login(email, fcmToken, password))
                         }.onSuccess { response ->
                             if (response.success) {
                                 response.data?.let { data ->
@@ -98,9 +96,10 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
 
             Log.d(TAG, "reissueAccessToken_refreshToken: $refreshToken")
 
-            val authService = ApplicationClass.retrofit.create(AuthService::class.java)
+            val authServiceLogin = ApplicationClass.retrofitLogin.create((AuthService::class.java))
+
             runCatching {
-                authService.reissueAccessToken(RefreshToken(refreshToken))
+                authServiceLogin.reissueAccessToken(RefreshToken(refreshToken))
             }.onSuccess { response ->
                 if (response.isSuccessful) {
                     val data = response.body()?.data
@@ -126,14 +125,15 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
             val refreshToken = sharedPreferencesUtil.getRefreshToken() ?: return@launch onResult(false)
 
             Log.d(TAG, "renewRefreshToken_refreshToken: $refreshToken")
-            val authService = ApplicationClass.retrofit.create(AuthService::class.java)
+            val authServiceLogin = ApplicationClass.retrofitLogin.create(AuthService::class.java)
             runCatching {
-                authService.renewRefreshToken(RefreshToken(refreshToken))
+                authServiceLogin.renewRefreshToken(RefreshToken("Bearer $refreshToken"))
             }.onSuccess { response ->
                 if (response.isSuccessful) {
-                    val data = response.body()?.data
-                    if (data != null) {
-                        //새 액세스 & 리프레시 토큰 저장
+                    val baseResponse = response.body()
+                    if (baseResponse != null && baseResponse.success && baseResponse.data != null) {
+                        val data = baseResponse.data
+                        // 새 액세스 & 리프레시 토큰 저장
                         sharedPreferencesUtil.saveTokens(
                             data.accessToken,
                             data.accessTokenExpiresIn,
@@ -143,6 +143,12 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                         )
                         onResult(true)
                     } else {
+                        // 서버 응답에 error 필드가 없으면 기본 객체 생성
+                        val errorResponse = baseResponse?.error ?: ErrorResponse(
+                            errorCode = "NO_ERROR_CODE",
+                            errorMessage = "No error details provided."
+                        )
+                        Log.e(TAG, "❌ Refresh Token 갱신 실패, error: $errorResponse")
                         onResult(false)
                     }
                 } else {
@@ -153,5 +159,6 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
             }
         }
     }
+
 
 }

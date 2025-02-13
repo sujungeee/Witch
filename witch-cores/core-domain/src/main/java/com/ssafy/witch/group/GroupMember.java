@@ -15,6 +15,7 @@ public class GroupMember {
 
   private boolean isLeader;
 
+
   private int cntLateArrival;
 
   public GroupMember(String groupMemberId, String userId, String groupId, boolean isLeader,

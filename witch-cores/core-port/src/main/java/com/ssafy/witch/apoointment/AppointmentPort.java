@@ -16,4 +16,7 @@ public interface AppointmentPort {
   boolean existsById(String appointmentId);
 
   void delete(Appointment appointment);
+
+  // 모임에 있는 모든 약속 삭제
+  void deleteAllByGroupId(String groupId);
 }

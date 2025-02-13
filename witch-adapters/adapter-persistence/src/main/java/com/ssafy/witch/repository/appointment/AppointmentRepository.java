@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Repository
@@ -50,6 +51,11 @@ public class AppointmentRepository implements AppointmentPort, AppointmentReadPo
     appointmentJpaRepository.delete(appointmentMapper.toEntity(appointment));
   }
 
+  @Transactional
+  @Override
+  public void deleteAllByGroupId(String groupId) {
+    appointmentJpaRepository.deleteAllByGroupId(groupId);
+  }
 
   @Override
   public List<AppointmentProjection> getAppointments(String userId, String groupId) {

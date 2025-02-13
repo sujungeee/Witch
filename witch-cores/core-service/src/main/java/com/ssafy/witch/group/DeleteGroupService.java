@@ -1,5 +1,6 @@
 package com.ssafy.witch.group;
 
+import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.GroupNotJoinedException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
@@ -14,6 +15,7 @@ public class DeleteGroupService implements DeleteGroupUseCase {
 
     private final GroupPort groupPort;
     private final GroupMemberPort groupMemberPort;
+    private final AppointmentPort appointmentPort;
 
     @Transactional
     @Override
@@ -36,8 +38,14 @@ public class DeleteGroupService implements DeleteGroupUseCase {
         // 모임장 여부
         validateUserIsLeader(groupMember);
 
+        // 모임 내 모든 멤버 삭제
         groupMemberPort.deleteAllByGroupId(groupId);
+
+        // 모임 삭제
         groupPort.delete(group);
+
+        // 모임 내 약속 삭제
+        appointmentPort.deleteAllByGroupId(groupId);
     }
 
     private void validateUserIsLeader(GroupMember groupMember) {

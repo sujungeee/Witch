@@ -67,13 +67,20 @@ CREATE TABLE `group_join_request`
 
 CREATE TABLE `snack`
 (
-    `snack_id`              VARCHAR(36)   NOT NULL PRIMARY KEY,
-    `appointment_id`        VARCHAR(36)   NOT NULL,
-    `user_id` VARCHAR(36)   NOT NULL,
-    `latitude`              DOUBLE        NOT NULL,
-    `longitude`             DOUBLE        NOT NULL,
-    `snack_image_url`           VARCHAR(2000) NULL,
-    `snack_sound_url`             VARCHAR(2000) NULL,
-    `created_at`            TIMESTAMP     NOT NULL,
-    `modified_at`           TIMESTAMP     NOT NULL
+    `snack_id`        VARCHAR(36)   NOT NULL PRIMARY KEY,
+    `appointment_id`  VARCHAR(36)   NOT NULL,
+    `user_id`         VARCHAR(36)   NOT NULL,
+    `latitude`        DOUBLE        NOT NULL,
+    `longitude`       DOUBLE        NOT NULL,
+    `snack_image_url` VARCHAR(2000) NULL,
+    `snack_sound_url` VARCHAR(2000) NULL,
+    `created_at`      TIMESTAMP     NOT NULL,
+    `modified_at`     TIMESTAMP     NOT NULL
+);
+
+CREATE TABLE `fcm_token`
+(
+    `fcm_token_id` BIGINT       NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    `user_id`      VARCHAR(36)  NOT NULL,
+    `fcm_token`    VARCHAR(300) NOT NULL
 );

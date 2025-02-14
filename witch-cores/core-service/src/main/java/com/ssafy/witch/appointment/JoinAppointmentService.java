@@ -1,6 +1,6 @@
 package com.ssafy.witch.appointment;
 
-import com.ssafy.witch.apoointment.AppointmentJoinEventPublishPort;
+import com.ssafy.witch.apoointment.AppointmentEventPublishPort;
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
 import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.apoointment.AppointmentReadPort;
@@ -24,7 +24,7 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
   private final AppointmentPort appointmentPort;
   private final GroupMemberPort groupMemberPort;
   private final AppointmentMemberPort appointmentMemberPort;
-  private final AppointmentJoinEventPublishPort appointmentJoinEventPublishPort;
+  private final AppointmentEventPublishPort appointmentEventPublishPort;
   private final AppointmentReadPort appointmentReadPort;
 
   @Transactional
@@ -49,7 +49,7 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
     AppointmentDetailProjection appointmentDetailProjection = appointmentReadPort.getAppointmentDetail(
         appointmentId);
 
-    appointmentJoinEventPublishPort.publish(
+    appointmentEventPublishPort.publish(
         new AppointmentJoinEvent(userId, appointmentDetailProjection));
   }
 

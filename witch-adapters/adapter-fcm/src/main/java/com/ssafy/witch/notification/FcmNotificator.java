@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FcmNotificator {
 
-  @Value("${witch.fcm.app-icon-url")
+  @Value("${witch.fcm.app-icon-url}")
   private String appIconUrl;
 
   public void sendNotification(WitchNotification witchNotification) {

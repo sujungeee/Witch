@@ -3,6 +3,7 @@ package com.ssafy.witch.appointment.command;
 import com.ssafy.witch.apoointment.AppointmentJoinNotification;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
 import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
+import com.ssafy.witch.user.UserNotification;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -14,7 +15,7 @@ public class NotifyAppointmentJoinCommand {
   private String appointmentId;
   private String name;
   private String joinUserId;
-  private List<User> members;
+  private List<UserNotification> members;
 
   public NotifyAppointmentJoinCommand(AppointmentJoinEvent event) {
     AppointmentDetailProjection appointment = event.getAppointment();
@@ -25,28 +26,14 @@ public class NotifyAppointmentJoinCommand {
 
     this.members = appointment.getMembers()
         .stream()
-        .map(member -> new User(member.getUserId(), member.getNickname(), member.getFcmToken()))
+        .map(UserNotification::of)
         .toList();
   }
 
-  public AppointmentJoinNotification toNotification(NotifyAppointmentJoinCommand command) {
+  public AppointmentJoinNotification toNotification() {
     return new AppointmentJoinNotification(
-        command.getAppointmentId(), command.getName(), command.getJoinUserId(),
-        command.members.stream().map(NotifyAppointmentJoinCommand.User::toCommand).toList()
-    );
-  }
-
-  @AllArgsConstructor
-  @Getter
-  private static class User {
-
-    private String userId;
-    private String nickname;
-    private String fcmToken;
-
-    public AppointmentJoinNotification.User toCommand() {
-      return new AppointmentJoinNotification.User(this.userId, this.nickname, this.fcmToken);
-    }
+        this.getAppointmentId(), this.getName(), this.getJoinUserId(),
+        this.getMembers());
   }
 
 }

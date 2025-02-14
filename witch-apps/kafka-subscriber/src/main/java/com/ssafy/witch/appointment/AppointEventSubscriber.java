@@ -3,7 +3,9 @@ package com.ssafy.witch.appointment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
+import com.ssafy.witch.apoointment.event.AppointmentStartEvent;
 import com.ssafy.witch.appointment.command.NotifyAppointmentJoinCommand;
+import com.ssafy.witch.appointment.command.NotifyAppointmentStartCommand;
 import com.ssafy.witch.event.AppointmentEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +30,20 @@ public class AppointEventSubscriber {
           AppointmentJoinEvent.class);
 
       notifyAppointmentUseCase.notifyJoin(new NotifyAppointmentJoinCommand(appointmentJoinEvent));
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  @KafkaListener(topics = AppointmentEvent.START_APPOINTMENT)
+  public void handleAppointmentStartEvent(ConsumerRecord<String, String> data,
+      Acknowledgment acknowledgment) {
+    try {
+      AppointmentStartEvent appointmentStartEvent = objectMapper.readValue(data.value(),
+          AppointmentStartEvent.class);
+
+      notifyAppointmentUseCase.notifyStart(
+          new NotifyAppointmentStartCommand(appointmentStartEvent));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
     }

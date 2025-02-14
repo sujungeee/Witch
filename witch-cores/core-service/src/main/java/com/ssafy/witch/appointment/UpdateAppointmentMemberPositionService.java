@@ -5,7 +5,7 @@ import com.ssafy.witch.apoointment.OnGoingAppointmentCachePort;
 import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.appointment.command.UpdateAppointmentMemberPositionCommand;
 import com.ssafy.witch.exception.appointment.AppointmentNotOnGoingException;
-import com.ssafy.witch.exception.appointment.UnauthorizedAppointmentAccessException;
+import com.ssafy.witch.exception.appointment.NotJoinedAppointmentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -33,7 +33,7 @@ public class UpdateAppointmentMemberPositionService implements
 
     appointmentDetailProjection.getMembers().stream()
         .filter(member -> member.getUserId().equals(userId))
-        .findFirst().orElseThrow(UnauthorizedAppointmentAccessException::new);
+        .findFirst().orElseThrow(NotJoinedAppointmentException::new);
 
     appointmentMemberPositionCachePort.upsert(userId, new Position(latitude, longitude));
   }

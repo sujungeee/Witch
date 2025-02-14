@@ -18,7 +18,7 @@ public class UpdateAppointmentMemberPositionController {
   private final UpdateAppointmentMemberPositionUseCase updateAppointmentMemberPositionUseCase;
   private final AppointmentRequestMapper mapper;
 
-  @PutMapping("/appointments/{appointmentId}/me/position")
+  @PutMapping("/appointments/{appointmentId}/members/me/position")
   public WitchApiResponse<Void> updatePosition(
       @AuthenticationPrincipal String userId,
       @PathVariable("appointmentId") String appointmentId,

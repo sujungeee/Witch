@@ -26,6 +26,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
     val sharedPreferencesUtil = SharedPreferencesUtil(application.applicationContext)
 
     // 이메일, 닉네임, JWT 토큰 로그인 처리
+    // firebase 토큰 로직 최적화 필요
     fun login(email:String, password: String, onResult: (Boolean, String?) -> Unit) {
         //API 호출은 IO 스레드에서 실행
         viewModelScope.launch(Dispatchers.IO) {
@@ -149,6 +150,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                             errorMessage = "No error details provided."
                         )
                         Log.e(TAG, "❌ Refresh Token 갱신 실패, error: $errorResponse")
+                        Log.d(TAG, "erorrRenewRefreshToken_refreshToken: $refreshToken")
                         onResult(false)
                     }
                 } else {

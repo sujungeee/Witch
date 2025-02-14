@@ -114,7 +114,7 @@ public class AppointmentCustomRepositoryImpl implements AppointmentCustomReposit
                 Projections.constructor(
                     AppointmentMemberProjection.class,
                     user.userId,
-                    user.nickname,
+                    user. nickname,
                     user.profileImageUrl,
                     member.isLeader,
                     fcmToken.fcmToken

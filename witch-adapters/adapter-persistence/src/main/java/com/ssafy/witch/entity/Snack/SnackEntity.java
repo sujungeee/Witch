@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
+import java.time.LocalDateTime;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,8 +36,10 @@ public class SnackEntity extends MutableBaseEntity {
   private String snackImageUrl;
   private String snackSoundUrl;
 
+  private LocalDateTime createdAt;
+
   public SnackEntity(String snackId, String appointmentId, String userId, Double longitude,
-      Double latitude, String snackImageUrl, String snackSoundUrl) {
+      Double latitude, String snackImageUrl, String snackSoundUrl, LocalDateTime createdAt) {
     this.snackId = snackId;
     this.appointmentId = appointmentId;
     this.userId = userId;
@@ -44,5 +47,6 @@ public class SnackEntity extends MutableBaseEntity {
     this.latitude = latitude;
     this.snackImageUrl = snackImageUrl;
     this.snackSoundUrl = snackSoundUrl;
+    this.createdAt = createdAt;
   }
 }

@@ -4,6 +4,7 @@ import com.ssafy.witch.apoointment.AppointmentEventPublishPort;
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
 import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.apoointment.AppointmentReadPort;
+import com.ssafy.witch.apoointment.OnGoingAppointmentCachePort;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
 import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.appointment.command.AppointmentJoinCommand;
@@ -12,6 +13,7 @@ import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
 import com.ssafy.witch.exception.appointment.ConflictingAppointmentTimeException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.GroupMemberPort;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
   private final AppointmentMemberPort appointmentMemberPort;
   private final AppointmentEventPublishPort appointmentEventPublishPort;
   private final AppointmentReadPort appointmentReadPort;
+  private final OnGoingAppointmentCachePort ongoingAppointmentCachePort;
 
   @Transactional
   @Override
@@ -48,6 +51,9 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
 
     AppointmentDetailProjection appointmentDetailProjection = appointmentReadPort.getAppointmentDetail(
         appointmentId);
+
+    ongoingAppointmentCachePort.save(appointmentDetailProjection,
+        Duration.between(LocalDateTime.now(), appointmentTime));
 
     appointmentEventPublishPort.publish(
         new AppointmentJoinEvent(userId, appointmentDetailProjection));

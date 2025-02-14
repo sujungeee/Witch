@@ -1,0 +1,12 @@
+spring:
+  config:
+    import:
+      - resource:adapter-persistence-properties.yml
+      - resource:adapter-redis-properties.yml
+      - resource:adapter-mail-properties.yml
+      - resource:adapter-security-properties.yml
+      - resource:adapter-s3-properties.yml
+      - resource:core-service-properties.yml
+      - resource:kafka-publisher-properties.yml
+      - resource:kafka-subscriber-properties.yml
+      - resource:fcm-properties.yml

@@ -15,6 +15,7 @@ import com.ssafy.witch.entity.appointment.AppointmentEntityProjection;
 import com.ssafy.witch.entity.appointment.AppointmentWithGroupEntityProjection;
 import com.ssafy.witch.entity.appointment.QAppointmentEntity;
 import com.ssafy.witch.entity.appointment.QAppointmentMemberEntity;
+import com.ssafy.witch.entity.notification.QFcmTokenEntity;
 import com.ssafy.witch.entity.user.QUserEntity;
 import com.ssafy.witch.group.model.GroupProjection;
 import java.time.LocalDateTime;
@@ -99,12 +100,14 @@ public class AppointmentCustomRepositoryImpl implements AppointmentCustomReposit
     QAppointmentEntity appointment = QAppointmentEntity.appointmentEntity;
     QAppointmentMemberEntity member = QAppointmentMemberEntity.appointmentMemberEntity;
     QUserEntity user = QUserEntity.userEntity;
+    QFcmTokenEntity fcmToken = QFcmTokenEntity.fcmTokenEntity;
 
     Map<AppointmentEntity, List<AppointmentMemberProjection>> transform = queryFactory
         .select(appointment)
         .from(appointment)
         .leftJoin(member).on(member.appointmentId.eq(appointment.appointmentId))
         .leftJoin(user).on(member.userId.eq(user.userId))
+        .leftJoin(fcmToken).on(user.userId.eq(fcmToken.userId))
         .where(appointment.appointmentId.eq(appointmentId))
         .transform(GroupBy.groupBy(appointment).as(
             GroupBy.list(
@@ -113,7 +116,8 @@ public class AppointmentCustomRepositoryImpl implements AppointmentCustomReposit
                     user.userId,
                     user.nickname,
                     user.profileImageUrl,
-                    member.isLeader
+                    member.isLeader,
+                    fcmToken.fcmToken
                 )
             )
         ));

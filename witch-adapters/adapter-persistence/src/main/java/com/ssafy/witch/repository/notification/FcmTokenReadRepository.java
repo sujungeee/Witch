@@ -21,4 +21,9 @@ public class FcmTokenReadRepository implements FcmTokenWritePort {
   public void saveFcmToken(String userid, String fcmToken) {
     fcmTokenJpaRepository.save(new FcmTokenEntity(null, userid, fcmToken));
   }
+
+  @Override
+  public void deleteByUserId(String userId) {
+    fcmTokenJpaRepository.deleteByUserId(userId);
+  }
 }

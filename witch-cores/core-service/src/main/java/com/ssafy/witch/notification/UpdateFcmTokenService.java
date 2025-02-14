@@ -14,6 +14,7 @@ public class UpdateFcmTokenService implements UpdateFcmTokenUseCase {
   @Override
   public void update(String userId, String fcmToken) {
     fcmTokenWritePort.deleteFcmToken(fcmToken);
+    fcmTokenWritePort.deleteByUserId(userId);
     fcmTokenWritePort.saveFcmToken(userId, fcmToken);
   }
 }

@@ -1,7 +1,10 @@
 dependencies {
     implementation(project(":witch-cores:core-domain"))
     implementation(project(":witch-cores:core-usecase"))
+    implementation(project(":witch-cores:core-port")) // 삭제예정
     implementation(project(":witch-commons"))
+
+    runtimeOnly(project(":witch-apps:kafka-subscriber"))
 
     runtimeOnly(project(":witch-adapters:adapter-persistence"))
     runtimeOnly(project(":witch-adapters:adapter-redis"))
@@ -10,6 +13,8 @@ dependencies {
     runtimeOnly(project(":witch-adapters:adapter-event"))
     runtimeOnly(project(":witch-adapters:adapter-security"))
     runtimeOnly(project(":witch-adapters:adapter-s3"))
+    runtimeOnly(project(":witch-adapters:adapter-kafka-publisher"))
+    runtimeOnly(project(":witch-adapters:adapter-fcm"))
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-security")

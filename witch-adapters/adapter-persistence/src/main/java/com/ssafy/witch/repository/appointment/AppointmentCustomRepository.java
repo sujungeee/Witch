@@ -15,4 +15,5 @@ public interface AppointmentCustomRepository {
   List<AppointmentWithGroupEntityProjection> getMyAppointments(String userId, int year, int month);
 
   AppointmentDetailEntityProjection getAppointmentDetail(String appointmentId);
+
 }

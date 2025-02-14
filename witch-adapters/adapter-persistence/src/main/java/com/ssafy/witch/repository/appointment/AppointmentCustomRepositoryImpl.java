@@ -140,5 +140,4 @@ public class AppointmentCustomRepositoryImpl implements AppointmentCustomReposit
         members
     );
   }
-
 }

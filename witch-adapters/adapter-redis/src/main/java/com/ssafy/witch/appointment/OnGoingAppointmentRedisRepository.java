@@ -42,6 +42,9 @@ public class OnGoingAppointmentRedisRepository implements OnGoingAppointmentCach
   public AppointmentDetailProjection get(String appointmentId) {
     ValueOperations<String, String> ops = redisTemplate.opsForValue();
     String value = ops.get(KEY_PREFIX + appointmentId);
+    if (value == null) {
+      return null;
+    }
     try {
       return objectMapper.readValue(value, AppointmentDetailProjection.class);
     } catch (JsonProcessingException e) {

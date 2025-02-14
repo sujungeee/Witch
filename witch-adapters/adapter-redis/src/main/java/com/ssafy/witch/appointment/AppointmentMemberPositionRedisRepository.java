@@ -29,4 +29,19 @@ public class AppointmentMemberPositionRedisRepository implements
       log.error(e.getMessage(), e);
     }
   }
+
+  @Override
+  public Position get(String appointmentId) {
+    ValueOperations<String, String> ops = redisTemplate.opsForValue();
+    try {
+      String value = ops.get(KEY_PREFIX + appointmentId);
+      if (value == null) {
+        return new Position(null, null);
+      }
+      return objectMapper.readValue(value, Position.class);
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage(), e);
+      return null;
+    }
+  }
 }

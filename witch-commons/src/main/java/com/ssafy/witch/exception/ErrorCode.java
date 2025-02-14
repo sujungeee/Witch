@@ -52,7 +52,8 @@ public enum ErrorCode {
   APPOINTMENT_NOT_ONGOING("WCH5009", "약속이 진행 중이지 않거나 존재하지 않는 약속입니다."),
 
   //스낵
-  NON_EXISTENT_SNACK("WCH6001", "존재하지 않는 스낵에 대한 요청입니다.");
+  NON_EXISTENT_SNACK("WCH6001", "존재하지 않는 스낵에 대한 요청입니다."),
+  SNACK_VIEW_NOT_AVAILABLE("WCH6002", "스낵을 조회할 수 없는 위치입니다.");
 
   private final String errorCode;
   private final String errorMessage;

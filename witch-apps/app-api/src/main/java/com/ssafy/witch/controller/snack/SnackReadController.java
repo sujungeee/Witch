@@ -5,6 +5,7 @@ import com.ssafy.witch.controller.snack.response.SnackDetailResponse;
 import com.ssafy.witch.response.WitchApiResponse;
 import com.ssafy.witch.snack.ReadSnackUseCase;
 import com.ssafy.witch.snack.Snack;
+import com.ssafy.witch.snack.output.SnackDetailOutput;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,7 +24,7 @@ public class SnackReadController {
       @AuthenticationPrincipal String userId,
       @PathVariable String snackId) {
 
-    Snack snack = readSnackUseCase.getSnackDetail(userId, snackId);
+    SnackDetailOutput snack = readSnackUseCase.getSnackDetail(userId, snackId);
     SnackDetailResponse response = snackResponseMapper.toDetailResponse(snack);
     return WitchApiResponse.success(response);
   }

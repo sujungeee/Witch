@@ -21,9 +21,9 @@ public class OnGoingAppointmentRedisRepository implements OnGoingAppointmentCach
   private final ObjectMapper objectMapper;
   private final StringRedisTemplate redisTemplate;
 
+
   @Override
-  public boolean has(AppointmentDetailProjection appointment) {
-    String appointmentId = appointment.getAppointmentId();
+  public boolean has(String appointmentId) {
     return Boolean.TRUE.equals(redisTemplate.hasKey(KEY_PREFIX + appointmentId));
   }
 
@@ -35,6 +35,18 @@ public class OnGoingAppointmentRedisRepository implements OnGoingAppointmentCach
       ops.set(KEY_PREFIX + appointmentDetail.getAppointmentId(), value, duration);
     } catch (JsonProcessingException e) {
       log.error(e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public AppointmentDetailProjection get(String appointmentId) {
+    ValueOperations<String, String> ops = redisTemplate.opsForValue();
+    String value = ops.get(KEY_PREFIX + appointmentId);
+    try {
+      return objectMapper.readValue(value, AppointmentDetailProjection.class);
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage(), e);
+      return null;
     }
   }
 }

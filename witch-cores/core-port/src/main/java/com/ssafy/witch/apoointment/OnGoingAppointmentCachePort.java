@@ -5,7 +5,9 @@ import java.time.Duration;
 
 public interface OnGoingAppointmentCachePort {
 
-  boolean has(AppointmentDetailProjection appointment);
+  boolean has(String appointmentId);
 
   void save(AppointmentDetailProjection appointmentDetail, Duration duration);
+
+  AppointmentDetailProjection get(String appointmentId);
 }

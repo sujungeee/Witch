@@ -57,6 +57,7 @@ public class SecurityConfig {
           .requestMatchers(HttpMethod.POST, "/users/email-verification-code/confirm").permitAll()
           .requestMatchers(HttpMethod.POST, "/users").permitAll()
           .requestMatchers(HttpMethod.GET, "/groups/{groupId}/preview").permitAll()
+          .requestMatchers(HttpMethod.GET, "/deeplink").permitAll()
           .anyRequest().authenticated();
     });
 

@@ -10,3 +10,7 @@ spring:
       - resource:kafka-publisher-properties.yml
       - resource:kafka-subscriber-properties.yml
       - resource:fcm-properties.yml
+
+witch:
+  app:
+    deeplink: witch-app://www.witch.com/groups?groupId=%s

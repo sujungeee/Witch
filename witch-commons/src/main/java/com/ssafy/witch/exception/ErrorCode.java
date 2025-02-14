@@ -49,6 +49,7 @@ public enum ErrorCode {
   NON_EXISTENT_APPOINTMENT("WCH5006", "존재하지 않는 약속에 대한 요청입니다."),
   ALREADY_JOIN_APPOINTMENT("WCH5007", "대상이 이미 참여한 약속입니다."),
   NOT_JOIN_APPOINTMENT("WCH5008", "대상이 이미 참여하지 않은 약속입니다."),
+  APPOINTMENT_NOT_ONGOING("WCH5009", "약속이 진행 중이지 않거나 존재하지 않는 약속입니다."),
 
   //스낵
   APPOINTMENT_NOT_ONGOING("WCH6000", "스낵은 약속이 진행 중일 때만 생성할 수 있습니다.");

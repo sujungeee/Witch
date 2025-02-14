@@ -294,3 +294,4 @@ gradle-app.setting
 /witch-apps/app-api/src/main/resources/static/docs/index.html
 /infrastructure/localstack/
 /.idea/runConfigurations/
+/witch-adapters/adapter-fcm/src/main/resources/witch-app-firebase.json

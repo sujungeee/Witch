@@ -10,7 +10,6 @@ import com.ssafy.witch.data.model.response.RefreshTokenResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
-import retrofit2.http.Headers
 import retrofit2.http.POST
 import retrofit2.http.Query
 
@@ -29,7 +28,6 @@ interface AuthService {
     @POST("auth/token/renew")
     suspend fun renewRefreshToken(@Body request: RefreshToken): Response<BaseResponse<RefreshTokenResponse>>
 
-
     // 회원가입 API
     // 서버 오류 -parameter 발생
     //이메일 중복 검증 (GET 요청, URL 파라미터)
@@ -42,17 +40,14 @@ interface AuthService {
     suspend fun checkNicknameUnique(@Query("nickname") nickname: String): Response<BaseResponse<Boolean>>
 
     //이메일 인증 코드 발급 요청 (POST 요청, 이메일을 Body로 전달)
-    @Headers("Content-Type: application/json")
     @POST("users/email-verification-code")
     suspend fun requestEmailVerification(@Body emailRequest: Map<String, String>): Response<BaseResponse<Boolean>>
 
     //이메일 인증 코드 확인 (POST 요청, 이메일 & 인증 코드 전달)
-    @Headers("Content-Type: application/json")
     @POST("users/email-verification-code/confirm")
     suspend fun confirmEmailVerification(@Body verificationRequest: Map<String, String>): Response<BaseResponse<Boolean>>
 
     //회원가입 (POST 요청, 전체 회원 정보 전달)
-    @Headers("Content-Type: application/json")
     @POST("users")
     suspend fun registerUser(@Body request: Join): Response<BaseResponse<Boolean>>
 }

@@ -62,6 +62,7 @@
             android:drawableStart="@drawable/search_icon"
             android:drawablePadding="8dp"
             android:hint="원하는 장소를 입력해주세요."
+            android:inputType="text"
             android:paddingStart="10dp"
             android:paddingEnd="55dp"
             android:textAppearance="@style/CustomHintText"

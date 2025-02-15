@@ -3,6 +3,7 @@ package com.ssafy.witch.ui
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import com.ssafy.witch.R
@@ -36,7 +37,8 @@ class MainActivity : AppCompatActivity() {
         // ViewModel 초기화 (토큰 재발급 함수 사용)
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
-        // 앱 시작 시 또는 액티비티 진입 시 토큰 유효성 체크
+        // 앱 시작 시 또는 액티비티 진입 시 토큰 유효성 체크 (UI 셋팅 전 체크)
+        Log.d(TAG, "onCreate: 불림")
         checkTokenValidity()
 
         val fragmentIdx = intent.getIntExtra("moveFragment", -1)
@@ -82,6 +84,7 @@ class MainActivity : AppCompatActivity() {
         // 프래그먼트 전환 시 토큰 유효성 체크
         // 리프레쉬 토큰 갱신은 onResume에서 프로액티브하게 처리,  포그라운드 진입 시점에서, refresh token의 만료 또는 갱신 가능 조건을 미리 체크
         Log.d(TAG, "onResume: 리프레쉬 토큰 체크")
+        // refreshTokenRenewAvailableSeconds (갱신 가능 시간) 도래 시점에만 실행
         checkTokenValidity()
     }
     
@@ -117,6 +120,8 @@ class MainActivity : AppCompatActivity() {
         val sharedPref = SharedPreferencesUtil(application.applicationContext)
         val accessTokenExpiresAt = sharedPref.getAccessTokenExpiresAt()
         val refreshTokenExpiresAt = sharedPref.getRefreshTokenExpiresAt()
+        val storedRefreshToken = sharedPref.getRefreshToken()
+        Log.d(TAG, "🔹 저장된 Refresh Token: $storedRefreshToken")
         val refreshTokenIssuedAt = sharedPref.getRefreshTokenRenewAvailableSeconds()
         val currentTime = System.currentTimeMillis() / 1000
 
@@ -125,33 +130,32 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "RefreshToken 만료 시간: $refreshTokenExpiresAt")
         Log.d(TAG, "RefreshToken 갱신 가능 시간: $refreshTokenIssuedAt")
 
-        //access Token 만료 및 재발급 여부 확인 후 로그아웃 처리
-//        if(currentTime >= accessTokenExpiresAt) {
-//            Log.d(TAG, "Access Token 만료됨. 로그인 필요.")
-//            navigateToLogin()
-//            return
-//        }
-
         // Refresh Token 만료 확인 (7일 기준)
-        if (currentTime >= refreshTokenExpiresAt) {
+        if (currentTime > refreshTokenExpiresAt) {
             Log.d(TAG, "Refresh Token 만료됨. 로그인 필요.")
             navigateToLogin()
             return
         }
 
         // Refresh Token 갱신 가능 여부 확인 (5일 이후)
-        val canRenew = (refreshTokenIssuedAt <= currentTime) && (currentTime < refreshTokenExpiresAt)  // 5일 후부터 7일 사이 까지 가능
+        val canRenew = (refreshTokenIssuedAt < currentTime) && (currentTime < refreshTokenExpiresAt)
         if (canRenew) {
             loginViewModel.renewRefreshToken { success ->
                 if (!success) {
-                    Log.d(TAG, "Refresh Token 갱신 실패. 로그인 필요.")
+                    Log.d(TAG, "❌ Refresh Token 갱신 실패. 로그인 필요.")
                     navigateToLogin()
+                } else {
+                    val newAccessTokenExpiresAt = sharedPref.getAccessTokenExpiresAt()
+                    val newRefreshTokenExpiresAt = sharedPref.getRefreshTokenExpiresAt()
+                    val newRefreshTokenRenewAvailableSeconds =
+                        sharedPref.getRefreshTokenRenewAvailableSeconds()
+
+                    Log.d(TAG, "✅ Refresh Token 재갱신 성공.")
+                    Log.d(TAG, "현재 시간: $currentTime")
+                    Log.d(TAG, "AccessToken 만료 시간 재갱신: $newAccessTokenExpiresAt")
+                    Log.d(TAG, "RefreshToken 만료 시간 재갱신: $newRefreshTokenExpiresAt")
+                    Log.d(TAG, "RefreshToken 갱신 가능 시간 재갱신 : $newRefreshTokenRenewAvailableSeconds")
                 }
-                Log.d(TAG, "Refresh Token 재갱신 성공.")
-                Log.d(TAG, "현재 시간: $currentTime")
-                Log.d(TAG, "AccessToken 만료 시간 재갱신: $accessTokenExpiresAt")
-                Log.d(TAG, "RefreshToken 만료 시간 재갱신: $refreshTokenExpiresAt")
-                Log.d(TAG, "RefreshToken 갱신 가능 시간 재갱신 : $refreshTokenIssuedAt")
             }
         } else {
             Log.d(TAG, "Refresh Token 갱신 조건 미충족 (5일 미만)")
@@ -163,12 +167,17 @@ class MainActivity : AppCompatActivity() {
         //자동 로그아웃 시 토큰 다 날리기
         val sharedPref = SharedPreferencesUtil(application.applicationContext)
         sharedPref.clearToken()
-
+        showToast("로그인 정보가 만료되었습니다.")
         val intent = Intent(this, LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         startActivity(intent)
         finish()
+    }
+
+    //토스트 메시지 출력 함수
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
 }

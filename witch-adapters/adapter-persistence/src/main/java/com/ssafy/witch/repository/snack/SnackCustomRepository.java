@@ -4,6 +4,5 @@ import com.ssafy.witch.entity.Snack.SnackDetailEntityProjection;
 
 public interface SnackCustomRepository {
 
-  SnackDetailEntityProjection getSnackDetail(String snackId);
-
+  boolean isOwnerByUserIdAndSnackId(String userId, String snackId);
 }

@@ -33,9 +33,15 @@ public class SnackRepository implements SnackPort {
     return snackJpaRepository.findById(snackId)
         .map(snackMapper::toDomain);
   }
-//  @Override
-//  public SnackDetailProjection getSnackDetail(String snackId) {
-//    return snackProjectionMapper.toProjection(snackJpaRepository.find);
-//  }
+
+  @Override
+  public void deleteById(String snackId) {
+    snackJpaRepository.deleteById(snackId);
+  }
+
+  @Override
+  public boolean isOwnerByUserIdAndSnackId(String userId, String snackId) {
+    return snackJpaRepository.isOwnerByUserIdAndSnackId(userId, snackId);
+  }
 
 }

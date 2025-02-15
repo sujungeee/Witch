@@ -42,7 +42,6 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         Log.d(TAG, "RefreshToken 만료 시간: $refreshTokenExpiresAt")
         Log.d(TAG, "RefreshToken 갱신 가능 시간: $refreshTokenIssuedAt")
 
-
         // Refresh Token 만료 확인 (7일 기준)
         if (currentTime > refreshTokenExpiresAt) {
             Log.d(TAG, "Refresh Token 만료됨. 로그인 필요.")
@@ -69,13 +68,16 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
                     Log.d(TAG, "RefreshToken 만료 시간 재갱신: $newRefreshTokenExpiresAt")
                     Log.d(TAG, "RefreshToken 갱신 가능 시간 재갱신 : $newRefreshTokenRenewAvailableSeconds")
 
-                    openFragment(1)
+//                    openFragment(1)
                 }
 
             }
         } else {
             Log.d(TAG, "Refresh Token 갱신 조건 미충족 (5일 미만)")
         }
+
+        openFragment(1)
+
     }
 
     //로그인 액티비티 이동 함수

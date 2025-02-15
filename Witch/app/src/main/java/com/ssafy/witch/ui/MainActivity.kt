@@ -84,10 +84,6 @@ class MainActivity : AppCompatActivity() {
         // 프래그먼트 전환 시 토큰 유효성 체크
         // 리프레쉬 토큰 갱신은 onResume에서 프로액티브하게 처리,  포그라운드 진입 시점에서, refresh token의 만료 또는 갱신 가능 조건을 미리 체크
         Log.d(TAG, "onResume: 리프레쉬 토큰 체크")
-        val sharedPref = SharedPreferencesUtil(application.applicationContext)
-        val currentTime = System.currentTimeMillis() / 1000
-        val refreshTokenIssuedAt = sharedPref.getRefreshTokenRenewAvailableSeconds()
-
         // refreshTokenRenewAvailableSeconds (갱신 가능 시간) 도래 시점에만 실행
         checkTokenValidity()
     }
@@ -134,23 +130,15 @@ class MainActivity : AppCompatActivity() {
         Log.d(TAG, "RefreshToken 만료 시간: $refreshTokenExpiresAt")
         Log.d(TAG, "RefreshToken 갱신 가능 시간: $refreshTokenIssuedAt")
 
-        //access Token 만료 및 재발급 여부 확인 후 로그아웃 처리
-//        if(currentTime >= accessTokenExpiresAt) {
-//            Log.d(TAG, "Access Token 만료됨. 로그인 필요.")
-//            navigateToLogin()
-//            return
-//        }
-
         // Refresh Token 만료 확인 (7일 기준)
-        if (currentTime >= refreshTokenExpiresAt) {
+        if (currentTime > refreshTokenExpiresAt) {
             Log.d(TAG, "Refresh Token 만료됨. 로그인 필요.")
-            showToast("로그인 정보가 만료되었습니다.")
             navigateToLogin()
             return
         }
 
         // Refresh Token 갱신 가능 여부 확인 (5일 이후)
-        val canRenew = (refreshTokenIssuedAt < currentTime)
+        val canRenew = (refreshTokenIssuedAt < currentTime) && (currentTime < refreshTokenExpiresAt)
         if (canRenew) {
             loginViewModel.renewRefreshToken { success ->
                 if (!success) {

@@ -3,7 +3,9 @@ package com.ssafy.witch.group;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.event.GroupEventTopic;
+import com.ssafy.witch.group.command.NotifyGroupJoinRequestApproveCommand;
 import com.ssafy.witch.group.command.NotifyGroupJoinRequestCommand;
+import com.ssafy.witch.group.event.ApproveGroupJoinRequestEvent;
 import com.ssafy.witch.group.event.CreateGroupJoinRequestEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,7 +22,7 @@ public class GroupEventSubscriber {
   private final ObjectMapper objectMapper;
   private final NotifyGroupUseCase notifyGroupUseCase;
 
-  @KafkaListener(topics = GroupEventTopic.JOIN_REQUEST_GROUP)
+  @KafkaListener(topics = GroupEventTopic.GROUP_JOIN_REQUEST)
   public void handleGroupJoinRequestEvent(ConsumerRecord<String, String> data,
       Acknowledgment acknowledgment) {
     try {
@@ -28,6 +30,19 @@ public class GroupEventSubscriber {
           CreateGroupJoinRequestEvent.class);
 
       notifyGroupUseCase.notifyJoinRequest(new NotifyGroupJoinRequestCommand(event));
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  @KafkaListener(topics = GroupEventTopic.GROUP_JOIN_REQUEST_APPROVE)
+  public void handleApproveGroupJoinRequestEvent(ConsumerRecord<String, String> data,
+      Acknowledgment acknowledgment) {
+    try {
+      ApproveGroupJoinRequestEvent event = objectMapper.readValue(data.value(),
+          ApproveGroupJoinRequestEvent.class);
+
+      notifyGroupUseCase.notifyJoinRequestApproved(new NotifyGroupJoinRequestApproveCommand(event));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
     }

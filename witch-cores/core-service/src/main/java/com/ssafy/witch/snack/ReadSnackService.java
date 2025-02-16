@@ -2,16 +2,19 @@ package com.ssafy.witch.snack;
 
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
 import com.ssafy.witch.apoointment.AppointmentMemberPositionCachePort;
+import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.apoointment.OnGoingAppointmentCachePort;
 import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.apoointment.model.AppointmentMemberProjection;
 import com.ssafy.witch.appointment.Position;
+import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
 import com.ssafy.witch.exception.appointment.UnauthorizedAppointmentAccessException;
 import com.ssafy.witch.exception.snack.NotOngoingAppointmentException;
 import com.ssafy.witch.exception.snack.SnackNotFoundException;
 import com.ssafy.witch.exception.snack.SnackViewNotAvailableException;
 import com.ssafy.witch.snack.mapper.SnackOutputMapper;
 import com.ssafy.witch.snack.output.SnackDetailOutput;
+import com.ssafy.witch.snack.output.SnackListOutput;
 import com.ssafy.witch.user.output.UserBasicOutput;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,11 @@ public class ReadSnackService implements ReadSnackUseCase {
   private final AppointmentMemberPort appointmentMemberPort;
   private final OnGoingAppointmentCachePort onGoingAppointmentCachePort;
   private final AppointmentMemberPositionCachePort appointmentMemberPositionCachePort;
+  private final AppointmentPort appointmentPort;
+  private final SnackReadPort snackReadPort;
+
+  private final SnackOutputMapper snackOutputMapper;
+
 
   @Override
   public SnackDetailOutput getSnackDetail(String userId, String snackId) {
@@ -122,5 +130,34 @@ public class ReadSnackService implements ReadSnackUseCase {
 
     // 두 점 사이의 거리 계산 (미터 단위)
     return Math.abs(EARTH_RADIUS * c);
+  }
+
+  @Override
+  public SnackListOutput getSnacks(String userId, String appointmentId) {
+
+    //약속 존재 하는지 검증
+    validateAppointmentExists(appointmentId);
+
+    AppointmentDetailProjection appointment =
+        onGoingAppointmentCachePort.get(appointmentId);
+    //진행 중인 약속인지 검증
+    validateAppointmentOngoing(appointment);
+    //해당 사용자가 약속의 멤버인지 검증
+    validateUserInAppointment(userId, appointmentId);
+
+    return snackOutputMapper.toOutput(snackReadPort.getSnacks(userId, appointmentId));
+  }
+
+  private void validateUserInAppointment(String userId, String appointmentId) {
+    if (!appointmentMemberPort.existsByUserIdAndAppointmentId(userId, appointmentId)) {
+      throw new UnauthorizedAppointmentAccessException();
+    }
+  }
+
+
+  private void validateAppointmentExists(String appointmentId) {
+    if (!appointmentPort.existsById(appointmentId)) {
+      throw new AppointmentNotFoundException();
+    }
   }
 }

@@ -10,7 +10,7 @@ import com.ssafy.witch.appointment.command.NotifyAppointmentArrivalCommand;
 import com.ssafy.witch.appointment.command.NotifyAppointmentEndCommand;
 import com.ssafy.witch.appointment.command.NotifyAppointmentJoinCommand;
 import com.ssafy.witch.appointment.command.NotifyAppointmentStartCommand;
-import com.ssafy.witch.event.AppointmentEvent;
+import com.ssafy.witch.event.AppointmentEventTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -26,7 +26,7 @@ public class AppointEventSubscriber {
   private final ObjectMapper objectMapper;
   private final NotifyAppointmentUseCase notifyAppointmentUseCase;
 
-  @KafkaListener(topics = AppointmentEvent.JOIN_APPOINTMENT)
+  @KafkaListener(topics = AppointmentEventTopic.JOIN_APPOINTMENT)
   public void handleAppointmentJoinEvent(ConsumerRecord<String, String> data,
       Acknowledgment acknowledgment) {
     try {
@@ -39,7 +39,7 @@ public class AppointEventSubscriber {
     }
   }
 
-  @KafkaListener(topics = AppointmentEvent.START_APPOINTMENT)
+  @KafkaListener(topics = AppointmentEventTopic.START_APPOINTMENT)
   public void handleAppointmentStartEvent(ConsumerRecord<String, String> data,
       Acknowledgment acknowledgment) {
     try {
@@ -53,7 +53,7 @@ public class AppointEventSubscriber {
     }
   }
 
-  @KafkaListener(topics = AppointmentEvent.END_APPOINTMENT)
+  @KafkaListener(topics = AppointmentEventTopic.END_APPOINTMENT)
   public void handleAppointmentEndEvent(ConsumerRecord<String, String> data,
       Acknowledgment acknowledgment) {
     try {
@@ -67,7 +67,7 @@ public class AppointEventSubscriber {
     }
   }
 
-  @KafkaListener(topics = AppointmentEvent.ARRIVAL_APPOINTMENT)
+  @KafkaListener(topics = AppointmentEventTopic.ARRIVAL_APPOINTMENT)
   public void handleAppointmentArrivalEvent(ConsumerRecord<String, String> data,
       Acknowledgment acknowledgment) {
     try {

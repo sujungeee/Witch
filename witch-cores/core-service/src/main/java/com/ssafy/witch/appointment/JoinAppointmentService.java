@@ -15,6 +15,7 @@ import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.GroupMemberPort;
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -52,8 +53,11 @@ public class JoinAppointmentService implements JoinAppointmentUseCase {
     AppointmentDetailProjection appointmentDetailProjection = appointmentReadPort.getAppointmentDetail(
         appointmentId);
 
-    ongoingAppointmentCachePort.save(appointmentDetailProjection,
-        Duration.between(LocalDateTime.now(), appointmentTime));
+    if (!Objects.isNull(appointmentDetailProjection)
+        && appointmentDetailProjection.getAppointmentStatus().equals(AppointmentStatus.ONGOING)) {
+      ongoingAppointmentCachePort.save(appointmentDetailProjection,
+          Duration.between(LocalDateTime.now(), appointmentTime));
+    }
 
     appointmentEventPublishPort.publish(
         new AppointmentJoinEvent(userId, appointmentDetailProjection));

@@ -7,9 +7,12 @@ import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.command.ApproveGroupJoinRequestCommand;
 import com.ssafy.witch.group.command.GetGroupJoinRequestListCommand;
 import com.ssafy.witch.group.command.RejectGroupJoinRequestCommand;
+import com.ssafy.witch.group.event.ApproveGroupJoinRequestEvent;
 import com.ssafy.witch.group.mapper.GroupJoinRequestListOutputMapper;
 import com.ssafy.witch.group.model.GroupJoinRequestProjection;
 import com.ssafy.witch.group.output.GroupJoinRequestListOutput;
+import com.ssafy.witch.user.User;
+import com.ssafy.witch.user.UserPort;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,6 +27,9 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
   private final GroupMemberPort groupMemberPort;
   private final GroupPort groupPort;
   private final GroupJoinRequestListOutputMapper groupJoinRequestListOutputMapper;
+  private final GroupEventPublishPort groupEventPublishPort;
+  private final GroupReadPort groupReadPort;
+  private final UserPort userPort;
 
   @Value("${witch.group.max-participants-count}")
   private int maxGroupParticipantsCount;
@@ -45,6 +51,13 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
 
     groupJoinRequestPort.deleteById(command.getJoinRequestId());
     groupMemberPort.save(GroupMember.createNewGroupMember(groupJoinRequest.getUserId(), groupId));
+
+    User joinMember = userPort.findById(requestUserId)
+        .orElseThrow(GroupJoinRequestNotFoundException::new);
+    GroupWithMemberUsers groupWithFcmTokenMembers = groupReadPort.findGroupWithFcmTokenMember(
+        groupId);
+    groupEventPublishPort.publish(
+        new ApproveGroupJoinRequestEvent(joinMember, groupWithFcmTokenMembers));
   }
 
   @Transactional
@@ -92,7 +105,8 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
   }
 
   @Override
-  public GroupJoinRequestListOutput getGroupJoinRequestList(GetGroupJoinRequestListCommand command) {
+  public GroupJoinRequestListOutput getGroupJoinRequestList(
+      GetGroupJoinRequestListCommand command) {
 
     String userId = command.getUserId();
     String groupId = command.getGroupId();
@@ -103,7 +117,8 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
     validateLeaderAuthorization(userId, groupId);
 
     //해당 모임에 대한 가입 신청 사용자 목록 조회
-    List<GroupJoinRequestProjection> projections = groupJoinRequestPort.readGroupJoinRequestsByGroupId(groupId);
+    List<GroupJoinRequestProjection> projections = groupJoinRequestPort.readGroupJoinRequestsByGroupId(
+        groupId);
 
     return groupJoinRequestListOutputMapper.toOutput(projections);
   }

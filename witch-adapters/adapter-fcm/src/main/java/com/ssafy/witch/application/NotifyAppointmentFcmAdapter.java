@@ -7,8 +7,6 @@ import com.ssafy.witch.event.AppointmentEvent;
 import com.ssafy.witch.notification.FcmNotificator;
 import com.ssafy.witch.notification.WitchNotification;
 import com.ssafy.witch.user.UserNotification;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +18,10 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
 
   private final FcmNotificator fcmNotificator;
 
-  private String getBody(AppointmentJoinNotification appointmentJoinNotification) {
+
+  @Override
+  public void notifyJoinAppointment(AppointmentJoinNotification appointmentJoinNotification) {
+    String appointmentId = appointmentJoinNotification.getAppointmentId();
     List<UserNotification> members = appointmentJoinNotification.getMembers();
     String name = appointmentJoinNotification.getName();
     String joinUserId = appointmentJoinNotification.getJoinUserId();
@@ -29,20 +30,13 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
         .findFirst()
         .orElseThrow();
     String joinUserNickname = joinUser.getNickname();
-    return String.format("%s 약속에 %s님이 참여하였습니다.", name, joinUserNickname);
-  }
 
-  @Override
-  public void notifyJoinAppointment(AppointmentJoinNotification appointmentJoinNotification) {
-    String appointmentId = appointmentJoinNotification.getAppointmentId();
+    String title = String.format("[Witch] %s 약속에 %s 님이 참여했어요.", name, joinUserNickname);
+    String body = "약속 참여자 목록을 확인해 보세요!";
 
-    String title = "[Witch] 약속 참여 알림";
-    String body = getBody(appointmentJoinNotification);
-
-    Map<String, String> data = Map.of("type", AppointmentEvent.JOIN_APPOINTMENT, "appointmentId",
+    Map<String, String> data = Map.of("type", AppointmentEvent.JOIN_APPOINTMENT, "parameter",
         appointmentId);
 
-    String joinUserId = appointmentJoinNotification.getJoinUserId();
     for (UserNotification member : appointmentJoinNotification.getMembers()) {
       if (member.getUserId().equals(joinUserId)) {
         continue;
@@ -57,14 +51,12 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
   @Override
   public void notifyStartAppointment(AppointmentStartNotification appointmentStartNotification) {
 
-    String title = "[Witch] 약속 시작 알림";
+    String appointmentName = appointmentStartNotification.getName();
 
-    LocalDateTime appointmentTime = appointmentStartNotification.getAppointmentTime();
-    String body = String.format("%s시에 시작하는 %s 약속 공유가 시작되었습니다.",
-        appointmentTime.format(DateTimeFormatter.ofPattern("HH:mm")),
-        appointmentStartNotification.getName());
+    String title = String.format("[Witch] %s 약속이 시작되었어요", appointmentName);
+    String body = "약속 참여자들의 위치를 확인해 보세요!";
 
-    Map<String, String> data = Map.of("type", AppointmentEvent.JOIN_APPOINTMENT, "appointmentId",
+    Map<String, String> data = Map.of("type", AppointmentEvent.JOIN_APPOINTMENT, "parameter",
         appointmentStartNotification.getAppointmentId());
 
     for (UserNotification member : appointmentStartNotification.getMembers()) {
@@ -73,4 +65,20 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
       fcmNotificator.sendNotification(witchNotification);
     }
   }
+
+  @Override
+  public void notifyEndAppointment(AppointmentStartNotification notification) {
+    String title = String.format("[Witch] %s 약속이 종료되었어요.", notification.getName());
+    String body = "약속 참여자들의 최종 위치를 확인해 보세요!";
+
+    Map<String, String> data = Map.of("type", AppointmentEvent.END_APPOINTMENT, "parameter",
+        notification.getAppointmentId());
+
+    for (UserNotification member : notification.getMembers()) {
+      String fcmToken = member.getFcmToken();
+      WitchNotification witchNotification = new WitchNotification(data, fcmToken, title, body);
+      fcmNotificator.sendNotification(witchNotification);
+    }
+  }
+
 }

@@ -3,6 +3,7 @@ package com.ssafy.witch.group;
 import com.ssafy.witch.event.GroupEventTopic;
 import com.ssafy.witch.notification.FcmNotificator;
 import com.ssafy.witch.notification.WitchNotification;
+import java.util.List;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -12,6 +13,30 @@ import org.springframework.stereotype.Component;
 public class NotifyGroupFcmAdapter implements NotifyGroupPort {
 
   private final FcmNotificator fcmNotificator;
+
+  @Override
+  public void notifyJoinRequestApproved(JoinRequestApprovedNotification notification) {
+    String groupName = notification.getGroupName();
+    String joinUserNickname = notification.getJoinUserNickname();
+
+    String joinUserTitle = String.format("[Witch] %s 모임 참여가 수락되었어요.", groupName);
+    String title = String.format("[Witch] %s 모임에 %s 님이 참여했어요.", groupName, joinUserNickname);
+    String body = "구성원 목록을 확인해 보세요!";
+
+    Map<String, String> data =
+        createGroupData(GroupEventTopic.GROUP_JOIN_REQUEST_APPROVE, notification.getGroupId());
+
+    String fcmToken = notification.getJoinUserFcmToken();
+    WitchNotification joinUserNotification =
+        new WitchNotification(data, fcmToken, joinUserTitle, body);
+    fcmNotificator.sendNotification(joinUserNotification);
+
+    List<String> userFcmTokens = notification.getTargetUserFcmTokens();
+    for (String userFcmToken : userFcmTokens) {
+      WitchNotification witchNotification = new WitchNotification(data, userFcmToken, title, body);
+      fcmNotificator.sendNotification(witchNotification);
+    }
+  }
 
   @Override
   public void notifyJoinRequestCreated(JoinRequestCreateNotification notification) {

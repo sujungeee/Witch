@@ -38,6 +38,15 @@ public class SnackRepository implements SnackPort, SnackReadPort {
   }
 
   @Override
+  public void deleteById(String snackId) {
+    snackJpaRepository.deleteById(snackId);
+  }
+
+  @Override
+  public boolean isOwnerByUserIdAndSnackId(String userId, String snackId) {
+    return snackJpaRepository.isOwnerByUserIdAndSnackId(userId, snackId);
+  }
+
   public List<SnackProjection> getSnacks(String userId, String appointmentId) {
     return snackJpaRepository.getSnacks(userId, appointmentId)
         .stream()

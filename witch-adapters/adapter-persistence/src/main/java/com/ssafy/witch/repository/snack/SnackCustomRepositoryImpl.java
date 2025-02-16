@@ -1,17 +1,12 @@
 package com.ssafy.witch.repository.snack;
 
-import static com.querydsl.core.types.Projections.*;
+import static com.querydsl.core.types.Projections.constructor;
 import static com.ssafy.witch.entity.Snack.QSnackEntity.snackEntity;
-import static com.ssafy.witch.entity.user.QUserEntity.*;
+import static com.ssafy.witch.entity.user.QUserEntity.userEntity;
 
-import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.ssafy.witch.entity.Snack.QSnackEntity;
-import com.ssafy.witch.entity.Snack.SnackDetailEntityProjection;
 import com.ssafy.witch.entity.Snack.SnackEntityProjection;
-import com.ssafy.witch.entity.user.QUserEntity;
 import com.ssafy.witch.user.model.UserBasicProjection;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -23,6 +18,18 @@ public class SnackCustomRepositoryImpl implements SnackCustomRepository {
   private final JPAQueryFactory queryFactory;
 
   @Override
+  public boolean isOwnerByUserIdAndSnackId(String userId, String snackId) {
+    Integer fetchOne = queryFactory
+        .selectOne()
+        .from(snackEntity)
+        .where(
+            snackEntity.userId.eq(userId),
+            snackEntity.snackId.eq(snackId)
+        )
+        .fetchFirst();
+    return fetchOne != null;
+  }
+
   public List<SnackEntityProjection> getSnacks(String userId, String appointmentId) {
 
     return queryFactory
@@ -46,4 +53,5 @@ public class SnackCustomRepositoryImpl implements SnackCustomRepository {
         .orderBy(snackEntity.createdAt.desc())
         .fetch();
   }
+
 }

@@ -10,4 +10,7 @@ public interface SnackPort {
 
   Optional<Snack> findById(String snackId);
 
+  void deleteById(String snackId);
+
+  boolean isOwnerByUserIdAndSnackId(String userId, String snackId);
 }

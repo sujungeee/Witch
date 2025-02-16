@@ -1,11 +1,14 @@
 package com.ssafy.witch.appointment;
 
 import com.ssafy.witch.apoointment.AppointmentArrivalNotification;
+import com.ssafy.witch.apoointment.AppointmentCreatedNotification;
 import com.ssafy.witch.apoointment.AppointmentEndNotification;
 import com.ssafy.witch.apoointment.AppointmentJoinNotification;
 import com.ssafy.witch.apoointment.AppointmentStartNotification;
 import com.ssafy.witch.apoointment.NotifyAppointmentPort;
 import com.ssafy.witch.event.AppointmentEventTopic;
+import com.ssafy.witch.group.GroupMemberUser;
+import com.ssafy.witch.group.GroupWithMemberUsers;
 import com.ssafy.witch.notification.FcmNotificator;
 import com.ssafy.witch.notification.WitchNotification;
 import com.ssafy.witch.user.UserNotification;
@@ -108,6 +111,33 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
           body);
       fcmNotificator.sendNotification(witchNotification);
     }
+  }
+
+  @Override
+  public void notifyAppointmentCreated(AppointmentCreatedNotification notification) {
+    Appointment appointment = notification.getAppointment();
+    GroupWithMemberUsers group = notification.getGroup();
+    String createUserId = notification.getCreateUserId();
+    List<GroupMemberUser> groupMemberUsers = group.getGroupMemberUsers();
+
+    String title = String.format("%s 모임에 %s 약속이 생성 되었습니다.", group.getGroup().getName(),
+        appointment.getName());
+    String body = "약속을 확인해 보세요!";
+
+    Map<String, String> appointmentData = createAppointmentData(
+        AppointmentEventTopic.APPOINTMENT_CREATED, appointment.getAppointmentId());
+
+    for (GroupMemberUser member : groupMemberUsers) {
+      String userId = member.getUserWithFcmToken().getUser().getUserId();
+      if (createUserId.equals(userId)) {
+        continue;
+      }
+      String fcmToken = member.getUserWithFcmToken().getFcmToken();
+      WitchNotification witchNotification = new WitchNotification(appointmentData, fcmToken, title,
+          body);
+      fcmNotificator.sendNotification(witchNotification);
+    }
+
   }
 
   private Map<String, String> createAppointmentData(String appointmentType,

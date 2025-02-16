@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface SnackCustomRepository {
 
+  boolean isOwnerByUserIdAndSnackId(String userId, String snackId);
+
   List<SnackEntityProjection> getSnacks(String userId, String appointmentId);
 
 }

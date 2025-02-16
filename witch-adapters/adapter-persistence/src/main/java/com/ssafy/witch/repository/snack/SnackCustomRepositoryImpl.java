@@ -23,6 +23,17 @@ public class SnackCustomRepositoryImpl implements SnackCustomRepository {
   private final JPAQueryFactory queryFactory;
 
   @Override
+  public boolean isOwnerByUserIdAndSnackId(String userId, String snackId) {
+    Integer fetchOne = queryFactory
+        .selectOne()
+        .from(snackEntity)
+        .where(
+            snackEntity.userId.eq(userId),
+            snackEntity.snackId.eq(snackId)
+        )
+        .fetchFirst();
+    return fetchOne != null;
+
   public List<SnackEntityProjection> getSnacks(String userId, String appointmentId) {
 
     return queryFactory
@@ -46,4 +57,5 @@ public class SnackCustomRepositoryImpl implements SnackCustomRepository {
         .orderBy(snackEntity.createdAt.desc())
         .fetch();
   }
+
 }

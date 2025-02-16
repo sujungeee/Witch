@@ -1,11 +1,11 @@
-package com.ssafy.witch.application;
+package com.ssafy.witch.appointment;
 
 import com.ssafy.witch.apoointment.AppointmentArrivalNotification;
 import com.ssafy.witch.apoointment.AppointmentEndNotification;
 import com.ssafy.witch.apoointment.AppointmentJoinNotification;
 import com.ssafy.witch.apoointment.AppointmentStartNotification;
 import com.ssafy.witch.apoointment.NotifyAppointmentPort;
-import com.ssafy.witch.event.AppointmentEvent;
+import com.ssafy.witch.event.AppointmentEventTopic;
 import com.ssafy.witch.notification.FcmNotificator;
 import com.ssafy.witch.notification.WitchNotification;
 import com.ssafy.witch.user.UserNotification;
@@ -37,7 +37,7 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
     String body = "약속 참여자 목록을 확인해 보세요!";
 
     Map<String, String> data =
-        createAppointmentData(AppointmentEvent.JOIN_APPOINTMENT, appointmentId);
+        createAppointmentData(AppointmentEventTopic.JOIN_APPOINTMENT, appointmentId);
 
     for (UserNotification member : appointmentJoinNotification.getMembers()) {
       if (member.getUserId().equals(joinUserId)) {
@@ -60,7 +60,7 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
     String body = "약속 참여자들의 위치를 확인해 보세요!";
 
     Map<String, String> data =
-        createAppointmentData(AppointmentEvent.START_APPOINTMENT, appointmentId);
+        createAppointmentData(AppointmentEventTopic.START_APPOINTMENT, appointmentId);
 
     for (UserNotification member : notification.getMembers()) {
       String fcmToken = member.getFcmToken();
@@ -77,7 +77,7 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
     String body = "약속 참여자들의 최종 위치를 확인해 보세요!";
 
     Map<String, String> data =
-        createAppointmentData(AppointmentEvent.END_APPOINTMENT, appointmentId);
+        createAppointmentData(AppointmentEventTopic.END_APPOINTMENT, appointmentId);
 
     for (UserNotification member : notification.getMembers()) {
       String fcmToken = member.getFcmToken();
@@ -100,7 +100,7 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
     String body = "약속 참여자들의 위치를 확인해 보세요!";
 
     Map<String, String> appointmentData = createAppointmentData(
-        AppointmentEvent.ARRIVAL_APPOINTMENT, appointmentId);
+        AppointmentEventTopic.ARRIVAL_APPOINTMENT, appointmentId);
 
     for (UserNotification member : notification.getMembers()) {
       String fcmToken = member.getFcmToken();

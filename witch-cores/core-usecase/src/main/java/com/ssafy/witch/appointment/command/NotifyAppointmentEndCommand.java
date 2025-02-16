@@ -1,6 +1,6 @@
 package com.ssafy.witch.appointment.command;
 
-import com.ssafy.witch.apoointment.AppointmentStartNotification;
+import com.ssafy.witch.apoointment.AppointmentEndNotification;
 import com.ssafy.witch.apoointment.event.AppointmentEndEvent;
 import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.user.UserNotification;
@@ -31,8 +31,8 @@ public class NotifyAppointmentEndCommand {
         .toList();
   }
 
-  public AppointmentStartNotification toNotification() {
-    return new AppointmentStartNotification(
+  public AppointmentEndNotification toNotification() {
+    return new AppointmentEndNotification(
         this.getAppointmentId(),
         this.getName(),
         this.getAppointmentTime(),

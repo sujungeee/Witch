@@ -7,7 +7,7 @@ import com.ssafy.witch.apoointment.event.AppointmentArrivalEvent;
 import com.ssafy.witch.apoointment.event.AppointmentEndEvent;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
 import com.ssafy.witch.apoointment.event.AppointmentStartEvent;
-import com.ssafy.witch.event.AppointmentEvent;
+import com.ssafy.witch.event.AppointmentEventTopic;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -25,7 +25,7 @@ public class AppointmentEventKafkaPublisher implements AppointmentEventPublishPo
   @Override
   public void publish(AppointmentJoinEvent appointmentJoinEvent) {
     try {
-      kafkaTemplate.send(AppointmentEvent.JOIN_APPOINTMENT,
+      kafkaTemplate.send(AppointmentEventTopic.JOIN_APPOINTMENT,
           objectMapper.writeValueAsString(appointmentJoinEvent));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
@@ -36,7 +36,7 @@ public class AppointmentEventKafkaPublisher implements AppointmentEventPublishPo
   public void publish(AppointmentStartEvent appointmentStartEvent) {
 
     try {
-      kafkaTemplate.send(AppointmentEvent.START_APPOINTMENT,
+      kafkaTemplate.send(AppointmentEventTopic.START_APPOINTMENT,
           objectMapper.writeValueAsString(appointmentStartEvent));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
@@ -46,7 +46,7 @@ public class AppointmentEventKafkaPublisher implements AppointmentEventPublishPo
   @Override
   public void publish(AppointmentEndEvent event) {
     try {
-      kafkaTemplate.send(AppointmentEvent.END_APPOINTMENT,
+      kafkaTemplate.send(AppointmentEventTopic.END_APPOINTMENT,
           objectMapper.writeValueAsString(event));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
@@ -56,7 +56,7 @@ public class AppointmentEventKafkaPublisher implements AppointmentEventPublishPo
   @Override
   public void publish(AppointmentArrivalEvent event) {
     try {
-      kafkaTemplate.send(AppointmentEvent.ARRIVAL_APPOINTMENT,
+      kafkaTemplate.send(AppointmentEventTopic.ARRIVAL_APPOINTMENT,
           objectMapper.writeValueAsString(event));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());

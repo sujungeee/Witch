@@ -2,8 +2,11 @@ package com.ssafy.witch.group;
 
 
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Getter
 public class GroupMember {
 

@@ -3,6 +3,7 @@ package com.ssafy.witch.repository.appointment;
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
 import com.ssafy.witch.appointment.AppointmentMember;
 import com.ssafy.witch.mapper.appointment.AppointmentMemberMapper;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -40,5 +41,13 @@ public class AppointmentMemberRepository implements AppointmentMemberPort {
   @Override
   public void deleteAllByAppointmentId(String appointmentId) {
     appointmentMemberJpaRepository.deleteAllByAppointmentId(appointmentId);
+  }
+
+  @Override
+  public List<AppointmentMember> findAllByUserId(String userId) {
+    return appointmentMemberJpaRepository.findAllByUserId(userId)
+        .stream()
+        .map(appointmentMemberMapper::toDomain)
+        .toList();
   }
 }

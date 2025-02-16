@@ -41,4 +41,17 @@ public class GroupMemberCustomRepositoryImpl implements GroupMemberCustomReposit
         .join(userEntity).on(groupMemberEntity.userId.eq(userEntity.userId))
         .where(groupMemberEntity.groupId.eq(groupId)).fetch();
   }
+
+  @Override
+  public boolean isJoinedGroupByUserId(String userId) {
+    Integer fetchOne = queryFactory
+        .selectOne()
+        .from(groupMemberEntity)
+        .where(
+            groupMemberEntity.userId.eq(userId)
+        )
+        .fetchFirst();
+
+    return fetchOne != null;
+  }
 }

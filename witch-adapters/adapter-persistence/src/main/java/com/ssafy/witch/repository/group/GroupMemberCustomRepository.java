@@ -8,4 +8,6 @@ public interface GroupMemberCustomRepository {
   boolean isLeaderByUserIdAndGroupId(String userId, String groupId);
 
   List<GroupMemberProjection> readGroupMemberList(String groupId);
+
+  boolean isJoinedGroupByUserId(String userId);
 }

@@ -9,4 +9,6 @@ public interface UserPort {
   Optional<User> findByEmail(String email);
 
   Optional<User> findById(String userId);
+
+  void delete(User user);
 }

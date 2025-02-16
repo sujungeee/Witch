@@ -45,4 +45,16 @@ public class GroupMemberRepository implements GroupMemberPort {
     groupMemberJpaRepository.deleteByUserIdAndGroupId(userId, groupId);
   }
 
+  @Override
+  public boolean isJoinedGroupByUserId(String userId) {
+    return groupMemberJpaRepository.isJoinedGroupByUserId(userId);
+  }
+
+  @Override
+  public List<GroupMember> findAllByUserId(String userId) {
+    return groupMemberJpaRepository.findAllByUserId(userId)
+        .stream()
+        .map(mapper::toDomain)
+        .toList();
+  }
 }

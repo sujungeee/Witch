@@ -6,5 +6,7 @@ public interface NotifyAppointmentPort {
 
   void notifyStartAppointment(AppointmentStartNotification appointmentStartNotification);
 
-  void notifyEndAppointment(AppointmentStartNotification notification);
+  void notifyEndAppointment(AppointmentEndNotification notification);
+
+  void notifyArrivalAppointment(AppointmentArrivalNotification notification);
 }

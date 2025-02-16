@@ -1,20 +1,20 @@
-package com.ssafy.witch.entity.Snack;
+package com.ssafy.witch.snack.output;
 
-import com.ssafy.witch.user.model.UserBasicProjection;
+import com.ssafy.witch.user.output.UserBasicOutput;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-@AllArgsConstructor
 @Getter
-public class SnackDetailEntityProjection {
+@AllArgsConstructor
+public class SnackOutput {
 
   private String snackId;
-  private String userId;
   private Double longitude;
   private Double latitude;
   private String snackImageUrl;
   private String snackSoundUrl;
   private LocalDateTime createdAt;
-  private final UserBasicProjection user;
+
+  private UserBasicOutput user;
 }

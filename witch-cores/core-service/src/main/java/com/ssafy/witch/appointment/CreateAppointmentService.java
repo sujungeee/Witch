@@ -1,9 +1,11 @@
 package com.ssafy.witch.appointment;
 
+import com.ssafy.witch.apoointment.AppointmentEventPublishPort;
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
 import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.apoointment.AppointmentReadPort;
 import com.ssafy.witch.apoointment.OnGoingAppointmentCachePort;
+import com.ssafy.witch.apoointment.event.AppointmentCreatedEvent;
 import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.appointment.command.AppointmentCreateCommand;
 import com.ssafy.witch.exception.appointment.AppointmentTimeInPastException;
@@ -12,6 +14,8 @@ import com.ssafy.witch.exception.group.GroupNotFoundException;
 import com.ssafy.witch.exception.group.UnauthorizedGroupAccessException;
 import com.ssafy.witch.group.GroupMemberPort;
 import com.ssafy.witch.group.GroupPort;
+import com.ssafy.witch.group.GroupReadPort;
+import com.ssafy.witch.group.GroupWithMemberUsers;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +31,8 @@ public class CreateAppointmentService implements CreateAppointmentUseCase {
   private final AppointmentMemberPort appointmentMemberPort;
   private final OnGoingAppointmentCachePort ongoingAppointmentCachePort;
   private final AppointmentReadPort appointmentReadPort;
+  private final GroupReadPort groupReadPort;
+  private final AppointmentEventPublishPort appointmentEventPublishPort;
 
   private void verifyFutureAppointment(LocalDateTime appointmentTime) {
     LocalDateTime now = LocalDateTime.now();
@@ -70,6 +76,12 @@ public class CreateAppointmentService implements CreateAppointmentUseCase {
       ongoingAppointmentCachePort.save(appointmentDetail,
           Duration.between(LocalDateTime.now(), appointmentTime));
     }
+
+    GroupWithMemberUsers groupWithFcmTokenMember = groupReadPort.findGroupWithFcmTokenMember(
+        groupId);
+
+    appointmentEventPublishPort.publish(
+        new AppointmentCreatedEvent(userId, newAppointment, groupWithFcmTokenMember));
 
     return newAppointment;
   }

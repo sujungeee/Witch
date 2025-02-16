@@ -9,4 +9,6 @@ public interface GroupReadPort {
   List<GroupWithLeaderProjection> readGroupsWithLeaderByUserId(String userId);
 
   GroupDetailProjection readGroupDetail(String userId, String groupId);
+
+  GroupWithMemberUsers findGroupWithFcmTokenMember(String groupId);
 }

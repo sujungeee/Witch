@@ -2,15 +2,25 @@ package com.ssafy.witch.repository.group;
 
 import static com.ssafy.witch.entity.group.QGroupEntity.groupEntity;
 import static com.ssafy.witch.entity.group.QGroupMemberEntity.groupMemberEntity;
+import static com.ssafy.witch.entity.notification.QFcmTokenEntity.fcmTokenEntity;
 import static com.ssafy.witch.entity.user.QUserEntity.userEntity;
 
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.ssafy.witch.entity.group.GroupEntity;
 import com.ssafy.witch.entity.group.QGroupEntity;
 import com.ssafy.witch.entity.group.QGroupMemberEntity;
+import com.ssafy.witch.entity.notification.QFcmTokenEntity;
 import com.ssafy.witch.entity.user.QUserEntity;
+import com.ssafy.witch.exception.group.GroupNotFoundException;
+import com.ssafy.witch.group.Group;
+import com.ssafy.witch.group.GroupMember;
+import com.ssafy.witch.group.GroupMemberUser;
+import com.ssafy.witch.group.GroupWithMemberUsers;
 import com.ssafy.witch.group.model.GroupDetailProjection;
 import com.ssafy.witch.group.model.GroupWithLeaderProjection;
+import com.ssafy.witch.user.User;
+import com.ssafy.witch.user.UserWithFcmToken;
 import com.ssafy.witch.user.model.UserBasicProjection;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -67,5 +77,53 @@ public class GroupCustomRepositoryImpl implements GroupCustomRepository {
         .join(userEntity).on(groupMemberEntity.userId.eq(userEntity.userId))
         .where(groupEntity.groupId.eq(groupId).and(groupMemberEntity.userId.eq(userId)))
         .fetchOne();
+  }
+
+  @Override
+  public GroupWithMemberUsers readGroupWithMemberUsers(String groupId) {
+    QGroupEntity group = groupEntity;
+    QGroupMemberEntity groupMember = groupMemberEntity;
+    QUserEntity user = userEntity;
+    QFcmTokenEntity fcmToken = fcmTokenEntity;
+
+    GroupEntity targetGroup = queryFactory.selectFrom(group).where(group.groupId.eq(groupId))
+        .fetchOne();
+
+    if (targetGroup == null) {
+      throw new GroupNotFoundException();
+    }
+
+    List<GroupMemberUser> groupMemberUsers = queryFactory.select(
+            Projections.constructor(GroupMemberUser.class,
+                Projections.constructor(GroupMember.class,
+                    groupMember.groupMemberId,
+                    groupMember.userId,
+                    groupMember.groupId,
+                    groupMember.isLeader,
+                    groupMember.cntLateArrival),
+                Projections.constructor(UserWithFcmToken.class,
+                    Projections.constructor(User.class,
+                        user.userId,
+                        user.email,
+                        user.password,
+                        user.nickname,
+                        user.profileImageUrl),
+                    fcmToken.fcmToken
+                )
+            )
+        )
+        .from(group)
+        .leftJoin(groupMember)
+        .on(group.groupId.eq(groupMember.groupId))
+        .leftJoin(user)
+        .on(groupMember.userId.eq(user.userId))
+        .leftJoin(fcmToken)
+        .on(user.userId.eq(fcmToken.userId))
+        .where(group.groupId.eq(groupId))
+        .fetch();
+
+    Group groupRet = new Group(groupId, targetGroup.getName(),
+        targetGroup.getGroupImageUrl());
+    return new GroupWithMemberUsers(groupRet, groupMemberUsers);
   }
 }

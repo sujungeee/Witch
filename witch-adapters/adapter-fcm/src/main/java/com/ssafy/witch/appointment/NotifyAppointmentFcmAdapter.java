@@ -1,4 +1,4 @@
-package com.ssafy.witch.application;
+package com.ssafy.witch.appointment;
 
 import com.ssafy.witch.apoointment.AppointmentArrivalNotification;
 import com.ssafy.witch.apoointment.AppointmentEndNotification;

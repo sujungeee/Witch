@@ -17,6 +17,7 @@ public class GroupEventKafkaPublisher implements GroupEventPublishPort {
   private final KafkaTemplate<String, String> kafkaTemplate;
   private final ObjectMapper objectMapper;
 
+
   @Override
   public void publish(CreateGroupJoinRequestEvent event) {
     try {
@@ -25,6 +26,5 @@ public class GroupEventKafkaPublisher implements GroupEventPublishPort {
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
     }
-
   }
 }

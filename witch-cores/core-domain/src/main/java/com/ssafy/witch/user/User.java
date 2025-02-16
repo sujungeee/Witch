@@ -1,9 +1,12 @@
 package com.ssafy.witch.user;
 
 import java.util.UUID;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 @Getter
 public class User {

@@ -19,25 +19,29 @@ public class GroupJoinRequestService implements CreateGroupJoinRequestUseCase {
   private final GroupPort groupPort;
   private final GroupMemberPort groupMemberPort;
   private final GroupJoinRequestPort groupJoinRequestPort;
-  private final UserPort userPort;
-
+  private final GroupReadPort groupReadPort;
   private final GroupEventPublishPort groupEventPublishPort;
+  private final UserPort userPort;
 
   @Transactional
   @Override
   public void creatGroupJoinRequest(GroupJoinRequestCreateCommand command) {
-    String groupId = command.getGroupId();
     String userId = command.getUserId();
+    String groupId = command.getGroupId();
+    String joinRequestUserId = command.getUserId();
 
-    Group group = groupPort.findById(groupId).orElseThrow(GroupNotFoundException::new);
-    validateUserNotParticipants(userId, groupId);
-    validateGroupJoinRequestNotExists(userId, groupId);
+    validateGroupExists(groupId);
+    validateUserNotParticipants(joinRequestUserId, groupId);
+    validateGroupJoinRequestNotExists(joinRequestUserId, groupId);
 
-    User user = userPort.findById(userId).orElseThrow(UserNotFoundException::new);
-
-    GroupJoinRequest groupJoinRequest = GroupJoinRequest.of(userId, groupId);
+    GroupJoinRequest groupJoinRequest = GroupJoinRequest.of(joinRequestUserId, groupId);
     groupJoinRequestPort.save(groupJoinRequest);
-    groupEventPublishPort.publish(new CreateGroupJoinRequestEvent(group, user));
+
+    User requestUser = userPort.findById(userId).orElseThrow(UserNotFoundException::new);
+    GroupWithMemberUsers groupWithMemberUsers = groupReadPort.findGroupWithFcmTokenMember(groupId);
+    groupEventPublishPort.publish(
+        new CreateGroupJoinRequestEvent(requestUser, groupWithMemberUsers));
+
   }
 
   private void validateGroupJoinRequestNotExists(String userId, String groupId) {

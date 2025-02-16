@@ -13,6 +13,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.jayway.jsonpath.JsonPath;
 import com.ssafy.witch.controller.snack.mapper.SnackResponseMapper;
 import com.ssafy.witch.exception.ErrorCode;
+import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
+import com.ssafy.witch.exception.appointment.AppointmentNotOnGoingException;
 import com.ssafy.witch.exception.appointment.UnauthorizedAppointmentAccessException;
 import com.ssafy.witch.exception.snack.NotOngoingAppointmentException;
 import com.ssafy.witch.exception.snack.SnackNotFoundException;
@@ -21,9 +23,12 @@ import com.ssafy.witch.mock.user.WithMockWitchUser;
 import com.ssafy.witch.snack.ReadSnackUseCase;
 import com.ssafy.witch.snack.Snack;
 import com.ssafy.witch.snack.output.SnackDetailOutput;
+import com.ssafy.witch.snack.output.SnackListOutput;
+import com.ssafy.witch.snack.output.SnackOutput;
 import com.ssafy.witch.support.docs.RestDocsTestSupport;
 import com.ssafy.witch.user.output.UserBasicOutput;
 import java.time.LocalDateTime;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.mockito.BDDMockito;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -191,6 +196,146 @@ class SnackReadControllerTest extends RestDocsTestSupport {
         .andExpect(
             jsonPath("error.errorCode").value(
                 ErrorCode.SNACK_VIEW_NOT_AVAILABLE.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_snacks_200() throws Exception {
+    String appointmentId = "test-appointment-id";
+
+    SnackListOutput output = new SnackListOutput(
+        List.of(
+            new SnackOutput(
+                "test-snack-id-1",
+                50.21,
+                48.23,
+                "http://test.image1.url",
+                "http://test.sound1.url",
+                LocalDateTime.parse("2025-02-16T13:21:24"),
+                new UserBasicOutput(
+                    "test-user-id-1",
+                    "닉네임1",
+                    "http://test.profile1.url")),
+            new SnackOutput(
+                "test-snack-id-2",
+                50.211,
+                48.235,
+                "http://test.image2.url",
+                "http://test.sound2.url",
+                LocalDateTime.parse("2025-02-16T13:23:46"),
+                new UserBasicOutput(
+                    "test-user-id-2",
+                    "닉네임2",
+                    "http://test.profile2.url"))
+        )
+    );
+
+    given(readSnackUseCase.getSnacks(any(), any())).willReturn(output);
+
+    mvc.perform(get("/appointments/{appointmentId}/snacks", appointmentId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .header("Authorization", "Bearer sample.access.token")
+    )
+        .andExpect(status().isOk())
+        .andDo(restDocs.document(
+            pathParameters(
+                parameterWithName("appointmentId")
+                    .description("조회하고자 하는 약속 식별자")
+            ),
+            requestHeaders(
+                headerWithName("Authorization")
+                    .description("JWT access token")
+            ),
+            responseFields(
+                fieldWithPath("success")
+                    .type(BOOLEAN)
+                    .description("성공 여부"),
+                fieldWithPath("data.snacks.[].snackId")
+                    .type(STRING)
+                    .description("스낵 식별자"),
+                fieldWithPath("data.snacks.[].longitude")
+                    .type(NUMBER)
+                    .description("스낵 경도"),
+                fieldWithPath("data.snacks.[].latitude")
+                    .type(NUMBER)
+                    .description("스낵 위도"),
+                fieldWithPath("data.snacks.[].snackImageUrl")
+                    .type(STRING)
+                    .description("스낵 이미지 URL"),
+                fieldWithPath("data.snacks.[].snackSoundUrl")
+                    .type(STRING)
+                    .description("스낵 사운드 URL"),
+                fieldWithPath("data.snacks.[].createdAt")
+                    .type(STRING)
+                    .description("스낵 생성 시간"),
+                fieldWithPath("data.snacks.[].user.userId")
+                    .type(STRING)
+                    .description("스낵 생성 사용자 식별자"),
+                fieldWithPath("data.snacks.[].user.nickname")
+                    .type(STRING)
+                    .description("스낵 생성 사용자 닉네임"),
+                fieldWithPath("data.snacks.[].user.profileImageUrl")
+                    .type(STRING)
+                    .description("스낵 생성 사용자 프로필 URL")
+            )
+        ));
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_snacks_400_appointment_not_exists() throws Exception {
+    String appointmentId = "test-appointment-id";
+
+    given(readSnackUseCase.getSnacks(any(), any()))
+        .willThrow(new AppointmentNotFoundException());
+
+    mvc.perform(get("/appointments/{appointmentId}/snacks", appointmentId)
+        .contentType(MediaType.APPLICATION_JSON)
+        .header("Authorization", "Bearer sample.access.token")
+    )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("error.errorCode").value(
+                ErrorCode.NON_EXISTENT_APPOINTMENT.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_snacks_400_appointment_is_not_ongoing() throws Exception {
+    String appointmentId = "test-appointment-id";
+
+    given(readSnackUseCase.getSnacks(any(), any()))
+        .willThrow(new AppointmentNotOnGoingException());
+
+    mvc.perform(get("/appointments/{appointmentId}/snacks", appointmentId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("error.errorCode").value(
+                ErrorCode.APPOINTMENT_NOT_ONGOING.getErrorCode()))
+        .andDo(restDocs.document());
+  }
+
+  @WithMockWitchUser
+  @Test
+  void get_snacks_400_user_is_not_appointment_member() throws Exception {
+    String appointmentId = "test-appointment-id";
+
+    given(readSnackUseCase.getSnacks(any(), any()))
+        .willThrow(new UnauthorizedAppointmentAccessException());
+
+    mvc.perform(get("/appointments/{appointmentId}/snacks", appointmentId)
+            .contentType(MediaType.APPLICATION_JSON)
+            .header("Authorization", "Bearer sample.access.token")
+        )
+        .andExpect(status().isBadRequest())
+        .andExpect(
+            jsonPath("error.errorCode").value(
+                ErrorCode.UNAUTHORIZED_APPOINTMENT_ACCESS.getErrorCode()))
         .andDo(restDocs.document());
   }
 }

@@ -10,4 +10,6 @@ public interface OnGoingAppointmentCachePort {
   void save(AppointmentDetailProjection appointmentDetail, Duration duration);
 
   AppointmentDetailProjection get(String appointmentId);
+
+  void remove(String appointmentId);
 }

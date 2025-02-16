@@ -52,4 +52,9 @@ public class OnGoingAppointmentRedisRepository implements OnGoingAppointmentCach
       return null;
     }
   }
+
+  @Override
+  public void remove(String appointmentId) {
+    redisTemplate.delete(KEY_PREFIX + appointmentId);
+  }
 }

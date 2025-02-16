@@ -3,6 +3,7 @@ package com.ssafy.witch.appointment;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.apoointment.AppointmentEventPublishPort;
+import com.ssafy.witch.apoointment.event.AppointmentEndEvent;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
 import com.ssafy.witch.apoointment.event.AppointmentStartEvent;
 import com.ssafy.witch.event.AppointmentEvent;
@@ -36,6 +37,16 @@ public class AppointmentEventKafkaPublisher implements AppointmentEventPublishPo
     try {
       kafkaTemplate.send(AppointmentEvent.START_APPOINTMENT,
           objectMapper.writeValueAsString(appointmentStartEvent));
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  @Override
+  public void publish(AppointmentEndEvent event) {
+    try {
+      kafkaTemplate.send(AppointmentEvent.END_APPOINTMENT,
+          objectMapper.writeValueAsString(event));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
     }

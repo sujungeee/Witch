@@ -6,7 +6,7 @@ operation::snack-delete-controller-test/delete_snack_200[snippets='http-request,
 
 ==== Failure
 
-===== 존재하지 않는 약속일 시
+===== 존재하지 않는 스낵일 시
 
 operation::snack-delete-controller-test/delete_snack_400_snack_not_exists[snippets='http-response']
 

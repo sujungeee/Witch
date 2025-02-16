@@ -8,6 +8,7 @@ import com.ssafy.witch.group.command.ApproveGroupJoinRequestCommand;
 import com.ssafy.witch.group.command.GetGroupJoinRequestListCommand;
 import com.ssafy.witch.group.command.RejectGroupJoinRequestCommand;
 import com.ssafy.witch.group.event.ApproveGroupJoinRequestEvent;
+import com.ssafy.witch.group.event.RejectGroupJoinRequestEvent;
 import com.ssafy.witch.group.mapper.GroupJoinRequestListOutputMapper;
 import com.ssafy.witch.group.model.GroupJoinRequestProjection;
 import com.ssafy.witch.group.output.GroupJoinRequestListOutput;
@@ -72,6 +73,13 @@ public class HandleGroupJoinRequestService implements HandleGroupJoinRequestUseC
     validateLeaderAuthorization(userId, groupId);
 
     groupJoinRequestPort.deleteById(command.getJoinRequestId());
+
+    User joinMember = userPort.findById(userId)
+        .orElseThrow(GroupJoinRequestNotFoundException::new);
+    GroupWithMemberUsers groupWithFcmTokenMembers = groupReadPort.findGroupWithFcmTokenMember(
+        groupId);
+    groupEventPublishPort.publish(
+        new RejectGroupJoinRequestEvent(joinMember, groupWithFcmTokenMembers));
   }
 
   private void validateLeaderAuthorization(List<GroupMember> groupMembers, String userId) {

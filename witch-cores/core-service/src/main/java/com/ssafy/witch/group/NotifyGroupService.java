@@ -2,6 +2,7 @@ package com.ssafy.witch.group;
 
 import com.ssafy.witch.group.command.NotifyGroupJoinRequestApproveCommand;
 import com.ssafy.witch.group.command.NotifyGroupJoinRequestCommand;
+import com.ssafy.witch.group.command.NotifyGroupJoinRequestRejectCommand;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -35,5 +36,18 @@ public class NotifyGroupService implements NotifyGroupUseCase {
     );
 
     notifyGroupPort.notifyJoinRequestApproved(notification);
+  }
+
+  @Override
+  public void notifyJoinRequestReject(NotifyGroupJoinRequestRejectCommand command) {
+    JoinRequestRejectedNotification notification = new JoinRequestRejectedNotification(
+        command.getGroupId(),
+        command.getGroupName(),
+        command.getTargetUserFcmTokens(),
+        command.getJoinUserNickname(),
+        command.getJoinUserFcmToken()
+    );
+
+    notifyGroupPort.notifyJoinRequestRejected(notification);
   }
 }

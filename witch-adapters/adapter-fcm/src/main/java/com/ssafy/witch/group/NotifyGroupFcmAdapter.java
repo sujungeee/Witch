@@ -39,6 +39,23 @@ public class NotifyGroupFcmAdapter implements NotifyGroupPort {
   }
 
   @Override
+  public void notifyJoinRequestRejected(JoinRequestRejectedNotification notification) {
+    String groupName = notification.getGroupName();
+
+    String title = String.format("[Witch] %s 모임 참여가 거절되었어요.", groupName);
+    String body = "참여 요청을 다시 시도해보세요.";
+
+    Map<String, String> data =
+        createGroupData(GroupEventTopic.GROUP_JOIN_REQUEST_REJECT, notification.getGroupId());
+
+    String fcmToken = notification.getJoinUserFcmToken();
+    WitchNotification joinUserNotification =
+        new WitchNotification(data, fcmToken, title, body);
+    fcmNotificator.sendNotification(joinUserNotification);
+
+  }
+
+  @Override
   public void notifyJoinRequestCreated(JoinRequestCreateNotification notification) {
     String title = String.format("[Witch] %s 모임으로 참여 요청이 도착했어요.", notification.getGroupName());
     String body = String.format("%s 님이 참여를 요청했어요!", notification.getRequestUserNickname());

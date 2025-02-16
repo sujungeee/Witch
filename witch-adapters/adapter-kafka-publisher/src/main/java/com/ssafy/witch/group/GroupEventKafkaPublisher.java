@@ -3,6 +3,7 @@ package com.ssafy.witch.group;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.event.GroupEventTopic;
+import com.ssafy.witch.group.event.ApproveGroupJoinRequestEvent;
 import com.ssafy.witch.group.event.CreateGroupJoinRequestEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +22,17 @@ public class GroupEventKafkaPublisher implements GroupEventPublishPort {
   @Override
   public void publish(CreateGroupJoinRequestEvent event) {
     try {
-      kafkaTemplate.send(GroupEventTopic.JOIN_REQUEST_GROUP,
+      kafkaTemplate.send(GroupEventTopic.GROUP_JOIN_REQUEST,
+          objectMapper.writeValueAsString(event));
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  @Override
+  public void publish(ApproveGroupJoinRequestEvent event) {
+    try {
+      kafkaTemplate.send(GroupEventTopic.GROUP_JOIN_REQUEST_APPROVE,
           objectMapper.writeValueAsString(event));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());

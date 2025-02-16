@@ -20,7 +20,7 @@ public class GroupEventSubscriber {
   private final ObjectMapper objectMapper;
   private final NotifyGroupUseCase notifyGroupUseCase;
 
-  @KafkaListener(topics = GroupEventTopic.JOIN_REQUEST_GROUP)
+  @KafkaListener(topics = GroupEventTopic.GROUP_JOIN_REQUEST)
   public void handleGroupJoinRequestEvent(ConsumerRecord<String, String> data,
       Acknowledgment acknowledgment) {
     try {

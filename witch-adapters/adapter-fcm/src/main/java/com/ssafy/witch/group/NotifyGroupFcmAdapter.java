@@ -19,7 +19,7 @@ public class NotifyGroupFcmAdapter implements NotifyGroupPort {
     String body = String.format("%s 님이 참여를 요청했어요!", notification.getRequestUserNickname());
 
     Map<String, String> data =
-        createGroupData(GroupEventTopic.JOIN_REQUEST_GROUP, notification.getGroupId());
+        createGroupData(GroupEventTopic.GROUP_JOIN_REQUEST, notification.getGroupId());
 
     String fcmToken = notification.getTargetUserFcmToken();
     WitchNotification witchNotification = new WitchNotification(data, fcmToken, title, body);

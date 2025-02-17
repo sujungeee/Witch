@@ -28,8 +28,8 @@ class ApplicationClass : Application() {
     // 코틀린의 전역변수 문법
     companion object {
         //ends with '/'
-        val API_URL = "http://i12d211.p.ssafy.io:30080/"
-//        val API_URL = "http://dukcode.iptime.org/"
+//        val API_URL = "http://i12d211.p.ssafy.io:30080/"
+        val API_URL = "http://dukcode.iptime.org/"
 
         lateinit var sharedPreferencesUtil: SharedPreferencesUtil
         lateinit var retrofitLogin: Retrofit
@@ -116,7 +116,4 @@ class ApplicationClass : Application() {
             return response
         }
     }
-
-
-
 }

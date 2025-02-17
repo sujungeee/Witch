@@ -6,6 +6,7 @@ import com.ssafy.witch.apoointment.AppointmentEventPublishPort;
 import com.ssafy.witch.apoointment.event.AppointmentArrivalEvent;
 import com.ssafy.witch.apoointment.event.AppointmentCreatedEvent;
 import com.ssafy.witch.apoointment.event.AppointmentEndEvent;
+import com.ssafy.witch.apoointment.event.AppointmentExitEvent;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
 import com.ssafy.witch.apoointment.event.AppointmentStartEvent;
 import com.ssafy.witch.event.AppointmentEventTopic;
@@ -72,5 +73,16 @@ public class AppointmentEventKafkaPublisher implements AppointmentEventPublishPo
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
     }
+  }
+
+  @Override
+  public void publish(AppointmentExitEvent event) {
+    try {
+      kafkaTemplate.send(AppointmentEventTopic.APPOINTMENT_EXIT,
+          objectMapper.writeValueAsString(event));
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage());
+    }
+
   }
 }

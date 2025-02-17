@@ -1,8 +1,10 @@
 package com.ssafy.witch.appointment;
 
+import com.ssafy.witch.apoointment.AppointmentEventPublishPort;
 import com.ssafy.witch.apoointment.AppointmentMemberPort;
 import com.ssafy.witch.apoointment.AppointmentPort;
 import com.ssafy.witch.apoointment.OnGoingAppointmentCachePort;
+import com.ssafy.witch.apoointment.event.AppointmentExitEvent;
 import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
 import com.ssafy.witch.apoointment.model.AppointmentMemberProjection;
 import com.ssafy.witch.appointment.command.AppointmentExitCommand;
@@ -23,6 +25,7 @@ public class ExitAppointmentService implements ExitAppointmentUseCase {
   private final AppointmentPort appointmentPort;
   private final AppointmentMemberPort appointmentMemberPort;
   private final OnGoingAppointmentCachePort ongoingAppointmentCachePort;
+  private final AppointmentEventPublishPort appointmentEventPublishPort;
 
   @Transactional
   @Override
@@ -50,6 +53,9 @@ public class ExitAppointmentService implements ExitAppointmentUseCase {
               .toList());
       ongoingAppointmentCachePort.save(appointmentDetailProjection,
           Duration.between(LocalDateTime.now(), appointmentDetailProjection.getAppointmentTime()));
+
+      appointmentEventPublishPort.publish(
+          new AppointmentExitEvent(userId, appointmentDetailProjection));
     }
   }
 

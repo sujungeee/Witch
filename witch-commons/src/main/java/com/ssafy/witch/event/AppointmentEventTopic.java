@@ -7,6 +7,7 @@ public class AppointmentEventTopic {
   public static final String END_APPOINTMENT = "APPOINTMENT_END";
   public static final String ARRIVAL_APPOINTMENT = "APPOINTMENT_ARRIVAL";
   public static final String APPOINTMENT_CREATED = "APPOINTMENT_CREATED";
+  public static final String APPOINTMENT_EXIT = "APPOINTMENT_EXIT";
 
   private AppointmentEventTopic() {
   }

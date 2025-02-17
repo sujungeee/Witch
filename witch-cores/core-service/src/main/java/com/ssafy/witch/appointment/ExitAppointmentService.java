@@ -11,6 +11,9 @@ import com.ssafy.witch.appointment.command.AppointmentExitCommand;
 import com.ssafy.witch.exception.appointment.AppointmentNotFoundException;
 import com.ssafy.witch.exception.appointment.NotJoinedAppointmentException;
 import com.ssafy.witch.exception.appointment.UnauthorizedAppointmentAccessException;
+import com.ssafy.witch.exception.user.UserNotFoundException;
+import com.ssafy.witch.user.User;
+import com.ssafy.witch.user.UserPort;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -26,6 +29,7 @@ public class ExitAppointmentService implements ExitAppointmentUseCase {
   private final AppointmentMemberPort appointmentMemberPort;
   private final OnGoingAppointmentCachePort ongoingAppointmentCachePort;
   private final AppointmentEventPublishPort appointmentEventPublishPort;
+  private final UserPort userPort;
 
   @Transactional
   @Override
@@ -54,8 +58,9 @@ public class ExitAppointmentService implements ExitAppointmentUseCase {
       ongoingAppointmentCachePort.save(appointmentDetailProjection,
           Duration.between(LocalDateTime.now(), appointmentDetailProjection.getAppointmentTime()));
 
+      User user = userPort.findById(userId).orElseThrow(UserNotFoundException::new);
       appointmentEventPublishPort.publish(
-          new AppointmentExitEvent(userId, appointmentDetailProjection));
+          new AppointmentExitEvent(user, appointmentDetailProjection));
     }
   }
 

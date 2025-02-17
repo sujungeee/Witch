@@ -15,7 +15,7 @@ public class FcmNotificator {
 
   public void sendNotification(WitchNotification witchNotification) {
     try {
-      Message message = witchNotification.toMessage(appIconUrl);
+      Message message = witchNotification.toMessage();
       FirebaseMessaging.getInstance().send(message);
     } catch (Exception e) {
       log.error(e.getMessage(), e);

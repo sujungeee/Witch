@@ -2,6 +2,9 @@ package com.ssafy.witch.ui.group
 
 import android.annotation.SuppressLint
 import android.app.Dialog
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -9,9 +12,11 @@ import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.ssafy.witch.R
+import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.data.model.dto.User
@@ -141,8 +146,7 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             if (isGroupLeader) {
                 dialog.findViewById<TextView>(R.id.group_out_dl_tv_title).text="모임을 삭제하시겠습니까?"
                 dialog.findViewById<View>(R.id.group_out_dl_btn_yes).setOnClickListener {
-                    viewModel.deleteGroup()
-                    mainActivity.openFragment(2)
+                    viewModel.deleteGroup(groupId, mainActivity)
                     dialog.dismiss()
                 }
             }
@@ -150,7 +154,6 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
                 dialog.findViewById<TextView>(R.id.group_out_dl_tv_title).text="모임을 나가시겠습니까?"
                 dialog.findViewById<View>(R.id.group_out_dl_btn_yes).setOnClickListener {
                     viewModel.groupOut(groupId, mainActivity)
-                    mainActivity.openFragment(2)
                     dialog.dismiss()
                 }
             }
@@ -265,5 +268,15 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         viewModel.getGroup(groupId)
         viewModel.getGroupAppointments(groupId)
     }
+
+    fun copyToClipboard(text: String) {
+        val clipboard = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+        val clip = ClipData.newPlainText("message", text)
+        clipboard.setPrimaryClip(clip)
+
+        Toast.makeText(requireContext(), "모임 초대 링크가 클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show()
+    }
+
+
 
 }

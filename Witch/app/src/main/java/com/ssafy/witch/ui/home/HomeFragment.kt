@@ -118,10 +118,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
                         val time=TimeConverter().convertToLocalDateTime(it.appointmentTime)
                         time.dayOfMonth == date.day && time.monthValue-1==date.month }) { id ->
                         val intent = Intent(mainActivity, ContentActivity::class.java)
-                        intent.putExtra("openFragment", 2)
+                        intent.putExtra("openFragment", 9)
                         intent.putExtra("id", id)
                         startActivity(intent)
-
 
                     }
                 }

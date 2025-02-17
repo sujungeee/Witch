@@ -135,10 +135,7 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
             appointmentViewModel.toastMsg.observe(viewLifecycleOwner) { msg ->
                 showCustomToast(msg)
                 if (msg == "약속이 생성되었어요!") {
-                    val mainActivity = Intent(requireContext(), MainActivity::class.java)
-                    mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
-                    mainActivity.putExtra("moveFragment", 5)
-                    startActivity(mainActivity)
+                    requireActivity().finish()
                     dialogBuilder.dismiss()
                 }
             }

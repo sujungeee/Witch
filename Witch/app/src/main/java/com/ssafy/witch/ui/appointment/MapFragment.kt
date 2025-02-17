@@ -40,7 +40,8 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.AppointmentDetailItem
-import com.ssafy.witch.data.model.dto.SnackItem
+import com.ssafy.witch.data.model.dto.Snack
+import com.ssafy.witch.data.model.dto.Snacks
 import com.ssafy.witch.databinding.BottomSheetLayoutBinding
 import com.ssafy.witch.databinding.FragmentMapBinding
 import com.ssafy.witch.ui.ContentActivity
@@ -64,7 +65,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         private lateinit var participantsAdapter: AppointmentDetailParticipantsAdapter
         private val participantsList = mutableListOf<AppointmentDetailItem.Participants>()
         private lateinit var appointmentSnackAdapter: AppointmentSnackAdatper
-        private lateinit var snackList: List<SnackItem>
+        private lateinit var snackList: List<Snacks.SnackItem>
 
         private lateinit var timer: TimerHandler
         private lateinit var map: GoogleMap
@@ -82,15 +83,8 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             startWorkManager()
 
             snackList= listOf(
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack),
-                SnackItem(1, R.drawable.example_snack)
+                Snacks.SnackItem("1", "김민지", "2025-02-01", "https://witch-app.s3.ap-northeast-2.amazonaws.com/witch-app/profile/efd1144e-f1b3-4b64-9eb3-b63357369e28.png", "https://witch-s3.s3.ap-northeast-2.amazonaws.com/snack/1.mp3", 37.5665, 126.9780),
+                Snacks.SnackItem("2", "김유라", "2025-02-01", "https://witch-app.s3.ap-northeast-2.amazonaws.com/witch-app/profile/efd1144e-f1b3-4b64-9eb3-b63357369e28.png", "https://witch-s3.s3.ap-northeast-2.amazonaws.com/snack/2.mp3", 37.5665, 126.9780),
             )
         }
 
@@ -182,7 +176,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
 
                     for(participant in it.participants) {
-                        if(participant.isLeader) { // 모임장인 경우
+                        if(participant.isLeader) { // 약속장인 경우
 
                             Glide.with(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile.context)
                                 .load(participant.profileImageUrl)
@@ -196,7 +190,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                             if (participant.userId == appointmentViewModel.userId.value) {
                                 userStatus = 1
                             }
-                        } else { // 모임원인 경우
+                        } else { // 약속원인 경우
                             participantsList.add(participant)
 
                             if (participant.userId == appointmentViewModel.userId.value) {

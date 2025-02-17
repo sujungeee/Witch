@@ -81,8 +81,17 @@ class GroupViewModel : ViewModel() {
         }
     }
 
-    fun deleteGroup(){
+    fun deleteGroup(groupId: String, context: MainActivity){
         // 그룹 삭제
+        viewModelScope.launch {
+            runCatching {
+//                groupService.deleteGroup(groupId)
+            }.onSuccess {
+                context.openFragment(2)
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
     }
 
     fun getGroupMemberList(groupId: String){

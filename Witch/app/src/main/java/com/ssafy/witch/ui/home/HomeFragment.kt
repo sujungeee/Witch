@@ -70,7 +70,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
         binding.homeFgTvUsername.setOnClickListener {
             val intent = Intent(mainActivity, ContentActivity::class.java)
+            intent.putExtra("openFragment", 4)
+            intent.putExtra("id", "15e37865-c0e1-42b3-9213-bfde7849f8c1")
+            startActivity(intent)
+        }
+        binding.textView2.setOnClickListener {
+            val intent = Intent(mainActivity, ContentActivity::class.java)
             intent.putExtra("openFragment", 5)
+            intent.putExtra("id", "69ec8f37-efe7-4cd3-b4c6-000240c8ebc7")
+
             startActivity(intent)
         }
 
@@ -98,9 +106,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun initAdapter(){
-        homeListAdapter = HomeListAdapter(mutableListOf()){ position->
-            (requireActivity() as MainActivity).openFragment(2)
-        }
 
         viewModel.appointmentList.observe(viewLifecycleOwner,{
             dotSchedule()
@@ -118,10 +123,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
                         val time=TimeConverter().convertToLocalDateTime(it.appointmentTime)
                         time.dayOfMonth == date.day && time.monthValue-1==date.month }) { id ->
                         val intent = Intent(mainActivity, ContentActivity::class.java)
-                        intent.putExtra("openFragment", 2)
+                        intent.putExtra("openFragment", 9)
                         intent.putExtra("id", id)
                         startActivity(intent)
-
 
                     }
                 }

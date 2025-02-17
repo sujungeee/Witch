@@ -21,6 +21,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import okhttp3.ResponseBody
+import retrofit2.Converter
+import java.lang.reflect.Type
+import com.google.gson.reflect.TypeToken
+import com.ssafy.witch.data.model.response.ErrorResponse
 
 // 앱이 실행될때 1번만 실행이 됩니다.
 class ApplicationClass : Application() {
@@ -97,23 +102,33 @@ class ApplicationClass : Application() {
             val originalRequest = chain.request()
             val builder = originalRequest.newBuilder()
 
-            val jwtToken = sharedPreferencesUtil.getAccessToken()
-
-            if (!jwtToken.isNullOrEmpty()) {
-                Log.d("AccessTokenInterceptor", "✅ 인터셉터 실행! 저장된 Access Token: $jwtToken")
-                builder.addHeader("Authorization", "Bearer $jwtToken")
+            if (chain.request().url.toString()
+                    .contains("witch-app.s3.ap-northeast-2.amazonaws.com")
+            ) {
+                return chain.proceed(builder.build())
             } else {
-                Log.e("AccessTokenInterceptor", "❌ Access Token 없음! Authorization 헤더 추가 안됨!")
+
+                val jwtToken = sharedPreferencesUtil.getAccessToken()
+
+                if (!jwtToken.isNullOrEmpty()) {
+                    Log.d("AccessTokenInterceptor", "✅ 인터셉터 실행! 저장된 Access Token: $jwtToken")
+                    builder.addHeader("Authorization", "Bearer $jwtToken")
+                } else {
+                    Log.e("AccessTokenInterceptor", "❌ Access Token 없음! Authorization 헤더 추가 안됨!")
+                }
+
+                val response = chain.proceed(builder.build())
+
+                // 401 응답을 받으면 TokenAuthenticator 실행
+                if (response.code == 401) {
+                    Log.e("AccessTokenInterceptor", "🚨 401 응답 받음! TokenAuthenticator에서 처리 필요!")
+                }
+
+                return response
             }
-
-            val response = chain.proceed(builder.build())
-
-            // 401 응답을 받으면 TokenAuthenticator 실행
-            if (response.code == 401) {
-                Log.e("AccessTokenInterceptor", "🚨 401 응답 받음! TokenAuthenticator에서 처리 필요!")
-            }
-
-            return response
         }
     }
+
+
+
 }

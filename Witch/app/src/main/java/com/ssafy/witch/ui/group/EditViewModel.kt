@@ -1,28 +1,28 @@
 package com.ssafy.witch.ui.group
 
 import android.content.Context
-import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
-import androidx.core.content.ContextCompat.startActivity
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.ssafy.witch.base.ApplicationClass
+import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.GroupInfo
 import com.ssafy.witch.data.model.dto.ObjectKey
+import com.ssafy.witch.data.model.dto.User
+import com.ssafy.witch.data.model.response.ErrorResponse
 import com.ssafy.witch.data.model.response.PresignedUrl
-import com.ssafy.witch.data.remote.RetrofitUtil.Companion.authService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.groupService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.s3Service
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.userService
 import com.ssafy.witch.ui.ContentActivity
-import com.ssafy.witch.ui.MainActivity
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.asRequestBody
-import okhttp3.RequestBody.Companion.toRequestBody
 import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -44,7 +44,7 @@ class EditViewModel : ViewModel() {
         get() = _groupName
 
 
-    fun setFile(file: Uri) {
+    fun setFile(file: Uri?) {
         _file.value = file
     }
 
@@ -64,15 +64,16 @@ class EditViewModel : ViewModel() {
         runCatching {
             var response=true
             var presignedUrl = PresignedUrl("",null)
+
             if (file.value != null) {
-            presignedUrl = getPresignedUrl(screen)
-            response = uploadImgS3(presignedUrl.presignedUrl, context)
+                presignedUrl = getPresignedUrl(screen)
+                response = uploadImgS3(presignedUrl.presignedUrl, context)
             }
-            if (response) {
+            if ( file.value == null || response) {
                 when (screen) {
                     "edit" -> editGroupImage(groupId,presignedUrl.objectKey, context)
                     "create" -> createGroup(groupName.value!!, presignedUrl.objectKey, context)
-                    "profile" -> editProfileImage(presignedUrl.objectKey, context)
+                    "profile" -> editProfileImage(presignedUrl, context)
                 }
             } else {
                 throw Exception("업로드 실패")
@@ -99,15 +100,21 @@ class EditViewModel : ViewModel() {
                         }
                     }
                 }.onSuccess {
-                    if (it.success) {
-                        val presignedUrl = it.data!!
-                        Log.d(TAG, "getPresignedUrl: ${presignedUrl.presignedUrl}")
-                        Log.d(TAG, "getPresignedUrl: ${presignedUrl.objectKey}")
+                    if (it.isSuccessful) {
+                        if (it.body()?.success==true) {
+                            val presignedUrl = it.body()?.data!!
+                            Log.d(TAG, "getPresignedUrl: ${presignedUrl.presignedUrl}")
+                            Log.d(TAG, "getPresignedUrl: ${presignedUrl.objectKey}")
 
-                        continuation.resume(presignedUrl)
+                            continuation.resume(presignedUrl)
+                        }
                     } else {
-                        Log.d(TAG, "getPresignedUrl: ${it.error.errorMessage}")
-                        continuation.resumeWithException(Exception(it.error.errorMessage))
+                        Log.d(TAG, "getPresignedUrl: ${it.errorBody()?.string()}")
+
+                        val data = Gson().fromJson(it.errorBody()?.string(), ErrorResponse::class.java)
+
+
+                        continuation.resumeWithException(Exception(data.errorMessage))
                     }
                 }.onFailure {
                     it.printStackTrace()
@@ -148,7 +155,7 @@ class EditViewModel : ViewModel() {
             runCatching {
                 groupService.createGroup(GroupInfo(groupName, groupImageObjectKey))
             }.onSuccess {
-                if (it.success) {
+                if (it.isSuccessful) {
                     context.finish()
                 }
             }.onFailure {
@@ -160,13 +167,13 @@ class EditViewModel : ViewModel() {
     fun editGroupImage(groupId:String,objectKey: String?, context: ContentActivity) {
         viewModelScope.launch {
             runCatching {
-                groupService.editGroupImage(groupId,objectKey)
+                groupService.editGroupImage(groupId,ObjectKey(objectKey))
             }.onSuccess {
-                if (it.success) {
+                if (it.isSuccessful) {
                     Log.d(TAG, "editGroupImage: 성공><")
                     context.finish()
                 } else {
-                    Log.d(TAG, "editGroupImage: ${it.error.errorMessage}")
+                    Log.d(TAG, "editGroupImage: ${it.errorBody()}")
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -174,15 +181,16 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editGroupName(groupId: String,groupName: String) {
+    fun editGroupName(groupId: String,groupName: String, context: ContentActivity) {
         viewModelScope.launch {
             runCatching {
                 groupService.editGroupName(groupId,groupName)
             }.onSuccess {
-                if (it.success) {
+                if (it.isSuccessful) {
+                    context.finish()
                     Log.d(TAG, "editGroupName: 성공><")
                 } else {
-                    Log.d(TAG, "editGroupName: ${it.error.errorMessage}")
+                    Log.d(TAG, "editGroupName: ${it.errorBody()}")
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -190,16 +198,18 @@ class EditViewModel : ViewModel() {
         }
     }
 
-    fun editProfileImage(objectKey: String?, context: ContentActivity) {
+    fun editProfileImage(presignedUrl: PresignedUrl, context: ContentActivity) {
         viewModelScope.launch {
             runCatching {
-                userService.editProfileImage(ObjectKey(objectKey))
+                userService.editProfileImage(ObjectKey(presignedUrl.objectKey))
             }.onSuccess {
-                if (it.success) {
-                    Log.d(TAG, "editProfileImage: 성공><")
+                if (it.isSuccessful) {
+                    val user=ApplicationClass.sharedPreferencesUtil.getUser()
+                    ApplicationClass.sharedPreferencesUtil.addUser(User(user.userId,user.email,user.nickname,presignedUrl.presignedUrl))
+
                     context.finish()
                 } else {
-                    Log.d(TAG, "editProfileImage: ${it.error.errorMessage}")
+                    Log.d(TAG, "editProfileImage: ${it.errorBody()}")
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -212,11 +222,13 @@ class EditViewModel : ViewModel() {
             runCatching {
                 userService.editProfileName(name)
             }.onSuccess {
-                if (it.success) {
+                if (it.isSuccessful) {
+                    val user=ApplicationClass.sharedPreferencesUtil.getUser()
+                    ApplicationClass.sharedPreferencesUtil.addUser(User(user.userId,user.email,name,user.profileImageUrl))
                     context.finish()
                     Log.d(TAG, "editProfileName: 성공><")
                 } else {
-                    Log.d(TAG, "editProfileName: ${it.error.errorMessage}")
+                    Log.d(TAG, "editProfileName: ${it.errorBody()}")
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -235,32 +247,33 @@ class EditViewModel : ViewModel() {
         return file
     }
 
-    fun checkdupl(name:String, screen: String, context: ContentActivity){
+    fun checkDupl(name:String, screen: String, context: ContentActivity){
         viewModelScope.launch {
             runCatching {
-                when(screen){
+                when(screen) {
                     "group" -> groupService.checkGroupName(name)
                     "profile" -> userService.checkNicknameUnique(name)
-                    else -> throw Exception("잘못된 screen")
+                    else -> {
+                        throw Exception("잘못된 screen")
+                    }
                 }
             }.onSuccess {
                 if (it.isSuccessful) {
-                    if (it.body()!=null && it.body()!!.success) {
-                        Log.d(TAG, "checkdupl: 성공><")
-                        Toast.makeText(context, "사용 가능한 이름입니다.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, "사용 가능한 이름입니다.", Toast.LENGTH_SHORT).show()
+                }else{
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        Toast.makeText(context, data.error.errorMessage , Toast.LENGTH_SHORT).show()
                     }
-                }else if(it.code()==400){
-                    it.body()?.let { body ->
-                        Toast.makeText(context, body.error.errorMessage, Toast.LENGTH_SHORT).show()
-                    }
-                    Log.d(TAG, "checkdupl: ${it.errorBody()?.string()}")
                 }
             }.onFailure {
                 it.printStackTrace()
             }
         }
-
     }
+
+
+
 
 
 

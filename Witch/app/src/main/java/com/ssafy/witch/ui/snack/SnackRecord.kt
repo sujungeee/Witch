@@ -1,7 +1,6 @@
-package com.ssafy.witch.ui.group
+package com.ssafy.witch.ui.snack
 
 import android.app.Dialog
-import android.content.Context
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -9,27 +8,31 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import androidx.core.view.isGone
 import androidx.fragment.app.Fragment
 import com.ssafy.witch.R
 import com.ssafy.witch.databinding.DialogSnackRecordBinding
-import com.ssafy.witch.ui.snack.SnackCreateViewModel
+import java.io.File
 
 
 private const val TAG = "SnackRecord"
-class SnackRecord(    private val fragment: Fragment,
-                      private val viewModel: SnackCreateViewModel,
-                      private val requestPermissionLauncher: ActivityResultLauncher<String>
+class SnackRecord(private val fragment: Fragment,
+                  private val viewModel: SnackCreateViewModel,
+                  private val requestPermissionLauncher: ActivityResultLauncher<String>
 ) {
     private var audioName=""
 
     private  var mediaRecorder: MediaRecorder = MediaRecorder()
 
     private lateinit var mediaPlayer: MediaPlayer
+
+    private var path: String? = null
+
+    private var file: File = File("")
+
 
     fun recordDialog() {
         val dialogBinding= DialogSnackRecordBinding.inflate(fragment.layoutInflater)
@@ -38,6 +41,7 @@ class SnackRecord(    private val fragment: Fragment,
         dialog.setContentView(dialogBinding.root)
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
 
+
         dialog.setOnDismissListener {
             stopRecord(true)
         }
@@ -45,7 +49,7 @@ class SnackRecord(    private val fragment: Fragment,
         dialogBinding.snackRecordDlTvTitle.text = "스낵을 입력해주세요"
 
         dialogBinding.snackRecordDlBtnYes.setOnClickListener {
-            viewModel.setAudio(Uri.parse(audioName))
+            viewModel.setAudio(File(audioName).toUri())
             dialog.dismiss()
         }
 
@@ -59,7 +63,7 @@ class SnackRecord(    private val fragment: Fragment,
             initRecord(dialogBinding)
             if (audioName.isNotEmpty() && viewModel.recordState.value == false) {
                 dialogBinding.snackRecordDlTvFilePlay.isGone = false
-                dialogBinding.snackRecordDlTvFileText.setOnClickListener {
+                dialogBinding.snackRecordDlTvFilePlay.setOnClickListener {
                     playRecord()
                 }
             }else{
@@ -76,6 +80,7 @@ class SnackRecord(    private val fragment: Fragment,
             dialogBinding.snackRecordDlIvRecord.setImageResource(R.drawable.record_stop)
 
             if (ActivityCompat.checkSelfPermission(fragment.requireContext(), android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+
                 startRecord()
             } else {
                 requestPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
@@ -92,29 +97,37 @@ class SnackRecord(    private val fragment: Fragment,
     }
 
     fun startRecord() {
-        val path = fragment.requireContext().getExternalFilesDir("/")?.absolutePath
+        path = fragment.requireContext().getExternalFilesDir("/")?.absolutePath // 🔥 path 설정
 
-        audioName = path + "/record.mp3"
+        audioName = "$path/${System.currentTimeMillis()}.mp3" // 🔥 path 활용
 
+        file = File(audioName)
+        file.parentFile?.mkdirs()
+        file.createNewFile()
 
-        mediaRecorder.setAudioSource(MediaRecorder.AudioSource.DEFAULT)
-        mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS)
-        mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
-        mediaRecorder.setOutputFile(audioName)
 
         try {
-            mediaRecorder.prepare()
-            mediaRecorder.start()
+            mediaRecorder.apply {
+                setAudioSource(MediaRecorder.AudioSource.MIC) // 🔥 에러 발생 지점
+                setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+                setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+                setOutputFile(audioName)
+                prepare()
+                start()
+            }
         } catch (e: Exception) {
-            e.printStackTrace()
+            Log.e(TAG, "startRecord: 녹음 시작 실패", e)
         }
     }
+
 
 
     fun stopRecord(onDismiiss: Boolean = false) {
 
         if(viewModel.recordState.value == true ){
-            mediaRecorder.stop()
+            if(mediaRecorder != null) {
+                mediaRecorder.stop()
+            }
         }
 
         mediaRecorder.release()
@@ -129,7 +142,7 @@ class SnackRecord(    private val fragment: Fragment,
         mediaPlayer = MediaPlayer()
 
         try {
-            mediaPlayer.setDataSource(viewModel.audioFile.value.toString())
+            mediaPlayer.setDataSource(audioName)
             mediaPlayer.prepare()
             mediaPlayer.start()
             Log.d(TAG, "playRecord: ")

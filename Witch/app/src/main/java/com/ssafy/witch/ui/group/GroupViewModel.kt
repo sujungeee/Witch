@@ -62,7 +62,7 @@ class GroupViewModel : ViewModel() {
             runCatching {
                 groupService.getGroup(groupId)
             }.onSuccess {
-                _group.value = it.data ?: GroupResponse(0, "", "", false, "")
+                _group.value = it.body()?.data ?: GroupResponse(0, "", "", false, "")
             }.onFailure {
                 it.printStackTrace()
             }
@@ -81,8 +81,17 @@ class GroupViewModel : ViewModel() {
         }
     }
 
-    fun deleteGroup(){
+    fun deleteGroup(groupId: String, context: MainActivity){
         // 그룹 삭제
+        viewModelScope.launch {
+            runCatching {
+//                groupService.deleteGroup(groupId)
+            }.onSuccess {
+                context.openFragment(2)
+            }.onFailure {
+                it.printStackTrace()
+            }
+        }
     }
 
     fun getGroupMemberList(groupId: String){
@@ -92,7 +101,7 @@ class GroupViewModel : ViewModel() {
                 groupService.getGroupMembers(groupId)
             }.onSuccess {
                 // 멤버 리스트 받아오기
-                _groupMember.value = it.data?.members
+                _groupMember.value = it.body()?.data?.members
             }.onFailure {
                 it.printStackTrace()
             }
@@ -106,7 +115,7 @@ class GroupViewModel : ViewModel() {
                 groupService.getJoinRequests(groupId)
             }.onSuccess {
                 // 가입 신청자 리스트 받아오기
-                _groupJoinList.value = it.data?.joinRequests
+                _groupJoinList.value = it.body()?.data?.joinRequests
             }.onFailure {
                 it.printStackTrace()
             }
@@ -148,7 +157,7 @@ class GroupViewModel : ViewModel() {
                 appointmentService.getGroupAppointments(groupId)
             }.onSuccess {
                 // 일정 리스트 받아오기
-                _groupAppointments.value = it.data?.appointments
+                _groupAppointments.value = it.body()?.data?.appointments
             }.onFailure {
                 it.printStackTrace()
             }

@@ -1,23 +1,7 @@
 package com.ssafy.witch.ui.mypage
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -25,14 +9,11 @@ import com.bumptech.glide.Glide
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.databinding.FragmentMyPageBinding
 import com.ssafy.witch.databinding.FragmentProfileEditBinding
 import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.group.EditViewModel
-import com.ssafy.witch.ui.group.GroupViewModel
 import com.ssafy.witch.util.ImagePicker
 import kotlinx.coroutines.launch
-import java.io.File
 
 
 private const val TAG = "ProfileEditFragment"
@@ -65,7 +46,7 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
         }
 
         binding.profileEditFgBtnDuplCheck.setOnClickListener {
-            viewModel.checkdupl(binding.profileEditFgEtNickname.text.toString(), "profile", requireContext() as ContentActivity).apply {
+            viewModel.checkDupl(binding.profileEditFgEtNickname.text.toString(), "profile", requireContext() as ContentActivity).apply {
                 binding.profileEditFgBtnNameChange.isEnabled = true
             }
         }
@@ -90,7 +71,9 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
 
         imagePickerUtil = ImagePicker(this) { uri ->
             viewModel.setFile(uri)
-            binding.profileEditFgIvProfileImage.setImageURI(uri)
+            Glide.with(requireContext())
+                .load(uri)
+                .into(binding.profileEditFgIvProfileImage)
         }
 
         binding.profileEditFgBtnImageUpload.setOnClickListener {

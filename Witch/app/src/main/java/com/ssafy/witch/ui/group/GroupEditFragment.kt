@@ -1,30 +1,27 @@
 package com.ssafy.witch.ui.group
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.databinding.FragmentGroupCreateBinding
 import com.ssafy.witch.databinding.FragmentGroupEditBinding
 import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.util.ImagePicker
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
+
+private const val TAG = "GroupEditFragment"
 class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEditBinding::bind, R.layout.fragment_group_edit) {
 
     private val viewModel: EditViewModel by viewModels()
-    private var imageUri: Uri? = null
+    private val groupViewModel: GroupViewModel by viewModels()
+
     private lateinit var imagePickerUtil: ImagePicker
     private var groupId = ""
 
@@ -33,24 +30,63 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initObserver()
+
+        groupViewModel.getGroup(groupId)
+
+
         binding.groupEditFgBtnNameChange.setOnClickListener{
-            viewModel.editGroupName(groupId, binding.groupEditFgEtNickname.text.toString())
+            viewModel.editGroupName(groupId, binding.groupEditFgEtNickname.text.toString() , requireContext() as ContentActivity)
         }
 
 
         binding.groupEditFgBtnPhotoChange.setOnClickListener {
+            Log.d(TAG, "onViewCreated: ${viewModel.file.value}")
             lifecycleScope.launch {
                 viewModel.uploadImage("edit", requireContext() as ContentActivity, groupId)
             }
         }
 
         imagePickerUtil = ImagePicker(this) { uri ->
+            Log.d(TAG, "onViewCreated: $uri")
             viewModel.setFile(uri)
-            binding.groupEditFgIvProfileImage.setImageURI(uri)
+            Glide.with(requireContext())
+                .load(uri)
+                .into(binding.groupEditFgIvProfileImage)
         }
 
         binding.groupEditFgBtnImageUpload.setOnClickListener {
             imagePickerUtil.checkPermissionAndOpenGallery()
+        }
+
+        binding.groupEditFgEtNickname.doOnTextChanged { text, start, before, count ->
+            binding.groupEditFgBtnNameChange.isEnabled = false
+        }
+
+        binding.groupEditFgBtnImageDelete.setOnClickListener {
+            binding.groupEditFgIvProfileImage.setImageResource(R.drawable.circle_shape)
+            viewModel.deleteFile()
+        }
+
+        binding.groupEditFgBtnDuplCheck.setOnClickListener {
+            val newName = binding.groupEditFgEtNickname.text.toString()
+            if (groupViewModel.group.value?.name == newName) {
+                Toast.makeText(requireContext(), "현재 사용중인 이름입니다.", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            } else {
+                viewModel.checkDupl(newName, "group", requireContext() as ContentActivity).apply {
+                    binding.groupEditFgBtnNameChange.isEnabled = true
+                }
+            }
+        }
+    }
+
+    private fun initObserver(){
+        groupViewModel.group.observe(viewLifecycleOwner){
+            binding.groupEditFgEtNickname.setText(it.name)
+            Glide.with(requireContext())
+                .load(it.groupImageUrl)
+                .into(binding.groupEditFgIvProfileImage)
         }
     }
 

@@ -21,7 +21,7 @@ class TimeConverter {
         Log.d(TAG, "calDaysDiff: $givenDate")
         Log.d(TAG, "calDaysDiff:  $currentDate")
         
-        return ChronoUnit.DAYS.between(givenDate, currentDate).toInt()
+        return ChronoUnit.DAYS.between(givenDate, currentDate).toInt() +1
     }
 
 

@@ -41,7 +41,6 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.AppointmentDetailItem
-import com.ssafy.witch.data.model.dto.SnackItem
 import com.ssafy.witch.data.model.response.SnackResponse
 import com.ssafy.witch.databinding.BottomSheetLayoutBinding
 import com.ssafy.witch.databinding.FragmentMapBinding
@@ -169,7 +168,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                         setTimer(LocalDateTime.parse(it.appointmentTime))
                         timerFlag = true
                     }
-                    
+
                     showSnackArea(it.appointmentStatus)
                 }
                 // 위치 표시

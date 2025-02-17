@@ -23,4 +23,8 @@ class LoadingDialog(context: Context) : Dialog(context) {
     override fun show() {
         if(!this.isShowing) super.show()
     }
+
+    override fun dismiss() {
+        if(this.isShowing) super.dismiss()
+    }
 }

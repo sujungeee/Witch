@@ -5,11 +5,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ssafy.witch.apoointment.event.AppointmentArrivalEvent;
 import com.ssafy.witch.apoointment.event.AppointmentCreatedEvent;
 import com.ssafy.witch.apoointment.event.AppointmentEndEvent;
+import com.ssafy.witch.apoointment.event.AppointmentExitEvent;
 import com.ssafy.witch.apoointment.event.AppointmentJoinEvent;
 import com.ssafy.witch.apoointment.event.AppointmentStartEvent;
 import com.ssafy.witch.appointment.command.NotifyAppointmentArrivalCommand;
 import com.ssafy.witch.appointment.command.NotifyAppointmentCreatedCommand;
 import com.ssafy.witch.appointment.command.NotifyAppointmentEndCommand;
+import com.ssafy.witch.appointment.command.NotifyAppointmentExitCommand;
 import com.ssafy.witch.appointment.command.NotifyAppointmentJoinCommand;
 import com.ssafy.witch.appointment.command.NotifyAppointmentStartCommand;
 import com.ssafy.witch.event.AppointmentEventTopic;
@@ -92,6 +94,20 @@ public class AppointEventSubscriber {
 
       notifyAppointmentUseCase.notifyCreated(
           new NotifyAppointmentCreatedCommand(event));
+    } catch (JsonProcessingException e) {
+      log.error(e.getMessage());
+    }
+  }
+
+  @KafkaListener(topics = AppointmentEventTopic.APPOINTMENT_EXIT)
+  public void handleAppointmentExitEvent(ConsumerRecord<String, String> data,
+      Acknowledgment acknowledgment) {
+    try {
+      AppointmentExitEvent event = objectMapper.readValue(data.value(),
+          AppointmentExitEvent.class);
+
+      notifyAppointmentUseCase.notifyExit(
+          new NotifyAppointmentExitCommand(event));
     } catch (JsonProcessingException e) {
       log.error(e.getMessage());
     }

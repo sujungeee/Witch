@@ -3,9 +3,12 @@ package com.ssafy.witch.appointment;
 import com.ssafy.witch.apoointment.AppointmentArrivalNotification;
 import com.ssafy.witch.apoointment.AppointmentCreatedNotification;
 import com.ssafy.witch.apoointment.AppointmentEndNotification;
+import com.ssafy.witch.apoointment.AppointmentExitNotification;
 import com.ssafy.witch.apoointment.AppointmentJoinNotification;
 import com.ssafy.witch.apoointment.AppointmentStartNotification;
 import com.ssafy.witch.apoointment.NotifyAppointmentPort;
+import com.ssafy.witch.apoointment.model.AppointmentDetailProjection;
+import com.ssafy.witch.apoointment.model.AppointmentMemberProjection;
 import com.ssafy.witch.event.AppointmentEventTopic;
 import com.ssafy.witch.group.GroupMemberUser;
 import com.ssafy.witch.group.GroupWithMemberUsers;
@@ -138,6 +141,26 @@ public class NotifyAppointmentFcmAdapter implements NotifyAppointmentPort {
       fcmNotificator.sendNotification(witchNotification);
     }
 
+  }
+
+  @Override
+  public void notifyAppointmentExit(AppointmentExitNotification notification) {
+    AppointmentDetailProjection appointment = notification.getAppointment();
+    String exitUserNickname = notification.getExitUser().getNickname();
+
+    String title = String.format("%s 약속에서 %s 님이 탈했어요.", appointment.getName(), exitUserNickname);
+    String body = "약속 참여자 목록을 확인해 보세요!";
+
+    Map<String, String> appointmentData = createAppointmentData(
+        AppointmentEventTopic.APPOINTMENT_EXIT, appointment.getAppointmentId());
+
+    List<AppointmentMemberProjection> members = appointment.getMembers();
+    for (AppointmentMemberProjection member : members) {
+      String fcmToken = member.getFcmToken();
+      WitchNotification witchNotification =
+          new WitchNotification(appointmentData, fcmToken, title, body);
+      fcmNotificator.sendNotification(witchNotification);
+    }
   }
 
   private Map<String, String> createAppointmentData(String appointmentType,

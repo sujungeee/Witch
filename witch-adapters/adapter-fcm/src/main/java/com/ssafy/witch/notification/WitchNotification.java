@@ -15,11 +15,10 @@ public class WitchNotification {
   private String title;
   private String body;
 
-  public Message toMessage(String appIconUrl) {
+  public Message toMessage() {
     Notification notification = Notification.builder()
         .setTitle(title)
         .setBody(body)
-        .setImage(appIconUrl)
         .build();
     return Message.builder()
         .setToken(token)

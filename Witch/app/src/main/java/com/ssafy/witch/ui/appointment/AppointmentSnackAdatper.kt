@@ -4,7 +4,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.ssafy.witch.data.model.dto.SnackItem
 import com.ssafy.witch.data.model.response.SnackResponse
 import com.ssafy.witch.databinding.SnackItemBinding
 

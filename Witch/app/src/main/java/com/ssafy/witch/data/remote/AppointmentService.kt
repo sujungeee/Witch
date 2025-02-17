@@ -21,7 +21,7 @@ interface AppointmentService {
     suspend fun getMyAppointments(
         @Query("year") year: Int,
         @Query("month") month: Int
-    ): BaseResponse<MyAppointmentResponse>
+    ): Response<BaseResponse<MyAppointmentResponse>>
 
     @GET("/appointments/me")
     suspend fun getNextAppointments(
@@ -32,7 +32,7 @@ interface AppointmentService {
     @GET("/groups/{groupId}/appointments")
     suspend fun getGroupAppointments(
         @Path("groupId") groupId: String,
-    ): BaseResponse<MyAppointmentResponse>
+    ): Response<BaseResponse<MyAppointmentResponse>>
 
     @GET("/appointments/{appointmentId}")
     suspend fun getAppointmentInfo(

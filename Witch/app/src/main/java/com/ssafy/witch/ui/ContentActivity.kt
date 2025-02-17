@@ -41,7 +41,6 @@ class ContentActivity  : BaseActivity<ActivityContentBinding>(ActivityContentBin
             3 -> transaction.replace(R.id.content_flayout, ProfileEditFragment())
             4 -> transaction.replace(R.id.content_flayout, SnackFragment.newInstance("snackId", id))
             5 -> transaction.replace(R.id.content_flayout, SnackCreateFragment.newInstance("appointmentId", id))
-                .addToBackStack(null)
             6 -> transaction.replace(R.id.content_flayout, AppointmentCreate1Fragment.newInstance("groupId", id))
             7 -> transaction.replace(R.id.content_flayout, AppointmentCreate2Fragment())
                 .addToBackStack(null)

@@ -5,12 +5,15 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.view.Gravity
+import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.android.gms.maps.model.LatLng
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
+import com.ssafy.witch.data.model.dto.Snack
 import com.ssafy.witch.data.model.response.MyAppointmentResponse
 import com.ssafy.witch.data.model.response.PresignedUrl
 import com.ssafy.witch.data.remote.RetrofitUtil
@@ -28,7 +31,9 @@ import java.io.File
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
+import kotlin.math.log
 
+private const val TAG = "SnackCreateViewModel"
 class SnackCreateViewModel : ViewModel() {
     private val _selectedButton = MutableLiveData<Int>(1)
     val selectedButton: LiveData<Int>
@@ -103,7 +108,7 @@ class SnackCreateViewModel : ViewModel() {
         _textAlign.value = align
     }
 
-    suspend fun uploadSnack(context: Context, uri: Uri) {
+    suspend fun uploadSnack(context: Context,appointmentId: String, location: LatLng, image: Uri, audio: Uri?) {
         var audioPresignedUrl = PresignedUrl("", "")
         runCatching {
             val imagePresignedUrl = getPresignedUrl("image")
@@ -111,10 +116,10 @@ class SnackCreateViewModel : ViewModel() {
                 audioPresignedUrl = getPresignedUrl("audio")
             }
 
-            val response= uploadSnackToS3(imagePresignedUrl, audioPresignedUrl, uri, _audioFile.value, context)
+            val response= uploadSnackToS3(imagePresignedUrl, audioPresignedUrl, image, audio, context)
 
             if (response) {
-                createSnack()
+                createSnack(appointmentId, Snack(location.latitude, location.longitude, imagePresignedUrl.objectKey, audioPresignedUrl.objectKey))
                 Log.d("uploadSnack", "업로드 성공")
             } else {
                 throw Exception("업로드 실패")
@@ -130,17 +135,17 @@ class SnackCreateViewModel : ViewModel() {
                 runCatching {
                     when (type) {
                         "image" -> snackService.getImagePresignedUrl("filename.png")
-                        "audio" -> snackService.getAudioPresignedUrl("filename.png")
+                        "audio" -> snackService.getAudioPresignedUrl("filename.mp3")
                         else -> {
                             throw Exception("잘못된 type")
                         }
                     }
                 }.onSuccess {
-                    if (it.success) {
-                        val presignedUrl = it.data!!
+                    if (it.isSuccessful) {
+                        val presignedUrl = it.body()?.data!!
                         continuation.resume(presignedUrl)
                     } else {
-                        continuation.resumeWithException(Exception(it.error.errorMessage))
+                        continuation.resumeWithException(Exception(it.errorBody().toString()))
                     }
                 }.onFailure {
                     it.printStackTrace()
@@ -180,24 +185,32 @@ class SnackCreateViewModel : ViewModel() {
 
 
     fun getFileFromUri(context: Context, uri: Uri?): File {
-        val inputStream = uri?.let { context.contentResolver.openInputStream(it) }
-        val file = File(context.cacheDir, "upload_image.jpg") // 임시 저장소에 파일 생성
-        inputStream.use { input ->
-            file.outputStream().use { output ->
-                input?.copyTo(output)
+        Log.d(TAG, "getFileFromUri: $uri")
+
+        return when (uri?.scheme) {
+            "file" -> File(uri.path!!) // 🔥 직접 File 변환
+            "content" -> {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val file = File(context.cacheDir, "upload_audio.mp3") // 🔥 파일명 변경
+                inputStream.use { input ->
+                    file.outputStream().use { output ->
+                        input?.copyTo(output)
+                    }
+                }
+                file
             }
+            else -> throw IllegalArgumentException("지원하지 않는 Uri 형식")
         }
-        return file
     }
 
 
-    fun createSnack(){
+
+    fun createSnack(appointmentId:String, snack: Snack){
         viewModelScope.launch {
             runCatching {
-                // Todo : snackInfo 생성
-                snackService.createSnack()
+                snackService.createSnack(appointmentId,snack)
             }.onSuccess {
-                if (it.success) {
+                if (it.isSuccessful) {
                     Log.d("createSnack", "스낵 생성 성공")
                 } else {
                     Log.d("createSnack", "스낵 생성 실패")

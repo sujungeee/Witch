@@ -3,12 +3,10 @@ package com.ssafy.witch.base
 import android.app.Application
 import android.content.Context
 import android.util.Log
+import androidx.lifecycle.ViewModelStore
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.ssafy.witch.data.local.SharedPreferencesUtil
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.Interceptor
@@ -35,6 +33,7 @@ class ApplicationClass : Application() {
 
         // JWT Token Header 키 값
         const val ACCESS_TOKEN = "ACCESS-TOKEN"
+
     }
 
     // 앱이 처음 생성되는 순간, SP를 새로 만들어주고, 레트로핏 인스턴스를 생성합니다.

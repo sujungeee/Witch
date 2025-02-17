@@ -96,4 +96,6 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.9.0"))
     implementation ("com.google.firebase:firebase-messaging-ktx")
 
+    // LifecycleService
+    implementation("androidx.lifecycle:lifecycle-service:2.7.0")
 }

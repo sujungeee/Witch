@@ -24,4 +24,7 @@ public class AppointmentDetailProjection {
 
   private List<AppointmentMemberProjection> members;
 
+  public void setMemberList(List<AppointmentMemberProjection> members) {
+    this.members = members;
+  }
 }

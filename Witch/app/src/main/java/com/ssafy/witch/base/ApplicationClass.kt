@@ -20,6 +20,11 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import java.io.IOException
 import java.util.concurrent.TimeUnit
+import okhttp3.ResponseBody
+import retrofit2.Converter
+import java.lang.reflect.Type
+import com.google.gson.reflect.TypeToken
+import com.ssafy.witch.data.model.response.ErrorResponse
 
 // 앱이 실행될때 1번만 실행이 됩니다.
 class ApplicationClass : Application() {
@@ -27,7 +32,8 @@ class ApplicationClass : Application() {
     // 코틀린의 전역변수 문법
     companion object {
         //ends with '/'
-        val API_URL = "http://192.168.100.138:8080/"
+//        val API_URL = "http://i12d211.p.ssafy.io:30080/"
+        val API_URL = "http://dukcode.iptime.org/"
 
         lateinit var sharedPreferencesUtil: SharedPreferencesUtil
         lateinit var retrofit: Retrofit
@@ -58,7 +64,6 @@ class ApplicationClass : Application() {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
-
     }
 
     //GSon은 엄격한 json type을 요구하는데, 느슨하게 하기 위한 설정. success, fail이 json이 아니라 단순 문자열로 리턴될 경우 처리..
@@ -71,12 +76,18 @@ class ApplicationClass : Application() {
         @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain): Response {
             val builder: Request.Builder = chain.request().newBuilder()
-            //Todo 로그인 구현 시 추가하기
-            val jwtToken = sharedPreferencesUtil.getAccessToken()
-            if (!jwtToken.isNullOrEmpty()) {
-                builder.addHeader("Authorization", "Bearer $jwtToken")
+            if (chain.request().url.toString()
+                    .contains("witch-app.s3.ap-northeast-2.amazonaws.com")
+            ) {
+                return chain.proceed(builder.build())
+            } else {
+                val jwtToken = sharedPreferencesUtil.getAccessToken()
+                if (!jwtToken.isNullOrEmpty()) {
+                    builder.addHeader("Authorization", "Bearer $jwtToken")
+                }
+                return chain.proceed(builder.build())
             }
-            return chain.proceed(builder.build())
         }
     }
 }
+

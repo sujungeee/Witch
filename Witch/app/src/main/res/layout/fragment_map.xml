@@ -22,6 +22,7 @@
                 android:background="@drawable/circle_btn"
                 android:textColor="@color/witch_black"
                 android:gravity="center"
+                android:visibility="invisible"
                 android:layout_marginEnd="32dp"
                 app:layout_constraintBottom_toBottomOf="@+id/map_ac_tv2"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -41,7 +42,7 @@
                 android:singleLine="true"
                 android:ellipsize="marquee"
                 android:textColor="@color/witch_white"
-                android:textSize="28sp"
+                android:textSize="24sp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -50,10 +51,10 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/pretendard_semibold"
-                android:text="약속까지"
+                android:text="약속 시작까지"
                 android:textColor="@color/witch_white"
-                android:textSize="28sp"
-                android:layout_marginStart="8dp"
+                android:textSize="24sp"
+                android:layout_marginStart="6dp"
                 app:layout_constraintTop_toTopOf="@+id/map_ac_tv_appointment_name"
                 app:layout_constraintLeft_toRightOf="@+id/map_ac_tv_appointment_name"/>
 
@@ -64,7 +65,7 @@
                 android:fontFamily="@font/pretendard_semibold"
                 android:text="09 : 12"
                 android:textColor="@color/witch_green"
-                android:textSize="34sp"
+                android:textSize="32sp"
                 android:layout_marginStart="30dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/map_ac_tv_appointment_name" />
@@ -77,7 +78,7 @@
                 android:fontFamily="@font/pretendard_semibold"
                 android:text="남았어요!"
                 android:textColor="@color/witch_green"
-                android:textSize="16sp"
+                android:textSize="14sp"
                 android:layout_marginStart="8dp"
                 android:layout_marginBottom="7dp"
                 app:layout_constraintBottom_toBottomOf="@+id/map_ac_tv_remainder_time"
@@ -115,6 +116,7 @@
                     android:layout_height="match_parent" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/map_fg_cl_snack_area"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
@@ -146,9 +148,10 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="12dp"
-                            android:text="스낵을 생성해보세요!"
+                            android:layout_marginTop="2dp"
+                            android:text="눌러서 스낵 생성하러 가기!"
                             android:textColor="@color/witch_white"
-                            android:textSize="12sp" />
+                            android:textSize="10sp" />
 
                     </FrameLayout>
 

@@ -6,10 +6,9 @@ import com.ssafy.witch.data.model.dto.Snack
 import com.ssafy.witch.data.model.response.GroupListResponse
 import com.ssafy.witch.data.model.response.PresignedUrl
 import retrofit2.Response
+import com.ssafy.witch.data.model.response.SnackResponse
 import retrofit2.http.Body
-import retrofit2.http.Field
 import retrofit2.http.GET
-import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -38,9 +37,9 @@ interface SnackService {
     ) : Response<BaseResponse<Snack>>
 
 
-    @GET("/snacks/{appointmentId}")
+    @GET("/appointment/{appointmentid}/snacks")
     suspend fun getSnackList(
-        @Path("appointmentId") appointmentId: String
-    ) : Response<BaseResponse<List<Snack>>>
+        @Path("appointmentid") appointmentId: String
+    ) : Response<BaseResponse<SnackResponse>>
 
 }

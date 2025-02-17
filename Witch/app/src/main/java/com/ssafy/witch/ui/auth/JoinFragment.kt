@@ -75,7 +75,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
                     binding.joinFgLlSendVeriNumGroup.isGone = false
                     isEmailChecked = true
                 } else {
-                    showToast(message ?: "이메일 중복 확인 불가")
+                    showToast("이메일 중복되었습니다.")
                     binding.joinFgTvEmailDuplFail.isGone = false
                     isEmailChecked = false
                     //API가 실패해도 인증번호 요청 버튼 활성화 - 테스트용
@@ -107,7 +107,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
                         binding.joinFgTvEmailVerificationCountText.isGone = true
                     }
                 } else {
-                    showToast(message ?: "인증번호 전송 실패")
+                    showToast("인증번호 전송 실패")
                 }
                 binding.joinFgLlCheckVeriNumGroup.isVisible = true   // 인증번호 입력란 표시
                 startVerificationTimer(599) // 10분 타이머 시작
@@ -134,7 +134,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
 
                     updateJoinButtonState() // 버튼 상태 업데이트
                 } else {
-                    showToast(message ?: "인증 실패 (테스트용으로 진행)")
+                    showToast("인증 실패")
                 }
             }
         }
@@ -159,7 +159,7 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
                     isNickChecked = true
                     binding.joinFgTvNickDuplFail.isGone = true
                 } else {
-                    showToast(message ?: "닉네임 중복됨")
+                    showToast("닉네임이 중복되었습니다.")
                     //회원가입 버튼 비활성화 색 변경
                     isNickChecked = false
                     binding.joinFgTvNickDuplFail.isGone = false
@@ -202,10 +202,10 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
 
             viewModel.registerUser(joinRequest) { success, message ->
                 if (success) {
-                    showToast("회원가입 성공!")
+                    showToast("회원가입이 완료되었습니다.\n 로그인 후 이용해주세요.")
                     loginActivity.openFragment(3)
                 } else {
-                    showToast(message ?: "회원가입 실패")
+                    showToast("회원가입에 실패하였습니다.")
                 }
             }
         }
@@ -329,8 +329,11 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
         // 4. 이메일 인증이 완료되어야 함
         val isVerificationCompleted = isEmailVerified
 
-        // 5. 모든 조건이 만족할 때만 회원가입 버튼 활성화
-        val isJoinEnabled = isInputValid && isDuplicateChecked && isPasswordMatching && isVerificationCompleted
+        // 5. 비밀번호가 8자 이상이어야 함
+        val isLengthValid = password.length >= 8
+
+        // 6. 모든 조건이 만족할 때만 회원가입 버튼 활성화
+        val isJoinEnabled = isInputValid && isDuplicateChecked && isPasswordMatching && isVerificationCompleted && isLengthValid
 
         binding.joinFgBtnJoin.isEnabled = isJoinEnabled
         if (isJoinEnabled) {

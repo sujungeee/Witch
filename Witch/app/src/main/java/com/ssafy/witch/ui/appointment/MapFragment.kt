@@ -16,18 +16,16 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.widget.Button
+import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -35,57 +33,51 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.data.model.dto.AppointmentDetailItem
-import com.ssafy.witch.data.model.dto.Snack
-import com.ssafy.witch.data.model.dto.Snacks
+import com.ssafy.witch.data.model.response.SnackResponse
 import com.ssafy.witch.databinding.BottomSheetLayoutBinding
 import com.ssafy.witch.databinding.FragmentMapBinding
 import com.ssafy.witch.ui.ContentActivity
+import com.ssafy.witch.ui.MainActivity
+import com.ssafy.witch.ui.snack.SnackCreateViewModel
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import java.util.concurrent.TimeUnit
 
 private const val TAG = "MapFragment_Witch"
 class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),
     OnMapReadyCallback {
         private var userStatus = 3
-        private var appointmentStatus = ""
-
         private var appointmentId = ""
 
         private val appointmentViewModel: AppointmentViewModel by activityViewModels()
-        private val mapViewModel: MapViewModel by activityViewModels()
+        private val mapViewModel: MapViewModel by viewModels()
+        private val snackViewModel: SnackCreateViewModel by viewModels()
 
         private lateinit var participantsAdapter: AppointmentDetailParticipantsAdapter
         private val participantsList = mutableListOf<AppointmentDetailItem.Participants>()
-        private lateinit var appointmentSnackAdapter: AppointmentSnackAdatper
-        private lateinit var snackList: List<Snacks.SnackItem>
+        private lateinit var snackList: List<SnackResponse.SnackInfo>
 
+        private var timerFlag = false
         private lateinit var timer: TimerHandler
         private lateinit var map: GoogleMap
         private lateinit var fusedLocationClient: FusedLocationProviderClient
-        private val LOCATION_PERMISSION_REQUEST_CODE = 1
+        private val userMarkers = mutableMapOf<String, Marker>()
 
         private var _bottomSheetBinding: BottomSheetLayoutBinding?= null
         private val bottomSheetBinding get() = _bottomSheetBinding!!
-        private lateinit var bottomSheetBehavior: BottomSheetBehavior<ConstraintLayout>
 
         @SuppressLint("ClickableViewAccessibility")
         override fun onCreate(savedInstanceState: Bundle?) {
             super.onCreate(savedInstanceState)
-
-            startWorkManager()
-
-            snackList= listOf(
-                Snacks.SnackItem("1", "김민지", "2025-02-01", "https://witch-app.s3.ap-northeast-2.amazonaws.com/witch-app/profile/efd1144e-f1b3-4b64-9eb3-b63357369e28.png", "https://witch-s3.s3.ap-northeast-2.amazonaws.com/snack/1.mp3", 37.5665, 126.9780),
-                Snacks.SnackItem("2", "김유라", "2025-02-01", "https://witch-app.s3.ap-northeast-2.amazonaws.com/witch-app/profile/efd1144e-f1b3-4b64-9eb3-b63357369e28.png", "https://witch-s3.s3.ap-northeast-2.amazonaws.com/snack/2.mp3", 37.5665, 126.9780),
-            )
         }
 
         @SuppressLint("ClickableViewAccessibility")
@@ -108,6 +100,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
             initAppointmentObserver()
             initSnackObserver()
+            initLocationObserver()
 
             binding.mapAcTvAppointmentName.isSelected = true
             bottomSheetBinding.mapFgTvBottomAppointmentSummary.isSelected= true
@@ -123,11 +116,11 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
 
             binding.mapAcIvSnack.setOnClickListener {
-                createSnack(userStatus, appointmentStatus)
+                (requireActivity() as ContentActivity).openFragment(5)
             }
 
             bottomSheetBinding.mapFgIvBottomAdd.setOnClickListener {
-                createSnack(userStatus, appointmentStatus)
+                (requireActivity() as ContentActivity).openFragment(5)
             }
 
             bottomSheetBinding.mapFgCbAppointmentIsLate.setOnCheckedChangeListener { _, isChecked ->
@@ -144,28 +137,72 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
         }
 
-        private fun startWorkManager() {
-            val constraints = Constraints.Builder()
-                .setRequiredNetworkType(NetworkType.CONNECTED)
-                .build()
+        private fun createMarkerBitmap(context: Context, imageUrl: String): Bitmap {
+            val markerView = LayoutInflater.from(context).inflate(R.layout.appointment_member_item, null)
 
-            val workRequest = PeriodicWorkRequestBuilder<LocationWorker>(30, TimeUnit.MINUTES)
-                .setConstraints(constraints)
-                .build()
+            val profileImage = markerView.findViewById<ImageView>(R.id.appointment_member_profile_image)
 
-            WorkManager.getInstance(requireContext()).enqueueUniquePeriodicWork(
-                "LocationWork",
-                ExistingPeriodicWorkPolicy.KEEP,
-                workRequest
-            )
+            Glide.with(context)
+                .load(imageUrl)
+                .circleCrop()
+                .into(profileImage)
+
+            markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+            markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
+            val bitmap = Bitmap.createBitmap(markerView.measuredWidth, markerView.measuredHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            markerView.draw(canvas)
+
+            return bitmap
+        }
+
+        private fun initLocationObserver() {
+            MyLocationForegroundService.locationData.observe(viewLifecycleOwner) {
+                appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
+                    // 약속이 시작되면
+                    if(it.appointmentStatus != "SCHEDULED") {
+                        binding.mapAcTvAppointmentStatus.visibility = View.GONE
+                    }
+
+                    if(timerFlag == false) {
+                        setTimer(LocalDateTime.parse(it.appointmentTime))
+                        timerFlag = true
+                    }
+
+                    showSnackArea(it.appointmentStatus)
+                }
+                // 위치 표시
+                appointmentViewModel.getLocationList(appointmentId)
+                if (appointmentViewModel.locationLists.value != null) {
+                    for (locationInfo in appointmentViewModel.locationLists.value!!) {
+                        val userId = locationInfo.userId
+                        val latlng = LatLng(locationInfo.latitude, locationInfo.longitude)
+                        val profileImageUrl = locationInfo.profileImageUrl
+                        val markerBitmap = createMarkerBitmap(requireContext(), profileImageUrl)
+
+                        if (userMarkers.containsKey(userId)) {
+                            userMarkers[userId]?.position = latlng
+                        } else {
+                            val marker = map.addMarker(
+                                MarkerOptions()
+                                    .position(latlng)
+                                    .icon(BitmapDescriptorFactory.fromBitmap(markerBitmap))
+                            )
+                            if (marker != null) {
+                                userMarkers[userId] = marker
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         private fun initAppointmentObserver() {
             appointmentViewModel.userId.observe(viewLifecycleOwner) {
-
                 appointmentViewModel.getAppointmentInfo(appointmentId)
                 appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
                     setTimer(LocalDateTime.parse(it.appointmentTime))
+                    startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
 
                     binding.mapAcTvAppointmentName.text = it.name
                     bottomSheetBinding.mapFgTvBottomAppointmentSummary.text = it.summary
@@ -174,9 +211,8 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                     bottomSheetBinding.mapFgTvBottomAppointmentTime.text = LocalDateTime.parse(it.appointmentTime).format(
                         DateTimeFormatter.ofPattern("M월 d일 a h시 mm분", Locale.KOREAN))
 
-
                     for(participant in it.participants) {
-                        if(participant.isLeader) { // 약속장인 경우
+                        if(participant.isLeader) { // 모임장인 경우
 
                             Glide.with(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile.context)
                                 .load(participant.profileImageUrl)
@@ -190,7 +226,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                             if (participant.userId == appointmentViewModel.userId.value) {
                                 userStatus = 1
                             }
-                        } else { // 약속원인 경우
+                        } else { // 모임원인 경우
                             participantsList.add(participant)
 
                             if (participant.userId == appointmentViewModel.userId.value) {
@@ -198,34 +234,34 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                             }
                         }
                     }
-                    
-                    // TODO: appointmentStatus 해결
-//                    setUserStatus(userStatus, it.appointmentStatus)
-                    setUserStatus(userStatus, appointmentStatus)
-                    showBottomSheetLayout(appointmentStatus)
+                    Log.d(TAG, "initAppointmentObserver: status: ${it.appointmentStatus}")
+                    setUserStatus(userStatus, it.appointmentStatus)
+                    showSnackArea(it.appointmentStatus)
 
                     participantsAdapter= AppointmentDetailParticipantsAdapter(participantsList)
                     bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
                 }
             }
+
+            appointmentViewModel.fragmentIdx.observe(viewLifecycleOwner) {
+                val mainActivity = Intent(requireContext(), MainActivity::class.java)
+                mainActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                mainActivity.putExtra("openFragment", it)
+                mainActivity.putExtra("id", appointmentViewModel.groupId.toString())
+                startActivity(mainActivity)
+            }
+
+            appointmentViewModel.toastMsg.observe(viewLifecycleOwner) { msg ->
+                showCustomToast(msg)
+            }
+
         }
 
         private fun initSnackObserver() {
-            appointmentSnackAdapter= AppointmentSnackAdatper(snackList) { position ->
-                (requireActivity() as ContentActivity).openFragment(4)
-            }
-            bottomSheetBinding.mapFgRvBottomSnack.adapter= appointmentSnackAdapter
-        }
-
-        private fun createSnack(userStatus: Int, appointmentStatus: String) {
-            if (appointmentStatus == "ONGOING" && (userStatus == 1 || userStatus == 2)) {
-                (requireActivity() as ContentActivity).openFragment(5)
-            } else {
-                if (appointmentStatus == "SCHEDULED" || appointmentStatus == "FINISHED") {
-                    showCustomToast("약속 진행 상태가 아닙니다.")
-                }
-                if (userStatus == 3) {
-                    showCustomToast("약속 참여 대상이 아닙니다.")
+            snackViewModel.getSnackList(appointmentId)
+            snackViewModel.snackList.observe(viewLifecycleOwner) {
+                bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(snackList) {
+                    (requireActivity() as ContentActivity).openFragment(4, it)
                 }
             }
         }
@@ -248,9 +284,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
             appointmentChangeDlBtnYes.setOnClickListener {
                 when(userStatus) {
-                    1 -> appointmentViewModel.deleteAppointment(1)
-                    2 -> appointmentViewModel.participateAppointment(1)
-                    3 -> appointmentViewModel.leaveAppointment(1)
+                    1 -> appointmentViewModel.deleteAppointment(appointmentId)
+                    2 -> appointmentViewModel.participateAppointment(appointmentId)
+                    3 -> appointmentViewModel.leaveAppointment(appointmentId)
                 }
                 dialogBuilder.dismiss()
             }
@@ -285,37 +321,72 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-        private fun showBottomSheetLayout(appointmentStatus: String) {
+        private fun showSnackArea(appointmentStatus: String) {
             if (appointmentStatus == "ONGOING") { // 스낵 보여주기
                 bottomSheetBinding.mapFgClBottomSnack.visibility= View.VISIBLE
+                binding.mapFgClSnackArea.visibility = View.VISIBLE
             } else if (appointmentStatus == "SCHEDULED") { // 약속 전
                 bottomSheetBinding.mapFgClBottomSnack.visibility= View.GONE
+                binding.mapFgClSnackArea.visibility = View.GONE
             } else if (appointmentStatus == "FINISHED") { // 약속 끝난 이후
                 bottomSheetBinding.mapFgClBottomSnack.visibility= View.GONE
+                binding.mapFgClSnackArea.visibility = View.GONE
             }
         }
 
-        lateinit var mylocation: Location
-        private fun startLocationUpdates() {
+        fun getBitmapFromVectorDrawable(context: Context, drawableId: Int): Bitmap {
+            val drawable = ContextCompat.getDrawable(context, drawableId)
+                ?: return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+
+            val bitmap = Bitmap.createBitmap(drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888)
+            val canvas = Canvas(bitmap)
+            drawable.setBounds(0, 0, canvas.width, canvas.height)
+            drawable.draw(canvas)
+            return bitmap
+        }
+
+
+    lateinit var mylocation: Location
+        private fun startLocationUpdates(latitude: Double?, longitude: Double?) {
+            Log.d(TAG, "startLocationUpdates: latitude: ${latitude}, longitude: ${longitude}")
             if (ContextCompat.checkSelfPermission(requireContext(),
                     Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                    if (location != null) {
-                        val userLocation = LatLng(location.latitude, location.longitude)
-                        mylocation = Location("")
-                        mylocation.latitude = location.latitude
-                        mylocation.longitude = location.longitude
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
-                    } else {
+                if (latitude == null || longitude == null) {
+                    fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                        if (location != null) {
+                            val userLocation = LatLng(location.latitude, location.longitude)
+                            mylocation = Location("")
+                            mylocation.latitude = location.latitude
+                            mylocation.longitude = location.longitude
+                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
+                        } else {
+                            Log.d(TAG, "startLocationUpdates: ")
+                        }
+                    }
+                } else {
+                    appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner){
+                        val placeLocation = LatLng(latitude, longitude)
+                        val bitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.balloon)
+                        val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
+                        map.addMarker(
+                            MarkerOptions()
+                                .position(placeLocation)
+                                .icon(markerIcon)
+                        )
                     }
                 }
+
             }
         }
 
         private val requestPermissionLauncher =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
                 if (isGranted) {
-                    startLocationUpdates()
+                    appointmentViewModel.getAppointmentInfo(appointmentId)
+                    appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
+                        startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
+                    }
                 } else {
                     Toast.makeText(requireContext(), "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
                 }
@@ -327,28 +398,16 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             ) {
                 requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
             } else {
-                startLocationUpdates()
+                appointmentViewModel.getAppointmentInfo(appointmentId)
+                appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
+                    startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
+                }
             }
         }
 
         override fun onMapReady(googleMap: GoogleMap) {
             map = googleMap
             requestLocationPermissions()
-        }
-
-        fun getBitmapFromVectorDrawable(context: Context, drawableId: Int) : Bitmap {
-            val drawable = ContextCompat.getDrawable(context, drawableId)
-                ?: return Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
-
-            val bitmap = Bitmap.createBitmap(
-                drawable.intrinsicWidth, drawable.intrinsicHeight, Bitmap.Config.ARGB_8888
-            )
-
-            val canvas = Canvas(bitmap)
-            drawable.setBounds(0, 0, canvas.width, canvas.height)
-            drawable.draw(canvas)
-
-            return bitmap
         }
 
         @SuppressLint("SetTextI18n")
@@ -359,7 +418,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             if (duration < 0) { // 이미 끝난 약속
                 binding.mapAcTvRemainderTime.text = "0분 0초"
                 binding.mapAcSbRemainderTime.progress = 0
-                appointmentStatus = "FINISHED" // TODO: delete
             } else if (duration in 0..3600) { // 약속 시간 한 시간 이내
                 timer = TimerHandler()
                 timer.startTimer(duration)
@@ -367,15 +425,12 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                     binding.mapAcTvRemainderTime.text = remainingTime?.let { parseSeconds(it) }
                     binding.mapAcSbRemainderTime.progress = remainingTime?.toInt() ?: 0
                 }
-                appointmentStatus = "ONGOING" // TODO: delete
             } else if (duration < 3600 * 24) { // 약속 시간 하루 이내
                 binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), appointmentTime).toHours().toString() + "시간"
                 binding.mapAcSbRemainderTime.progress = 3600
-                appointmentStatus = "SCHEDULED" // TODO: delete
             } else { // 약속 시간 하루 초과
                 binding.mapAcTvRemainderTime.text = Duration.between(LocalDateTime.now(), appointmentTime).abs().toDays().toString() + "일"
                 binding.mapAcSbRemainderTime.progress = 3600
-                appointmentStatus = "SCHEDULED" // TODO: delete
             }
         }
     
@@ -416,13 +471,13 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(key:String, value:String) =
-            MapFragment().apply {
-                arguments = Bundle().apply {
-                    putString(key, value)
+        companion object {
+            @JvmStatic
+            fun newInstance(key:String, value:String) =
+                MapFragment().apply {
+                    arguments = Bundle().apply {
+                        putString(key, value)
+                    }
                 }
-            }
-    }
+        }
 }

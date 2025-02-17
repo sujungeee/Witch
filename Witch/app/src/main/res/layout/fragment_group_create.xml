@@ -43,6 +43,8 @@
         android:backgroundTint="@color/witch_white"
         android:hint="모임 이름을 입력해주세요."
         android:textSize="16dp"
+        android:inputType="text"
+        android:paddingStart="10dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView2" />

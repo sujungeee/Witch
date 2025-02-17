@@ -5,7 +5,6 @@ import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import androidx.fragment.app.activityViewModels
@@ -15,17 +14,17 @@ import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentAppointmentCreate3Binding
 import com.ssafy.witch.ui.MainActivity
+import java.time.Instant
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
+import java.time.ZoneId
 
 private const val TAG = "AppointmentCreate3Fragment_Witch"
 class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Binding>(
     FragmentAppointmentCreate3Binding::bind, R.layout.fragment_appointment_create3){
-
     private var today: Long= 0
     private lateinit var minute: String
     private lateinit var hour: String
+    private lateinit var localDateTime: LocalDateTime
     private val appointmentViewModel: AppointmentViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,16 +67,6 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
         }
     }
 
-    private fun changeLocalDateTime(): LocalDateTime{
-        val dateFormatter = DateTimeFormatter.ofPattern("yyyy년 M월 d일", Locale.KOREAN)
-        val localDate = java.time.LocalDate.parse(binding.appointmentFgTvDateChoice.text, dateFormatter)
-
-        val hour = hour.toInt()
-        val minute = minute.toInt()
-
-        return LocalDateTime.of(localDate, java.time.LocalTime.of(hour, minute))
-    }
-
     private fun showTimePickerDialog() {
         val builder= MaterialTimePicker.Builder()
         builder.setTheme(R.style.CustomTimePickerDialog)
@@ -108,7 +97,11 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
         builder.setTheme(R.style.CustomDatePickerDialog)
         val picker = builder.build()
 
-        picker.addOnPositiveButtonClickListener {
+        picker.addOnPositiveButtonClickListener { datepicker ->
+            localDateTime = Instant.ofEpochMilli(datepicker)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+
             binding.appointmentFgTvDateChoice.text = picker.headerText
         }
         picker.addOnNegativeButtonClickListener {
@@ -130,7 +123,7 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
         val appointmentCreateDlBtnNo = dialogView.findViewById<Button>(R.id.dl_btn_no)
 
         appointmentCreateDlBtnYes.setOnClickListener {
-            appointmentViewModel.setAppointmentTime(changeLocalDateTime().toString())
+            appointmentViewModel.setAppointmentTime(LocalDateTime.of(localDateTime.year, localDateTime.monthValue, localDateTime.dayOfMonth, hour.toInt(), minute.toInt()).toString())
             appointmentViewModel.registerAppointment()
             appointmentViewModel.toastMsg.observe(viewLifecycleOwner) { msg ->
                 showCustomToast(msg)

@@ -70,7 +70,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
         binding.homeFgTvUsername.setOnClickListener {
             val intent = Intent(mainActivity, ContentActivity::class.java)
+            intent.putExtra("openFragment", 4)
+            intent.putExtra("id", "15e37865-c0e1-42b3-9213-bfde7849f8c1")
+            startActivity(intent)
+        }
+        binding.textView2.setOnClickListener {
+            val intent = Intent(mainActivity, ContentActivity::class.java)
             intent.putExtra("openFragment", 5)
+            intent.putExtra("id", "69ec8f37-efe7-4cd3-b4c6-000240c8ebc7")
+
             startActivity(intent)
         }
 

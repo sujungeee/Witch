@@ -11,11 +11,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.data.model.dto.Snack
+import com.ssafy.witch.base.BaseResponse
+import com.ssafy.witch.data.model.response.ErrorResponse
 import com.ssafy.witch.data.model.response.MyAppointmentResponse
 import com.ssafy.witch.data.model.response.PresignedUrl
+import com.ssafy.witch.data.model.response.SnackResponse
 import com.ssafy.witch.data.remote.RetrofitUtil
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.appointmentService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.groupService
@@ -33,7 +38,7 @@ import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
 import kotlin.math.log
 
-private const val TAG = "SnackCreateViewModel"
+private const val TAG = "SnackCreateViewModel_Witch"
 class SnackCreateViewModel : ViewModel() {
     private val _selectedButton = MutableLiveData<Int>(1)
     val selectedButton: LiveData<Int>
@@ -67,6 +72,10 @@ class SnackCreateViewModel : ViewModel() {
     private val _textAlign = MutableLiveData<Int>(R.id.top_start)
     val textAlign: LiveData<Int>
         get() = _textAlign
+
+    private val _snackList = MutableLiveData<List<SnackResponse.SnackInfo>>()
+    val snackList: LiveData<List<SnackResponse.SnackInfo>>
+        get() = _snackList
 
     fun setSnackText(text: String) {
         _snackText.value = text
@@ -221,5 +230,25 @@ class SnackCreateViewModel : ViewModel() {
         }
     }
 
+    fun getSnackList(appointmentId: String) {
+        viewModelScope.launch {
+            runCatching {
+                snackService.getSnackList(appointmentId)
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    _snackList.value = response.body()?.data!!.snacks
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    Log.d(TAG, "getSnackList failed(): ${errorResponse?.data?.errorMessage}")
+                }
+            }.onFailure { e ->
+                Log.e(TAG, "deleteAppointment() Exception: ${e.message}", e)
+            }
+        }
+    }
 
 }

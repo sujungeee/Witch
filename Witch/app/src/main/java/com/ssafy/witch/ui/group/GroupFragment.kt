@@ -83,6 +83,11 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             mainActivity.openFragment(7)
         }
 
+        binding.groupFgTvInviteLink.setOnClickListener {
+            copyToClipboard(ApplicationClass.API_URL+"deeplink?groupId=${groupId}")
+        }
+
+
 //        viewModel.getGroup(groupId)
 
     }

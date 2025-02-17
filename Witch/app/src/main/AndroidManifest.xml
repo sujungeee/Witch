@@ -66,8 +66,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data android:scheme="http" android:host="www.witch.com" />
-                <data android:scheme="app" android:host="www.witch.com" />
+                <data android:scheme="witch-app" android:host="www.witch.com" />
             </intent-filter>
 
     </activity>

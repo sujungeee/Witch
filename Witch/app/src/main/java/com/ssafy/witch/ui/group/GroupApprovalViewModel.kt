@@ -20,7 +20,7 @@ class GroupApprovalViewModel : ViewModel() {
             runCatching {
                 groupService.getGroupPreview(groupId)
             }.onSuccess {
-                _group.value = it.data ?: GroupResponse("","","")
+                _group.value = it.body()?.data ?: GroupResponse("","","")
             }.onFailure {
                 it.printStackTrace()
             }

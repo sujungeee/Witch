@@ -98,9 +98,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun initAdapter(){
-        homeListAdapter = HomeListAdapter(mutableListOf()){ position->
-            (requireActivity() as MainActivity).openFragment(2)
-        }
 
         viewModel.appointmentList.observe(viewLifecycleOwner,{
             dotSchedule()

@@ -34,8 +34,8 @@ class HomeViewModel : ViewModel() {
             runCatching {
                 appointmentService.getMyAppointments(year,month)
             }.onSuccess {
-                if (it.success) {
-                    it.data?.let { appointments ->
+                if (it.isSuccessful) {
+                    it.body()?.data?.let { appointments ->
                         try {
                             _appointmentList.value = appointments
                         } catch (e: Exception) {
@@ -52,14 +52,13 @@ class HomeViewModel : ViewModel() {
 
     }
 
-
     fun getProfile(){
         viewModelScope.launch {
             runCatching {
                 userService.getProfile()
             }.onSuccess {
-                if (it.success) {
-                    it.data?.let { user ->
+                if (it.isSuccessful) {
+                    it.body()?.data?.let { user ->
                         try {
                             ApplicationClass.sharedPreferencesUtil.addUser(user)
                             _name.value = user.nickname
@@ -71,7 +70,6 @@ class HomeViewModel : ViewModel() {
                     // 실패
                 }
             }.onFailure {
-
             }
         }
     }

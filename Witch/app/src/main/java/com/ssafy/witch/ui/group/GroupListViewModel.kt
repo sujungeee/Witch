@@ -19,7 +19,7 @@ class GroupListViewModel : ViewModel() {
             runCatching {
                 groupService.getMyGroupList()
             }.onSuccess {
-                _groupList.value = it.data?.groups
+                _groupList.value = it.body()?.data?.groups
             }.onFailure {
                 it.printStackTrace()
             }

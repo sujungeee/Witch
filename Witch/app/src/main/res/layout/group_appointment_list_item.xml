@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_marginBottom="4dp"
     android:background="@color/witch_black"
-    android:layout_height="70dp">
+    android:layout_height="75dp">
 
     <TextView
         android:id="@+id/group_appointment_li_tv_time"
@@ -60,14 +60,13 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:visibility="gone"
         android:id="@+id/group_appointment_li_tv_appointment_active"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="35dp"
+        android:layout_height="18dp"
         android:layout_marginStart="10dp"
+        android:textAlignment="center"
         android:padding="2dp"
-        android:background="@drawable/circle_shape"
-        android:backgroundTint="@color/witch_red"
+        android:background="@drawable/green_btn"
         android:text="진행중"
         android:textColor="@color/witch_white"
         android:textSize="10dp"

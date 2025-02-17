@@ -50,7 +50,7 @@
         <receiver
             android:name=".data.remote.LocationReceiver"
             android:exported="false" />
-        
+
         <activity
             android:name=".ui.ContentActivity"
             android:exported="false" />
@@ -89,12 +89,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
 
-                <data
-                    android:host="www.witch.com"
-                    android:scheme="http" />
-                <data
-                    android:host="www.witch.com"
-                    android:scheme="app" />
+                <data android:scheme="witch-app" android:host="www.witch.com" />
             </intent-filter>
         </activity>
 

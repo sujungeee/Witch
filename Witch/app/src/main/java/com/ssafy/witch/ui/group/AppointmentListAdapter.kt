@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.ssafy.witch.R
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.databinding.GroupAppointmentListItemBinding
 import com.ssafy.witch.databinding.GroupListItemBinding
@@ -32,11 +34,7 @@ class AppointmentListAdapter(val appointmentList: List<MyAppointment>, val itemC
     inner class AppointmentListViewHolder(private val binding: GroupAppointmentListItemBinding) : RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("NewApi")
         fun bind(position: Int) {
-            if (appointmentList[position].status == "APROVED") {
-                binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.VISIBLE
-            } else {
-                binding.groupAppointmentLiTvIsmine.visibility = ViewGroup.GONE
-            }
+            binding.groupAppointmentLiTvIsmine.isVisible = appointmentList[position].isMyAppointment
             binding.groupAppointmentLiTvTitle.text = appointmentList[position].name
 
             val time= TimeConverter().convertToLocalDateTime(appointmentList[position].appointmentTime)
@@ -53,13 +51,12 @@ class AppointmentListAdapter(val appointmentList: List<MyAppointment>, val itemC
                     else -> ""
                 }
 
-
-            binding.groupAppointmentLiTvAppointmentActive.setBackgroundColor(
+            binding.groupAppointmentLiTvAppointmentActive.setBackgroundResource(
                 when(appointmentList[position].status){
-                    "ONGOING" -> binding.root.context.getColor(android.R.color.holo_red_light)
-                    "SCHEDULED" -> binding.root.context.getColor(android.R.color.holo_green_light)
-                    "FINISHED" -> binding.root.context.getColor(android.R.color.darker_gray)
-                    else -> binding.root.context.getColor(android.R.color.darker_gray)
+                    "ONGOING" -> R.drawable.red_btn
+                    "SCHEDULED" -> R.drawable.green_btn
+                    "FINISHED" ->  R.drawable.gray_btn
+                    else ->  R.drawable.gray_btn
                 }
 )
 

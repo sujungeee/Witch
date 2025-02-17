@@ -17,31 +17,35 @@ import retrofit2.http.Query
 interface UserService {
 
     @GET("users/me")
-    suspend fun getProfile() : BaseResponse<User>
+    suspend fun getProfile(
+
+    ) : Response<BaseResponse<User>>
 
     @PATCH("users/me/nickname")
     suspend fun editProfileName(
         @Body name: String
-    ) : BaseResponse<String>
+    ) : Response<BaseResponse<String>>
 
 
     @POST("users/me/profile-image/presigned-url")
     suspend fun getPresignedUrl(
         @Body filename: String
-    ) : BaseResponse<PresignedUrl>
+    ) : Response<BaseResponse<PresignedUrl>>
 
 
     @PATCH("users/me/profile-image")
     suspend fun editProfileImage(
         @Body objectKey: ObjectKey
-    ) : BaseResponse<String>
+    ) : Response<BaseResponse<String>>
 
 
     @GET("users/nickname/is-unique")
-    suspend fun checkNicknameUnique(@Query("nickname") nickname: String): Response<BaseResponse<String>>
+    suspend fun checkNicknameUnique(
+        @Query("nickname") nickname: String
+    ): Response<BaseResponse<String>>
 
     @PATCH("users/me/password")
     suspend fun editPassword(
         @Body editPassword: EditPwd
-    ) : BaseResponse<String>
+    ) : Response<BaseResponse<String>>
 }

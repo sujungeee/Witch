@@ -1,28 +1,17 @@
 package com.ssafy.witch.ui.group
 
-import android.Manifest
-import android.app.Activity.RESULT_OK
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.MediaStore
-import android.util.Log
 import android.view.View
-import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
+import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentGroupCreateBinding
 import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.util.ImagePicker
 import kotlinx.coroutines.launch
-import okhttp3.internal.wait
-import java.io.File
 
 private const val TAG = "GroupCreateFragment"
 class GroupCreateFragment : BaseFragment<FragmentGroupCreateBinding>(FragmentGroupCreateBinding::bind, R.layout.fragment_group_create) {
@@ -42,11 +31,24 @@ class GroupCreateFragment : BaseFragment<FragmentGroupCreateBinding>(FragmentGro
         }
         imagePickerUtil = ImagePicker(this) { uri ->
             viewModel.setFile(uri)
-            binding.groupCreateFgIvProfileImage.setImageURI(uri)
+            Glide.with(requireContext())
+                .load(uri)
+                .into(binding.groupCreateFgIvProfileImage)
         }
 
         binding.groupCreateFgBtnImageUpload.setOnClickListener {
             imagePickerUtil.checkPermissionAndOpenGallery()
+        }
+        binding.groupCreateFgBtnPhotoChange.isEnabled = false
+
+        binding.groupCreateFgEtGroupName.doOnTextChanged { text, start, before, count ->
+            binding.groupCreateFgBtnPhotoChange.isEnabled = false
+        }
+
+        binding.groupCreateFgBtnDuplCheck.setOnClickListener {
+            viewModel.checkDupl(binding.groupCreateFgEtGroupName.text.toString(), "group", requireContext() as ContentActivity).apply {
+                binding.groupCreateFgBtnPhotoChange.isEnabled = true
+            }
         }
     }
 

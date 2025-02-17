@@ -1,13 +1,17 @@
 package com.ssafy.witch.ui.snack
 
+import android.Manifest
 import android.app.Dialog
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.location.Location
 import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Log
 import android.view.Gravity
 import android.view.View
 import android.widget.FrameLayout
@@ -15,21 +19,24 @@ import android.widget.LinearLayout
 import android.widget.RadioGroup
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.drawToBitmap
+import androidx.core.content.ContextCompat
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.maps.model.LatLng
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.DialogSnackTextBinding
 import com.ssafy.witch.databinding.FragmentSnackCreateBinding
 import com.ssafy.witch.ui.ContentActivity
-import com.ssafy.witch.ui.group.GroupEditFragment
-import com.ssafy.witch.ui.group.SnackRecord
 import com.ssafy.witch.util.ImagePicker
+import com.ssafy.witch.util.LoadingDialog
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import kotlin.math.log
 
 
 private const val TAG = "SnackCreateFragment"
@@ -39,6 +46,13 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
     private lateinit var contentActivity: ContentActivity
     private lateinit var imagePickerUtil: ImagePicker
     private var appointmentId = ""
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private var userLocation: LatLng? = null
+    private var snackRecord: SnackRecord? = null
+    private var snackCamera: SnackCamera? = null
+
+    private lateinit var loadingDialog: LoadingDialog
+
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
@@ -50,17 +64,32 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
         }
     }
 
-    private var snackRecord: SnackRecord? = null
+    private val requestCameraPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            snackCamera?.startCamera()
+        } else {
+            Toast.makeText(requireContext(), "카메라 권한을 허용해주세요.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        loadingDialog = LoadingDialog(requireContext())
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
+
 
         contentActivity = requireActivity() as ContentActivity
         initView()
         initObserver()
     }
     fun initView() {
-
+        requestLocationPermissions()
         binding.snackCreateFgIbText.setOnClickListener {
             viewModel.setSelectedButton(1)
         }
@@ -77,6 +106,7 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
         initPhotoView()
         initRecordView()
         initUploadView()
+        initCameraView()
 
     }
 
@@ -85,7 +115,6 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
             val isSnackTextEmpty = it.isNullOrEmpty()
             binding.snackCreateFgLlTvTextCreate.isGone = !isSnackTextEmpty
             binding.snackCreateFgLlLlText.isGone = isSnackTextEmpty
-
             binding.snackCreateFgTvBitmapText.text = it
         })
 
@@ -93,6 +122,11 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
             val isPhotoEmpty = it == null
             binding.snackCreateFgLlLlCamera.isGone = !isPhotoEmpty
             binding.snackCreateFgLlTvCameraDelete.isGone = isPhotoEmpty
+            if (it != null) {
+                binding.snackCreateFgIvImage.setImageURI(it)
+                loadingDialog.dismiss()
+            }
+            Log.d(TAG, "initObserver: ${it}")
         })
 
         viewModel.audioFile.observe(viewLifecycleOwner, {
@@ -259,12 +293,15 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
     }
 
     fun initPhotoView() {
-        binding.snackCreateFgLlLlCamera.setOnClickListener {
-            binding.snackCreateFgLlLlCamera.isGone = true
-            binding.snackCreateFgLlTvCameraDelete.isGone = false
-        }
+//        binding.snackCreateFgLlLlCamera.setOnClickListener {
+//            bi
+//            binding.snackCreateFgLlLlCamera.isGone = true
+//            binding.snackCreateFgLlTvCameraDelete.isGone = false
+//        }
+//
 
         binding.snackCreateFgLlTvCameraDelete.setOnClickListener {
+            Log.d(TAG, "initPhotoView: 지웠나요? ${viewModel.photoFile.value}")
             viewModel.deletePhoto()
             binding.snackCreateFgIvImage.setImageResource(R.color.witch_black)
         }
@@ -275,13 +312,46 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
         }
 
         binding.snackCreateFgLlTvCameraPhoto.setOnClickListener {
+            binding.snackCreateFgIvImage.visibility = View.VISIBLE
+            binding.snackCreateFgFlCamera.visibility = View.GONE
             imagePickerUtil.checkPermissionAndOpenGallery()
         }
+    }
+
+    fun initCameraView() {
+        binding.snackCreateFgLlTvCameraCreate.setOnClickListener {
+            val snackCamera = SnackCamera(this@SnackCreateFragment, viewModel, requestCameraPermissionLauncher)
+            binding.snackCreateFgIvImage.visibility = View.GONE
+            binding.snackCreateFgFlCamera.visibility = View.VISIBLE
+            snackCamera.initCamera()
+
+            binding.snackCreateFgIvCameraCancel.setOnClickListener {
+                snackCamera.stopCamera()
+                binding.snackCreateFgFlCamera.visibility = View.GONE
+                binding.snackCreateFgIvImage.visibility = View.VISIBLE
+            }
+
+            binding.snackCreateFgIvCameraExchange.setOnClickListener{
+                snackCamera.toggleCamera()
+            }
+
+            binding.snackCreateFgIvCameraShot.setOnClickListener {
+                loadingDialog.show()
+                snackCamera.takePicture()
+                binding.snackCreateFgFlCamera.visibility = View.GONE
+                binding.snackCreateFgIvImage.visibility = View.VISIBLE
+            }
+
+        }
+
+
+
     }
 
     fun initRecordView() {
         binding.snackCreateFgLlTvRecordCreate.setOnClickListener {
             val isRecordEmpty = viewModel.audioFile.value == null
+
             binding.snackCreateFgLlTvRecordCreate.isGone = !isRecordEmpty
             binding.snackCreateFgLlTvRecordDelete.isGone = isRecordEmpty
         }
@@ -300,12 +370,16 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
         binding.snackCreateFgBtnUpload.setOnClickListener {
             binding.snackCreateFgLlBitmap.post {
                 val bitmap = captureView(binding.snackCreateFgLlBitmap)
+                val imgUri = bitmapToUri(bitmap)
 
-                val uri = bitmapToUri(bitmap)
+
+
+                Log.d(TAG, "initUploadView: ${userLocation}")
+
 
 
                 lifecycleScope.launch {
-                    viewModel.uploadSnack(contentActivity, uri)
+                    viewModel.uploadSnack(contentActivity, appointmentId, userLocation!!, imgUri, viewModel.audioFile.value)
                 }
             }
         }
@@ -335,6 +409,40 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
             appointmentId = it.getString("appointmentId").toString()
         }
 
+    }
+
+
+    private fun startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                if (location != null) {
+                    userLocation = LatLng(location.latitude, location.longitude)
+                    Log.d(TAG, "startLocationUpdates: ${userLocation}")
+                } else {
+                    Toast.makeText(requireContext(), "위치 정보를 가져올 수 없습니다.", Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
+    }
+
+    private val locationRequestPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+            if (isGranted) {
+                startLocationUpdates()
+            } else {
+                Toast.makeText(requireContext(), "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+    private fun requestLocationPermissions() {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            locationRequestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        } else {
+            startLocationUpdates()
+        }
     }
 
     companion object {

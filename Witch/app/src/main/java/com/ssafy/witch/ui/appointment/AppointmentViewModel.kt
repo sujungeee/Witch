@@ -168,8 +168,8 @@ class AppointmentViewModel: ViewModel() {
             runCatching {
                 userService.getProfile()
             }.onSuccess {
-                if (it.success) {
-                    it.data?.let { user ->
+                if (it.isSuccessful) {
+                    it.body()?.data?.let { user ->
                         try {
                             _userId.value = user.userId
                         } catch (e: Exception) {

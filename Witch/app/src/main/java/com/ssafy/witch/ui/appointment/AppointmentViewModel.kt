@@ -11,6 +11,7 @@ import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.AppointmentDetailItem
 import com.ssafy.witch.data.model.dto.request.AppointmentRequest
 import com.ssafy.witch.data.model.response.ErrorResponse
+import com.ssafy.witch.data.model.response.LocationResponse
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.appointmentService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.userService
 import kotlinx.coroutines.launch
@@ -21,9 +22,17 @@ class AppointmentViewModel: ViewModel() {
     val toastMsg: LiveData<String>
         get() = _toastMsg
 
+    private val _fragmentIdx = MutableLiveData<Int>()
+    val fragmentIdx: LiveData<Int>
+        get() = _fragmentIdx
+
     private val _appointmentInfo = MutableLiveData<AppointmentDetailItem>()
     val appointmentInfo: LiveData<AppointmentDetailItem>
         get() = _appointmentInfo
+
+    private val _locationList = MutableLiveData<List<LocationResponse.LocationInfo>>()
+    val locationLists : LiveData<List<LocationResponse.LocationInfo>>
+        get()= _locationList
 
     private val _groupId = MutableLiveData<String>()
     val groupId: LiveData<String>
@@ -56,6 +65,7 @@ class AppointmentViewModel: ViewModel() {
     private val _address= MutableLiveData<String>()
     val address: LiveData<String>
         get()= _address
+
 
     fun appointmentClear() {
         _name.value = ""
@@ -93,6 +103,8 @@ class AppointmentViewModel: ViewModel() {
     fun setAddress(address: String){
         _address.value = address
     }
+
+
 
     fun registerAppointment() {
         viewModelScope.launch {
@@ -181,6 +193,7 @@ class AppointmentViewModel: ViewModel() {
                 if (response.isSuccessful) {
                     if (response.body()?.success == true) {
                         _toastMsg.value = "약속을 삭제하였습니다!"
+                        _fragmentIdx.value = 5
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()
@@ -238,6 +251,27 @@ class AppointmentViewModel: ViewModel() {
                 }
             }.onFailure { e ->
                 Log.e(TAG, "leaveAppointment() Exception: ${e.message}", e)
+            }
+        }
+    }
+
+    fun getLocationList(appointmentId: String) {
+        viewModelScope.launch {
+            runCatching {
+                appointmentService.getAppointmentMembers(appointmentId)
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                     _locationList.value = response.body()?.data?.positions!!
+                } else {
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    Log.d(TAG, "getLocationList(): ${errorResponse?.data?.errorMessage}")
+                }
+            }.onFailure {  e ->
+                Log.e(TAG, "getLocationList() Exception: ${e.message}", e)
             }
         }
     }

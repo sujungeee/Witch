@@ -6,7 +6,6 @@ import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.ssafy.witch.data.local.SharedPreferencesUtil
-import com.ssafy.witch.data.remote.network.TokenAuthenticator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -28,52 +27,29 @@ class ApplicationClass : Application() {
     // 코틀린의 전역변수 문법
     companion object {
         //ends with '/'
-        val API_URL = "http://i12d211.p.ssafy.io:30080/"
-//        val API_URL = "http://dukcode.iptime.org/"
+//        val API_URL = "http://i12d211.p.ssafy.io:30080/"
+        val API_URL = "http://dukcode.iptime.org/"
 
         lateinit var sharedPreferencesUtil: SharedPreferencesUtil
-        lateinit var retrofitLogin: Retrofit
         lateinit var retrofit: Retrofit
 
         // JWT Token Header 키 값
         const val ACCESS_TOKEN = "ACCESS-TOKEN"
-
-        lateinit var instance: ApplicationClass
-            private set
     }
 
     // 앱이 처음 생성되는 순간, SP를 새로 만들어주고, 레트로핏 인스턴스를 생성합니다.
     override fun onCreate() {
         super.onCreate()
-        instance = this
 
         sharedPreferencesUtil = SharedPreferencesUtil(applicationContext)
-
-        //로그인 시만 작업하는 레트로핏
-        // 1) 로그인 전용 (토큰 필요 없음)
-        val loginClient: OkHttpClient = OkHttpClient.Builder()
-            .readTimeout(5000, TimeUnit.MILLISECONDS)
-            .connectTimeout(5000, TimeUnit.MILLISECONDS)
-            .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .build()
-
-        retrofitLogin = Retrofit.Builder()
-            .baseUrl(API_URL)
-            .client(loginClient)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-
-        // 메인에서 작업하는 레트로핏
         // 레트로핏 인스턴스를 생성하고, 레트로핏에 각종 설정값들을 지정해줍니다.
         // 연결 타임아웃시간은 5초로 지정이 되어있고, HttpLoggingInterceptor를 붙여서 어떤 요청이 나가고 들어오는지를 보여줍니다.
-        // 2) 로그인 후용 (TokenAuthenticator 적용)
         val client: OkHttpClient = OkHttpClient.Builder()
             .readTimeout(5000, TimeUnit.MILLISECONDS)
             .connectTimeout(5000, TimeUnit.MILLISECONDS)
             // 로그캣에 okhttp.OkHttpClient로 검색하면 http 통신 내용을 보여줍니다.
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
-            .addNetworkInterceptor(AccessTokenInterceptor(sharedPreferencesUtil)) // JWT 자동 헤더 전송
-            .authenticator(TokenAuthenticator(sharedPreferencesUtil))
+            .addNetworkInterceptor(AccessTokenInterceptor()) // JWT 자동 헤더 전송
             .build()
 
         // retrofit 이라는 전역변수에 API url, 인터셉터, Gson을 넣어주고 빌드해주는 코드
@@ -91,32 +67,17 @@ class ApplicationClass : Application() {
         .setLenient()
         .create()
 
-    class AccessTokenInterceptor(private val sharedPreferencesUtil: SharedPreferencesUtil) : Interceptor {
+    class AccessTokenInterceptor : Interceptor {
+
         @Throws(IOException::class)
         override fun intercept(chain: Interceptor.Chain): Response {
-            val originalRequest = chain.request()
-            val builder = originalRequest.newBuilder()
-
+            val builder: Request.Builder = chain.request().newBuilder()
+            //Todo 로그인 구현 시 추가하기
             val jwtToken = sharedPreferencesUtil.getAccessToken()
-
             if (!jwtToken.isNullOrEmpty()) {
-                Log.d("AccessTokenInterceptor", "✅ 인터셉터 실행! 저장된 Access Token: $jwtToken")
                 builder.addHeader("Authorization", "Bearer $jwtToken")
-            } else {
-                Log.e("AccessTokenInterceptor", "❌ Access Token 없음! Authorization 헤더 추가 안됨!")
             }
-
-            val response = chain.proceed(builder.build())
-
-            // 401 응답을 받으면 TokenAuthenticator 실행
-            if (response.code == 401) {
-                Log.e("AccessTokenInterceptor", "🚨 401 응답 받음! TokenAuthenticator에서 처리 필요!")
-            }
-
-            return response
+            return chain.proceed(builder.build())
         }
     }
-
-
-
 }

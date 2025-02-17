@@ -41,6 +41,8 @@
         android:background="@drawable/box_style"
         android:backgroundTint="@color/witch_white"
         android:hint="모임 이름을 입력해주세요."
+        android:inputType="text"
+        android:paddingStart="10dp"
         android:textColor="@color/witch_white"
         android:textSize="16dp"
         app:layout_constraintEnd_toStartOf="@+id/group_edit_fg_btn_dupl_check"

@@ -1,12 +1,9 @@
 package com.ssafy.witch.data.model.response
 
-data class AccessTokenResponse(
-    val success: Boolean,
-    val data: AccessTokenData?
-)
+import com.google.gson.annotations.SerializedName
 
-data class AccessTokenData(
-    val tokenType: String,
-    val accessToken: String,
-    val accessTokenExpiresIn: Long
+data class AccessTokenResponse(
+    @SerializedName("tokenType") val tokenType: String,
+    @SerializedName("accessToken") val accessToken: String,
+    @SerializedName("accessTokenExpiresIn") val accessTokenExpiresIn: Long
 )

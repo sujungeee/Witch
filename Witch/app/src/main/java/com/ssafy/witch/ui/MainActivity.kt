@@ -2,18 +2,10 @@ package com.ssafy.witch.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.work.Constraints
-import androidx.work.ExistingPeriodicWorkPolicy
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
-import com.ssafy.witch.data.remote.LocationWorker
 import com.ssafy.witch.databinding.ActivityMainBinding
 import com.ssafy.witch.ui.group.GroupCreateFragment
 import com.ssafy.witch.ui.group.GroupEditFragment
@@ -23,10 +15,9 @@ import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment
 import com.ssafy.witch.ui.mypage.MyPageFragment
 import com.ssafy.witch.ui.snack.SnackCreateFragment
-import java.util.concurrent.TimeUnit
 
 
-private const val TAG = "MainActivity_Witch"
+private const val TAG = "MainActivity"
 class MainActivity : AppCompatActivity() {
 
     // 메인액티비티 자동로그인 후 토큰만료시간에 따른 토큰 재발급 및 자동 로그아웃 로직 위한 import
@@ -36,18 +27,18 @@ class MainActivity : AppCompatActivity() {
         ActivityMainBinding.inflate(layoutInflater)
     }
 
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        Log.d(TAG, "onCreate: ")
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
-        startWorkManager()
 
 //        ApplicationClass.sharedPreferencesUtil.clearToken()
         // ViewModel 초기화 (토큰 재발급 함수 사용)
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
         // 앱 시작 시 또는 액티비티 진입 시 토큰 유효성 체크
-        checkTokenValidity()
+//        checkTokenValidity()
 
         val fragmentIdx = intent.getIntExtra("moveFragment", -1)
         if (fragmentIdx != -1) {
@@ -160,28 +151,4 @@ class MainActivity : AppCompatActivity() {
         finish()
     }
 
-    private fun startWorkManager() {
-        val workManager = WorkManager.getInstance(this)
-
-        workManager.cancelUniqueWork("LocationWorker")
-
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
-
-        val workRequest = PeriodicWorkRequestBuilder<LocationWorker>(30, TimeUnit.MINUTES)
-            .setConstraints(constraints)
-            .build()
-
-        workManager.enqueueUniquePeriodicWork(
-            "LocationWorker",
-            ExistingPeriodicWorkPolicy.KEEP,
-            workRequest
-        )
-    }
-
-    override fun onResume() {
-        super.onResume()
-        startWorkManager()
-    }
 }

@@ -33,6 +33,9 @@
         android:id="@+id/pwd_edit_fg_et_origin_pwd"
         android:layout_width="match_parent"
         android:paddingHorizontal="10dp"
+        android:inputType="textPassword"
+        android:paddingStart="10dp"
+        android:maxLength="16"
         android:layout_height="30dp"
         android:layout_margin="20dp"
         android:background="@drawable/box_style"
@@ -53,10 +56,26 @@
         android:id="@+id/pwd_edit_fg_et_new_pwd"
         android:layout_width="match_parent"
         android:paddingHorizontal="10dp"
+        android:inputType="textPassword"
+        android:paddingStart="10dp"
+        android:maxLength="16"
         android:layout_height="30dp"
         android:layout_margin="20dp"
         android:background="@drawable/box_style"
         app:layout_constraintTop_toBottomOf="@+id/textView8" />
+
+    <TextView
+        android:id="@+id/pwd_edit_fg_tv_same_pwd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="기존 비밀번호와 동일해요."
+        android:paddingStart="30dp"
+        android:visibility="invisible"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/witch_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pwd_edit_fg_et_new_pwd" />
+
 
     <TextView
         android:id="@+id/textView9"
@@ -75,8 +94,23 @@
         android:paddingHorizontal="10dp"
         android:layout_height="30dp"
         android:layout_margin="20dp"
+        android:inputType="textPassword"
+        android:paddingStart="10dp"
+        android:maxLength="16"
         android:background="@drawable/box_style"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+    <TextView
+        android:id="@+id/pwd_edit_fg_tv_password_dupl_fail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="비밀번호가 일치하지 않아요."
+        android:paddingStart="30dp"
+        android:visibility="invisible"
+        android:layout_marginTop="4dp"
+        android:textColor="@color/witch_gray"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pwd_edit_fg_et_new_pwd_twice" />
 
     <Button
         android:id="@+id/pwd_edit_fg_btn_change_pwd"

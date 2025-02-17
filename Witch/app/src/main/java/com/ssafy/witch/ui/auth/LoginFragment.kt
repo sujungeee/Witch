@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.ssafy.witch.R
+import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentLoginBinding
 import com.ssafy.witch.ui.LoginActivity
@@ -18,6 +19,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(
     private lateinit var loginActivity: LoginActivity
     private val viewModel: LoginFragmentViewModel by viewModels()
 
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         loginActivity = context as LoginActivity
@@ -25,8 +27,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        //자동 로그인 시도
-        attemptAutoLogin()
 
         binding.loginFgBtnLogin.setOnClickListener {
             val email = binding.loginFgEtEmail.text.toString().trim()
@@ -50,7 +50,7 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(
                     if (success) {
                         navigateToMainActivity()
                     } else {
-                        Toast.makeText(requireContext(), message ?: "로그인 실패", Toast.LENGTH_SHORT)
+                        Toast.makeText(requireContext(), "이메일 또는 비밀번호가 올바르지 않습니다.", Toast.LENGTH_SHORT)
                             .show()
                     }
                 }
@@ -68,31 +68,6 @@ class LoginFragment : BaseFragment<FragmentLoginBinding>(
         super.onCreate(savedInstanceState)
     }
 
-    //자동 로그인 시도
-    private fun attemptAutoLogin() {
-        val accessTokenExpiresAt = viewModel.sharedPreferencesUtil.getAccessTokenExpiresAt()
-        val refreshTokenExpiresAt = viewModel.sharedPreferencesUtil.getRefreshTokenExpiresAt()
-
-        if (accessTokenExpiresAt > getCurrentTime()) {
-            navigateToMainActivity() //액세스 토큰이 유효하면 바로 로그인
-        } else if (refreshTokenExpiresAt > getCurrentTime()) {
-            viewModel.reissueAccessToken { success ->
-                if (success) {
-                    navigateToMainActivity()
-                } else {
-                    viewModel.renewRefreshToken { refreshSuccess ->
-                        if (refreshSuccess) {
-                            navigateToMainActivity()
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    private fun getCurrentTime(): Long {
-        return System.currentTimeMillis() / 1000
-    }
 
     //로그인 성공 시 메인액티비로 넘어가기
     private fun navigateToMainActivity() {

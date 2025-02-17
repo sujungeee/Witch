@@ -202,10 +202,10 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
 
             viewModel.registerUser(joinRequest) { success, message ->
                 if (success) {
-                    showToast("회원가입 성공")
+                    showToast("회원가입이 완료되었습니다.\n 로그인 후 이용해주세요.")
                     loginActivity.openFragment(3)
                 } else {
-                    showToast("회원가입 실패")
+                    showToast("회원가입에 실패하였습니다.")
                 }
             }
         }
@@ -329,8 +329,11 @@ class JoinFragment : BaseFragment<FragmentJoinBinding>(
         // 4. 이메일 인증이 완료되어야 함
         val isVerificationCompleted = isEmailVerified
 
-        // 5. 모든 조건이 만족할 때만 회원가입 버튼 활성화
-        val isJoinEnabled = isInputValid && isDuplicateChecked && isPasswordMatching && isVerificationCompleted
+        // 5. 비밀번호가 8자 이상이어야 함
+        val isLengthValid = password.length >= 8
+
+        // 6. 모든 조건이 만족할 때만 회원가입 버튼 활성화
+        val isJoinEnabled = isInputValid && isDuplicateChecked && isPasswordMatching && isVerificationCompleted && isLengthValid
 
         binding.joinFgBtnJoin.isEnabled = isJoinEnabled
         if (isJoinEnabled) {

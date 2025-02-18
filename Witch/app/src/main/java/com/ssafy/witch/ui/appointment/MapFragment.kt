@@ -55,7 +55,7 @@ import java.util.Locale
 private const val TAG = "MapFragment_Witch"
 class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),
     OnMapReadyCallback {
-        private var userStatus = 3
+        private var userStatus = -1
         private var appointmentId = ""
 
         private val appointmentViewModel: AppointmentViewModel by activityViewModels()
@@ -84,11 +84,11 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
             super.onViewCreated(view, savedInstanceState)
 
-            appointmentViewModel.getMyInfo()
-
             arguments?.let {
                 appointmentId = it.getString("appointmentId").toString()
             }
+            appointmentViewModel.getAppointmentInfo(appointmentId)
+            appointmentViewModel.getMyInfo()
 
             fusedLocationClient = LocationServices.getFusedLocationProviderClient(requireActivity())
             val mapFragment =
@@ -98,9 +98,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             val bottomSheetView = view.findViewById<View>(R.id.bottom_sheet_layout)
             _bottomSheetBinding = BottomSheetLayoutBinding.bind(bottomSheetView)
 
-            initAppointmentObserver()
-            initSnackObserver()
             initLocationObserver()
+            initUserObserver()
+            initSnackObserver()
+            initAppointmentObserver()
 
             binding.mapAcTvAppointmentName.isSelected = true
             bottomSheetBinding.mapFgTvBottomAppointmentSummary.isSelected= true
@@ -156,19 +157,37 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             return bitmap
         }
 
+        private fun initUserObserver() {
+            mapViewModel.userStatus.observe(viewLifecycleOwner) {
+                val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.circle_btn) as GradientDrawable
+
+                when (userStatus) {
+                    1 -> {
+                        binding.mapAcTvAppointmentStatus.text = "약속 삭제"
+                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_red))
+                    }
+                    2 -> {
+                        binding.mapAcTvAppointmentStatus.text = "약속 참여"
+                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_green))
+                    }
+                    3 -> {
+                        binding.mapAcTvAppointmentStatus.text = "약속 탈퇴"
+                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_green))
+                    }
+                }
+
+                binding.mapAcTvAppointmentStatus.background = drawable
+            }
+        }
+
         private fun initLocationObserver() {
             MyLocationForegroundService.locationData.observe(viewLifecycleOwner) {
+                appointmentViewModel.getAppointmentInfo(appointmentId)
                 appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
-                    // 약속이 시작되면
-                    if(it.appointmentStatus != "SCHEDULED") {
-                        binding.mapAcTvAppointmentStatus.visibility = View.GONE
-                    }
-
                     if(timerFlag == false) {
                         setTimer(LocalDateTime.parse(it.appointmentTime))
                         timerFlag = true
                     }
-
                     showSnackArea(it.appointmentStatus)
                 }
                 // 위치 표시
@@ -198,49 +217,49 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         }
 
         private fun initAppointmentObserver() {
-            appointmentViewModel.userId.observe(viewLifecycleOwner) {
-                appointmentViewModel.getAppointmentInfo(appointmentId)
-                appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
-                    setTimer(LocalDateTime.parse(it.appointmentTime))
-                    startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
 
-                    binding.mapAcTvAppointmentName.text = it.name
-                    bottomSheetBinding.mapFgTvBottomAppointmentSummary.text = it.summary
-                    bottomSheetBinding.mapFgTvBottomAppointmentLocation.text = it.address
-                    bottomSheetBinding.mapFgTvBottomAppointmentLeader.text = it.name
-                    bottomSheetBinding.mapFgTvBottomAppointmentTime.text = LocalDateTime.parse(it.appointmentTime).format(
-                        DateTimeFormatter.ofPattern("M월 d일 a h시 mm분", Locale.KOREAN))
+            appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
+                setTimer(LocalDateTime.parse(it.appointmentTime))
+                startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
 
-                    for(participant in it.participants) {
-                        if(participant.isLeader) { // 모임장인 경우
+                binding.mapAcTvAppointmentName.text = it.name
+                bottomSheetBinding.mapFgTvBottomAppointmentSummary.text = it.summary
+                bottomSheetBinding.mapFgTvBottomAppointmentLocation.text = it.address
+                bottomSheetBinding.mapFgTvBottomAppointmentTime.text = LocalDateTime.parse(it.appointmentTime).format(
+                    DateTimeFormatter.ofPattern("M월 d일 a h시 mm분", Locale.KOREAN))
 
-                            Glide.with(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile.context)
-                                .load(participant.profileImageUrl)
-                                .circleCrop()
-                                .into(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile)
+                var flag = false
+                for(participant in it.participants) {
+                    if(participant.isLeader) { // 약속장인 경우
 
-                            bottomSheetBinding.mapFgTvBottomAppointmentLeader.text = participant.nickname
-//                            if(participant.is_late) {
+                        Glide.with(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile.context)
+                            .load(participant.profileImageUrl)
+                            .circleCrop()
+                            .into(bottomSheetBinding.mapFgIvBottomAppointmentCpProfile)
+                        bottomSheetBinding.mapFgTvBottomAppointmentLeader.text = participant.nickname
+//                            if(participant.is_late) { // 약속장이 지각한 경우
 //                                bottomSheetBinding.mapFgTvBottomLeaderLate.visibility = View.VISIBLE
 //                            }
-                            if (participant.userId == appointmentViewModel.userId.value) {
-                                userStatus = 1
-                            }
-                        } else { // 모임원인 경우
-                            participantsList.add(participant)
 
-                            if (participant.userId == appointmentViewModel.userId.value) {
-                                userStatus = 2
-                            }
+                        if (participant.userId == appointmentViewModel.userId.value) {
+                            flag = true
+                            mapViewModel.setUserStatus(1)
+                        }
+                    } else { // 모임원인 경우
+                        participantsList.add(participant)
+
+                        if (participant.userId == appointmentViewModel.userId.value) {
+                            flag = true
+                            mapViewModel.setUserStatus(3)
                         }
                     }
-                    Log.d(TAG, "initAppointmentObserver: status: ${it.appointmentStatus}")
-                    setUserStatus(userStatus, it.appointmentStatus)
-                    showSnackArea(it.appointmentStatus)
-
-                    participantsAdapter= AppointmentDetailParticipantsAdapter(participantsList)
-                    bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
                 }
+                if (flag == false) {
+                    mapViewModel.setUserStatus(2)
+                }
+                showSnackArea(it.appointmentStatus)
+                participantsAdapter= AppointmentDetailParticipantsAdapter(participantsList)
+                bottomSheetBinding.mapFgRvBottomMembers.adapter= participantsAdapter
             }
 
             appointmentViewModel.fragmentIdx.observe(viewLifecycleOwner) {
@@ -267,7 +286,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         }
 
         private fun setDialog(userStatus: Int) {
-            val dialogView= when (userStatus) {
+            val dialogView= when (mapViewModel.userStatus.value) {
                 1 -> layoutInflater.inflate(R.layout.dialog_appointment_delete, null)
                 2 -> layoutInflater.inflate(R.layout.dialog_appointment_join, null)
                 3 -> layoutInflater.inflate(R.layout.dialog_appointment_leave, null)
@@ -293,31 +312,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
             appointmentChangeDlBtnNo.setOnClickListener {
                 dialogBuilder.dismiss()
-            }
-        }
-
-        private fun setUserStatus(userStatus: Int, appointmentStatus: String) {
-            val drawable = ContextCompat.getDrawable(requireContext(), R.drawable.circle_btn) as GradientDrawable
-
-            if (appointmentStatus == "ONGOING" || appointmentStatus == "FINISHED") {
-                binding.mapAcTvAppointmentStatus.visibility = View.GONE
-            } else {
-                when (userStatus) {
-                    1 -> {
-                        binding.mapAcTvAppointmentStatus.text = "약속 삭제"
-                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_red))
-                    }
-                    2 -> {
-                        binding.mapAcTvAppointmentStatus.text = "약속 참여"
-                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_green))
-                    }
-                    3 -> {
-                        binding.mapAcTvAppointmentStatus.text = "약속 탈퇴"
-                        drawable.setColor(ContextCompat.getColor(requireContext(), R.color.witch_green))
-                    }
-                }
-
-                binding.mapAcTvAppointmentStatus.background = drawable
             }
         }
 

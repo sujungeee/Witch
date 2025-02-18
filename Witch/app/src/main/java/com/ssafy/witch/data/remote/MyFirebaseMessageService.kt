@@ -15,18 +15,16 @@ class MyFirebaseMessageService :  FirebaseMessagingService() {
         super.onMessageReceived(message)
 
         var type = message.data["type"].toString()
-        var id = message.data["id"].toString()
-        var parameter = message.data["parameter"].toString().toInt()
+        var parameter = message.data["parameter"].toString()
         var title = message.data["title"].toString()
         var content = message.data["content"].toString()
 
-        sendToForegroundService(type, id, parameter, title, content)
+        sendToForegroundService(type, parameter, title, content)
     }
 
-    private fun sendToForegroundService(type: String, id: String, parameter: Int, title: String, content: String) {
+    private fun sendToForegroundService(type: String, parameter: String, title: String, content: String) {
         val intent = Intent(this, ForegroundService::class.java).apply {
             putExtra("type", type)
-            putExtra("id", id)
             putExtra("parameter", parameter)
             putExtra("title", title)
             putExtra("content", content)

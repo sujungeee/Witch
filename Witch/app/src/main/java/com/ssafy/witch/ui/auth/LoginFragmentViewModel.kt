@@ -11,6 +11,8 @@ import com.ssafy.witch.data.model.dto.Login
 import com.ssafy.witch.data.model.dto.RefreshToken
 import com.ssafy.witch.data.model.response.ErrorResponse
 import com.ssafy.witch.data.remote.AuthService
+import com.ssafy.witch.data.remote.RetrofitUtil.Companion.authService
+import com.ssafy.witch.data.remote.RetrofitUtil.Companion.tokenService
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -30,9 +32,6 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
     fun login(email:String, password: String, onResult: (Boolean, String?) -> Unit) {
         //API 호출은 IO 스레드에서 실행
         viewModelScope.launch(Dispatchers.IO) {
-            // login 위해 retrofit 으로 가야 함
-
-            val authServiceLogin = ApplicationClass.retrofitLogin.create((AuthService::class.java))
 
             FirebaseMessaging.getInstance().token.addOnCompleteListener {
                 if (it.isSuccessful) {
@@ -42,7 +41,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                     // FCM 토큰 발급 완료 후 API 호출
                     viewModelScope.launch {
                         runCatching {
-                            authServiceLogin.login(Login(email, fcmToken, password))
+                            authService.login(Login(email, fcmToken, password))
                         }.onSuccess { response ->
                             if (response.success) {
                                 response.data?.let { data ->
@@ -97,10 +96,8 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
 
             Log.d(TAG, "reissueAccessToken_refreshToken: $refreshToken")
 
-            val authServiceLogin = ApplicationClass.retrofitLogin.create((AuthService::class.java))
-
             runCatching {
-                authServiceLogin.reissueAccessToken(RefreshToken(refreshToken))
+                tokenService.reissueAccessToken(RefreshToken(refreshToken))
             }.onSuccess { response ->
                 if (response.isSuccessful) {
                     val data = response.body()?.data
@@ -125,10 +122,8 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
         viewModelScope.launch {
             val refreshToken = sharedPreferencesUtil.getRefreshToken() ?: return@launch onResult(false)
 
-            Log.d(TAG, "renewRefreshToken_refreshToken: $refreshToken")
-            val authServiceLogin = ApplicationClass.retrofitLogin.create(AuthService::class.java)
             runCatching {
-                authServiceLogin.renewRefreshToken(RefreshToken("Bearer $refreshToken"))
+                tokenService.renewRefreshToken(RefreshToken("Bearer $refreshToken"))
             }.onSuccess { response ->
                 if (response.isSuccessful) {
                     val baseResponse = response.body()

@@ -88,6 +88,7 @@ class ApplicationClass : Application() {
             .client(client)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
+
     }
 
     //GSon은 엄격한 json type을 요구하는데, 느슨하게 하기 위한 설정. success, fail이 json이 아니라 단순 문자열로 리턴될 경우 처리..
@@ -127,4 +128,7 @@ class ApplicationClass : Application() {
             }
         }
     }
+
+
+
 }

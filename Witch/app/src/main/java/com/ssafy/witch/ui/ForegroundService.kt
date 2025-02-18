@@ -10,8 +10,20 @@ import android.os.IBinder
 import androidx.core.app.NotificationCompat
 import com.ssafy.witch.R
 
+enum class appointmentFcm{
+    APPOINTMENT_START, APPOINTMENT_END, APPOINTMENT_DELETED
+    , APPOINTMENT_JOIN, APPOINTMENT_EXIT, APPOINTMENT_ARRIVAL
+}
+
+enum class groupFcm {
+    GROUP_JOIN_REQUEST, GROUP_JOIN_REQUEST_APPROVE, GROUP_JOIN_REQUEST_REJECT
+    , GROUP_DELETED, APPOINTMENT_CREATED
+}
+
 private const val TAG = "ForegroundService_Witch"
 class ForegroundService : Service() {
+
+    private lateinit var fcmType: String
 
     override fun onBind(intent: Intent): IBinder? {
         return null
@@ -19,27 +31,34 @@ class ForegroundService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         val type = intent?.getStringExtra("type") ?: "default"
-        val id = intent?.getStringExtra("id") ?: "아이디"
         val parameter = intent?.getStringExtra("parameter") ?: "파라미터"
         val title = intent?.getStringExtra("title") ?: "알림 제목"
         val content = intent?.getStringExtra("body") ?: "알림 내용"
 
-        val channelId = getChannelId(type)
-        createNotificationChannel(channelId, type)
-        startForegroundService(channelId, type, id, parameter, title, content)
+        fcmType = getFcmType(type)
+        val channelId = getChannelId(fcmType)
+        createNotificationChannel(channelId, fcmType)
+        startForegroundService(channelId, fcmType, parameter, title, content)
 
         return START_STICKY
     }
 
-    private fun startForegroundService(channelId: String, type: String, id: String, parameter: String, title: String, content: String) {
-        val pendingIntent = createPendingIntent(type, id, parameter)
+    private fun getFcmType(type: String): String {
+        return when {
+            groupFcm.values().map { it.name }.contains(type) -> "group"
+            appointmentFcm.values().map { it.name }.contains(type) -> "appointment"
+            else -> "basic"
+        }
+    }
+
+    private fun startForegroundService(channelId: String, fcmType: String, parameter: String, title: String, content: String) {
+        val pendingIntent = createPendingIntent(fcmType, parameter)
 
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle(title)
             .setContentText(content)
-            .setSmallIcon(R.drawable.location)
+            .setSmallIcon(R.drawable.app_icon)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setVisibility(NotificationCompat.VISIBILITY_SECRET) // 알림 안뜨게
             .setOngoing(true)
             .setContentIntent(pendingIntent)
             .build()
@@ -53,24 +72,24 @@ class ForegroundService : Service() {
         notificationManager?.createNotificationChannel(NotificationChannel(channelId, getChannelName(type), importance))
     }
 
-    private fun getChannelId(type: String): String {
-        return when (type) {
+    private fun getChannelId(fcmType: String): String {
+        return when (fcmType) {
             "appointment" -> "appointment_channel"
             "group" -> "group_channel"
             else -> "default_channel"
         }
     }
 
-    private fun getChannelName(type: String): String {
-        return when (type) {
+    private fun getChannelName(fcmType: String): String {
+        return when (fcmType) {
             "appointment" -> "약속 알림"
             "group" -> "모임 알림"
             else -> "기본 알림"
         }
     }
 
-    private fun createPendingIntent(type: String, id: String, parameter: String): PendingIntent {
-        val intent = when (type) {
+    private fun createPendingIntent(fcmType: String, parameter: String): PendingIntent {
+        val intent = when (fcmType) {
             "group" -> Intent(this, MainActivity::class.java).apply {
                 putExtra("openFragment", 5)
                 putExtra("id", parameter)

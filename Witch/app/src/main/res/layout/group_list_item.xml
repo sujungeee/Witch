@@ -12,14 +12,14 @@
     android:layout_height="110dp">
 
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
+        app:shapeAppearanceOverlay="@style/Circle"
         android:id="@+id/group_li_iv_group_img"
         android:layout_width="35dp"
         android:layout_height="35dp"
-        android:background="@drawable/circle_shape"
-        android:backgroundTint="@color/witch_white"
+        android:scaleType="centerCrop"
+        android:background="@drawable/pot_icon"
         android:clipToOutline="true"
-        android:src="@drawable/pot_icon"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 

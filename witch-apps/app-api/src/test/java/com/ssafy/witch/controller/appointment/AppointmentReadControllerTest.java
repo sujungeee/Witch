@@ -350,22 +350,4 @@ class AppointmentReadControllerTest extends RestDocsTestSupport {
         .andDo(restDocs.document());
   }
 
-  @WithMockWitchUser
-  @Test
-  void get_appointment_detail_400_not_appointment_member() throws Exception {
-
-    String appointmentId = "example-appointment-id";
-
-    given(readAppointmentUseCase.getAppointmentDetail(any(), any()))
-        .willThrow(new UnauthorizedAppointmentAccessException());
-
-    mvc.perform(get("/appointments/{appointmentId}", appointmentId)
-            .contentType(MediaType.APPLICATION_JSON)
-            .header("Authorization", "Bearer sample.access.token")
-        )
-        .andExpect(status().isBadRequest())
-        .andExpect(jsonPath("error.errorCode").value(
-            ErrorCode.UNAUTHORIZED_APPOINTMENT_ACCESS.getErrorCode()))
-        .andDo(restDocs.document());
-  }
 }

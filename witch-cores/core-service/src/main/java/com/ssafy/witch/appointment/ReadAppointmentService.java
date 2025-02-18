@@ -53,10 +53,6 @@ public class ReadAppointmentService implements ReadAppointmentUseCase {
       throw new AppointmentNotFoundException();
     }
 
-    if (!appointmentMemberPort.existsByUserIdAndAppointmentId(userId, appointmentId)) {
-      throw new UnauthorizedAppointmentAccessException();
-    }
-
     return appointmentOutputMapper.toOutput(
         appointmentReadPort.getAppointmentDetail(appointmentId));
   }

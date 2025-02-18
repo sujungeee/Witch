@@ -9,7 +9,3 @@ operation::appointment-read-controller-test/get_appointment_detail_200[snippets=
 ===== 약속이 존재하지 않을 시
 
 operation::appointment-read-controller-test/get_appointment_detail_400_appointment_not_exists[snippets='http-response']
-
-===== 약속 멤버가 아닐 시
-
-operation::appointment-read-controller-test/get_appointment_detail_400_not_appointment_member[snippets='http-response']

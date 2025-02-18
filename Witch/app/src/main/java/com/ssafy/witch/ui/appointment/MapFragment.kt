@@ -22,10 +22,8 @@ import android.widget.Button
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -37,16 +35,13 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.data.model.dto.AppointmentDetailItem
 import com.ssafy.witch.data.model.response.SnackResponse
 import com.ssafy.witch.databinding.BottomSheetLayoutBinding
 import com.ssafy.witch.databinding.FragmentMapBinding
 import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
-import com.ssafy.witch.ui.snack.SnackCreateViewModel
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -59,9 +54,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
         private val appointmentViewModel: AppointmentViewModel by activityViewModels()
         private val mapViewModel: MapViewModel by activityViewModels()
-        private val snackViewModel: SnackCreateViewModel by viewModels()
 
-        private lateinit var participantsAdapter: AppointmentDetailParticipantsAdapter
         private lateinit var snackList: List<SnackResponse.SnackInfo>
 
         private lateinit var timer: TimerHandler
@@ -117,7 +110,12 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
 
             bottomSheetBinding.mapFgIvBottomAdd.setOnClickListener {
-                (requireActivity() as ContentActivity).openFragment(5)
+                for(participant in appointmentViewModel.participants.value!!) {
+                    if (appointmentViewModel.userId.value == participant.userId) {
+                        (requireActivity() as ContentActivity).openFragment(5, appointmentId)
+                    }
+                }
+                showCustomToast("약속 참여자가 아닙니다.")
             }
 
             bottomSheetBinding.mapFgCbAppointmentIsLate.setOnCheckedChangeListener { _, isChecked ->
@@ -346,33 +344,18 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         private fun startLocationUpdates(latitude: Double?, longitude: Double?) {
             Log.d(TAG, "startLocationUpdates: latitude: ${latitude}, longitude: ${longitude}")
             if (ContextCompat.checkSelfPermission(requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                if (latitude == null || longitude == null) {
-                    fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
-                        if (location != null) {
-                            val userLocation = LatLng(location.latitude, location.longitude)
-                            mylocation = Location("")
-                            mylocation.latitude = location.latitude
-                            mylocation.longitude = location.longitude
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 15f))
-                        } else {
-                            Log.d(TAG, "startLocationUpdates: ")
-                        }
-                    }
-                } else {
-                    appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner){
-                        val placeLocation = LatLng(latitude, longitude)
-                        val bitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.balloon)
-                        val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
-                        map.addMarker(
-                            MarkerOptions()
-                                .position(placeLocation)
-                                .icon(markerIcon)
-                        )
-                    }
+                Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner){
+                    val placeLocation = LatLng(latitude!!, longitude!!)
+                    val bitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.balloon)
+                    val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
+                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
+                    map.addMarker(
+                        MarkerOptions()
+                            .position(placeLocation)
+                            .icon(markerIcon)
+                    )
                 }
-
             }
         }
 

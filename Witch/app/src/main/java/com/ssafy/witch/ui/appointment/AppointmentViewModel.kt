@@ -158,7 +158,9 @@ class AppointmentViewModel: ViewModel() {
                     if (response.body()?.success == true) {
                         _appointmentInfo.value = response.body()?.data!!
                         _appointmentStatus.value = appointmentInfo.value?.appointmentStatus
-                        _participants.value = appointmentInfo.value?.participants as MutableList<Participants>
+                        _participants.value = appointmentInfo.value?.participants
+                            ?.filter { it.isLeader != true }
+                            ?.toMutableList()
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()

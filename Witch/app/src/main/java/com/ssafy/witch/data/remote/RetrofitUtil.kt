@@ -8,7 +8,9 @@ class RetrofitUtil {
 
         val appointmentService = ApplicationClass.retrofit.create(AppointmentService::class.java)
 
-        val authService = ApplicationClass.retrofit.create(AuthService::class.java)
+        val authService = ApplicationClass.retrofitLogin.create(AuthService::class.java)
+
+        val tokenService = ApplicationClass.retrofit.create(TokenService::class.java)
 
         val groupService = ApplicationClass.retrofit.create(GroupService::class.java)
 
@@ -16,4 +18,5 @@ class RetrofitUtil {
 
         val snackService = ApplicationClass.retrofit.create(SnackService::class.java)
     }
+
 }

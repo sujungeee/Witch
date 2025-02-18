@@ -106,5 +106,4 @@ interface GroupService {
         @Path("groupId") groupId: String
     ) : Response<BaseResponse<String>>
 
-
 }

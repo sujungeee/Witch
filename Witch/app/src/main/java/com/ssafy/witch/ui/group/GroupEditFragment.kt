@@ -30,10 +30,13 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        initView()
         initObserver()
 
-        groupViewModel.getGroup(groupId)
+    }
 
+    fun initView(){
+        groupViewModel.getGroup(groupId)
 
         binding.groupEditFgBtnNameChange.setOnClickListener{
             viewModel.editGroupName(groupId, binding.groupEditFgEtNickname.text.toString() , requireContext() as ContentActivity)
@@ -73,6 +76,8 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
             if (groupViewModel.group.value?.name == newName) {
                 Toast.makeText(requireContext(), "현재 사용중인 이름입니다.", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
+            } else if(newName.isBlank()){
+                Toast.makeText(requireContext(), "그룹 이름을 입력해주세요.", Toast.LENGTH_SHORT).show()
             } else {
                 viewModel.checkDupl(newName, "group", requireContext() as ContentActivity).apply {
                     binding.groupEditFgBtnNameChange.isEnabled = true
@@ -82,6 +87,12 @@ class GroupEditFragment : BaseFragment<FragmentGroupEditBinding>(FragmentGroupEd
     }
 
     private fun initObserver(){
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
+
         groupViewModel.group.observe(viewLifecycleOwner){
             binding.groupEditFgEtNickname.setText(it.name)
             Glide.with(requireContext())

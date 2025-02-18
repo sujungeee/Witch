@@ -12,8 +12,6 @@ import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
 
 class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupListBinding::bind, R.layout.fragment_group_list) {
-    private lateinit var groupListAdapter: GroupListAdapter
-
     private val viewModel: GroupListViewModel by viewModels()
 
     private lateinit var mainActivity: MainActivity
@@ -22,32 +20,31 @@ class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupLi
         mainActivity = requireActivity() as MainActivity
 
         initView()
-        initAdapter()
-
-        binding.groupListFgIbAddGroup.setOnClickListener {
-            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
-            contentActivity.putExtra("openFragment", 1)
-            startActivity(contentActivity)
-        }
+        initObserver()
     }
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-
-    fun initView(){
-        viewModel.getGroupList()
-    }
-
-    fun initAdapter(){
+    fun initObserver() {
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if (!it.isNullOrBlank()) {
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
 
         viewModel.groupList.observe(viewLifecycleOwner) {
             binding.groupListFgRvGroupList.adapter = GroupListAdapter(it) { id ->
                 (requireActivity() as MainActivity).openFragment(5, id)
             }
         }
+    }
 
+    fun initView(){
+        viewModel.getGroupList()
+
+        binding.groupListFgIbAddGroup.setOnClickListener {
+            val contentActivity = Intent(requireContext(), ContentActivity::class.java)
+            contentActivity.putExtra("openFragment", 1)
+            startActivity(contentActivity)
+        }
     }
 
     override fun onResume() {

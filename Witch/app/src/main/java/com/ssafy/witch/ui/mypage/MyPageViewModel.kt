@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.ssafy.witch.base.ApplicationClass
+import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.EditPwd
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.data.model.dto.User
@@ -17,6 +19,10 @@ import com.ssafy.witch.ui.MainActivity
 import kotlinx.coroutines.launch
 
 class MyPageViewModel : ViewModel() {
+    val _errorMessage = MutableLiveData<String>("")
+    val errorMessage: LiveData<String>
+        get() = _errorMessage
+
     private val _name = MutableLiveData<String>()
     val name: LiveData<String>
         get() = _name
@@ -39,7 +45,15 @@ class MyPageViewModel : ViewModel() {
             runCatching {
                 userService.editPassword(EditPwd(password, newPassword))
             }.onSuccess {
-                context.finish()
+                if (it.isSuccessful) {
+                    context.finish()
+                } else {
+                    // 실패
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -59,6 +73,10 @@ class MyPageViewModel : ViewModel() {
                         }
                     }
                 } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                     // 실패
                 }
             }.onFailure {

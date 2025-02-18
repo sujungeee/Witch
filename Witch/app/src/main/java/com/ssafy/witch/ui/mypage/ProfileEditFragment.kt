@@ -25,6 +25,7 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
         super.onViewCreated(view, savedInstanceState)
 
         initView()
+        initObserver()
 
     }
 
@@ -33,7 +34,6 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
     }
 
     fun initView(){
-
         binding.profileEditFgEtNickname.setText(ApplicationClass.sharedPreferencesUtil.getUser().nickname)
         Glide.with(binding.root)
             .load(ApplicationClass.sharedPreferencesUtil.getUser().profileImageUrl)
@@ -80,5 +80,13 @@ class ProfileEditFragment : BaseFragment<FragmentProfileEditBinding>(FragmentPro
             imagePickerUtil.checkPermissionAndOpenGallery()
         }
 
+    }
+
+    fun initObserver(){
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
     }
 }

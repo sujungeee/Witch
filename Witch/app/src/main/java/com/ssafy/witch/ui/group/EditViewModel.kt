@@ -31,6 +31,10 @@ import kotlin.coroutines.suspendCoroutine
 
 private const val TAG = "GroupCreateViewModel"
 class EditViewModel : ViewModel() {
+    val _errorMessage = MutableLiveData<String>("")
+    val errorMessage: LiveData<String>
+        get() = _errorMessage
+
     private val _name = MutableLiveData<String>()
     val name: LiveData<String>
         get() = _name
@@ -157,6 +161,11 @@ class EditViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     context.finish()
+                }else{
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -173,6 +182,10 @@ class EditViewModel : ViewModel() {
                     Log.d(TAG, "editGroupImage: 성공><")
                     context.finish()
                 } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                     Log.d(TAG, "editGroupImage: ${it.errorBody()}")
                 }
             }.onFailure {
@@ -190,6 +203,10 @@ class EditViewModel : ViewModel() {
                     context.finish()
                     Log.d(TAG, "editGroupName: 성공><")
                 } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                     Log.d(TAG, "editGroupName: ${it.errorBody()}")
                 }
             }.onFailure {
@@ -209,7 +226,10 @@ class EditViewModel : ViewModel() {
 
                     context.finish()
                 } else {
-                    Log.d(TAG, "editProfileImage: ${it.errorBody()}")
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -228,7 +248,10 @@ class EditViewModel : ViewModel() {
                     context.finish()
                     Log.d(TAG, "editProfileName: 성공><")
                 } else {
-                    Log.d(TAG, "editProfileName: ${it.errorBody()}")
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                 }
             }.onFailure {
                 it.printStackTrace()
@@ -263,7 +286,7 @@ class EditViewModel : ViewModel() {
                 }else{
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
-                        Toast.makeText(context, data.error.errorMessage , Toast.LENGTH_SHORT).show()
+                        _errorMessage.value = data.error.errorMessage
                     }
                 }
             }.onFailure {

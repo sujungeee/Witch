@@ -61,6 +61,24 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
         initAdapter()
         initObserver()
 
+
+    }
+
+
+
+    fun initView(){
+
+        initMemberDialog()
+        initOutDialog()
+
+        binding.groupFgIbGroupEdit.setOnClickListener {
+            mainActivity.openFragment(7)
+        }
+
+        binding.groupFgTvInviteLink.setOnClickListener {
+            copyToClipboard(ApplicationClass.API_URL+"deeplink?groupId=${groupId}")
+        }
+
         binding.groupFgIvAppointmentCreate.setOnClickListener {
             val contentActivity = Intent(requireContext(), ContentActivity::class.java)
             contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -76,29 +94,17 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             contentActivity.putExtra("id", groupId)
             startActivity(contentActivity)
         }
-    }
-
-
-
-    fun initView(){
-
-        initMemberDialog()
-        initOutDialog()
-        binding.groupFgIbGroupEdit.setOnClickListener {
-            mainActivity.openFragment(7)
-        }
-
-        binding.groupFgTvInviteLink.setOnClickListener {
-            copyToClipboard(ApplicationClass.API_URL+"deeplink?groupId=${groupId}")
-        }
-
-
-//        viewModel.getGroup(groupId)
 
     }
 
 
     fun initObserver(){
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
+
         viewModel.group.observe(viewLifecycleOwner, {
             Glide.with(binding.root)
                 .load(viewModel.group.value?.groupImageUrl)

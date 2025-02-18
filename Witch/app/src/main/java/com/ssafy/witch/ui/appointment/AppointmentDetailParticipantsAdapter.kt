@@ -8,7 +8,7 @@ import com.ssafy.witch.R
 import com.ssafy.witch.data.model.dto.AppointmentDetailItem
 import com.ssafy.witch.databinding.AppointmentDetailParticipantsItemBinding
 
-class AppointmentDetailParticipantsAdapter(var participantsList: List<AppointmentDetailItem.Participants>)
+class AppointmentDetailParticipantsAdapter(var participantsList: MutableList<AppointmentDetailItem.Participants>)
     : RecyclerView.Adapter<AppointmentDetailParticipantsAdapter.ParticipantsViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ParticipantsViewHolder {
@@ -37,9 +37,4 @@ class AppointmentDetailParticipantsAdapter(var participantsList: List<Appointmen
 //            binding.appointmentDetailParticipantName.setTextColor(textColor)
         }
     }
-
-//    fun updateList(list: List<AppointmentDetailItem.Participants>) {
-//        participantsList = list
-//        notifyDataSetChanged()
-//    }
 }

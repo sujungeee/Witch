@@ -7,17 +7,18 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.os.IBinder
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.ssafy.witch.R
 
-enum class appointmentFcm{
-    APPOINTMENT_START, APPOINTMENT_END, APPOINTMENT_DELETED
+enum class appointmentFcm{ // APPOINTMENT_DELETED
+    APPOINTMENT_START, APPOINTMENT_END
     , APPOINTMENT_JOIN, APPOINTMENT_EXIT, APPOINTMENT_ARRIVAL
 }
 
-enum class groupFcm {
-    GROUP_JOIN_REQUEST, GROUP_JOIN_REQUEST_APPROVE, GROUP_JOIN_REQUEST_REJECT
-    , GROUP_DELETED, APPOINTMENT_CREATED
+enum class groupFcm { // GROUP_DELETED
+    GROUP_JOIN_REQUEST, GROUP_JOIN_REQUEST_APPROVE
+    , GROUP_JOIN_REQUEST_REJECT, APPOINTMENT_CREATED
 }
 
 private const val TAG = "ForegroundService_Witch"

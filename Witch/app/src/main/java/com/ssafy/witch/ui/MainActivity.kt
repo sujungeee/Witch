@@ -4,8 +4,14 @@ import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.work.Constraints
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkManager
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
+import com.ssafy.witch.data.remote.LocationWorker
 import com.ssafy.witch.databinding.ActivityMainBinding
 import com.ssafy.witch.ui.group.GroupCreateFragment
 import com.ssafy.witch.ui.group.GroupEditFragment
@@ -15,6 +21,7 @@ import com.ssafy.witch.ui.group.GroupListFragment
 import com.ssafy.witch.ui.home.HomeFragment
 import com.ssafy.witch.ui.mypage.MyPageFragment
 import com.ssafy.witch.ui.snack.SnackCreateFragment
+import java.util.concurrent.TimeUnit
 
 
 private const val TAG = "MainActivity"
@@ -32,6 +39,8 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(mainBinding.root)
+
+        startWorkManager()
 
 //        ApplicationClass.sharedPreferencesUtil.clearToken()
         // ViewModel 초기화 (토큰 재발급 함수 사용)
@@ -149,6 +158,26 @@ class MainActivity : AppCompatActivity() {
         }
         startActivity(intent)
         finish()
+    }
+
+    private fun startWorkManager() {
+        val workManager = WorkManager.getInstance(this)
+
+        workManager.cancelUniqueWork("LocationWorker")
+
+        val constraints = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .build()
+
+        val workRequest = PeriodicWorkRequestBuilder<LocationWorker>(30, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+
+        workManager.enqueueUniquePeriodicWork(
+            "LocationWorker",
+            ExistingPeriodicWorkPolicy.KEEP,
+            workRequest
+        )
     }
 
 }

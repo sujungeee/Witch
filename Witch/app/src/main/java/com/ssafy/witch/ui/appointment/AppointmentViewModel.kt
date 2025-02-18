@@ -9,6 +9,7 @@ import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.AppointmentDetailItem
+import com.ssafy.witch.data.model.dto.AppointmentDetailItem.Participants
 import com.ssafy.witch.data.model.dto.request.AppointmentRequest
 import com.ssafy.witch.data.model.response.ErrorResponse
 import com.ssafy.witch.data.model.response.LocationResponse
@@ -42,6 +43,7 @@ class AppointmentViewModel: ViewModel() {
     val userId: LiveData<String>
         get() = _userId
 
+    // bottomsheet 정보
     private val _name= MutableLiveData<String>()
     val name: LiveData<String>
         get()= _name
@@ -54,6 +56,10 @@ class AppointmentViewModel: ViewModel() {
     val appointmentTime: LiveData<String>
         get()= _appointmentTime
 
+    private val _address= MutableLiveData<String>()
+    val address: LiveData<String>
+        get()= _address
+
     private val _latitude= MutableLiveData<Double>()
     val latitude: LiveData<Double>
         get()= _latitude
@@ -62,10 +68,13 @@ class AppointmentViewModel: ViewModel() {
     val longitude: LiveData<Double>
         get()= _longitude
 
-    private val _address= MutableLiveData<String>()
-    val address: LiveData<String>
-        get()= _address
+    private val _appointmentStatus = MutableLiveData<String>()
+    val appointmentStatus: LiveData<String>
+        get() = _appointmentStatus
 
+    private val _participants = MutableLiveData<MutableList<Participants>>()
+    val participants : LiveData<MutableList<Participants>>
+        get() = _participants
 
     fun appointmentClear() {
         _name.value = ""
@@ -148,6 +157,10 @@ class AppointmentViewModel: ViewModel() {
                 if (response.isSuccessful) {
                     if (response.body()?.success == true) {
                         _appointmentInfo.value = response.body()?.data!!
+                        _appointmentStatus.value = appointmentInfo.value?.appointmentStatus
+                        _participants.value = appointmentInfo.value?.participants
+                            ?.filter { it.isLeader != true }
+                            ?.toMutableList()
                     }
                 } else {
                     val errorBody = response.errorBody()?.string()

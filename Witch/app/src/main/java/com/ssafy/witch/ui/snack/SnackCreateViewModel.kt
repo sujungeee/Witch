@@ -81,10 +81,6 @@ class SnackCreateViewModel : ViewModel() {
     val textAlign: LiveData<Int>
         get() = _textAlign
 
-    private val _snackList = MutableLiveData<List<SnackResponse.SnackInfo>>()
-    val snackList: LiveData<List<SnackResponse.SnackInfo>>
-        get() = _snackList
-
     fun setSnackText(text: String) {
         _snackText.value = text
     }
@@ -238,27 +234,6 @@ class SnackCreateViewModel : ViewModel() {
 
             }.onFailure {
                 it.printStackTrace()
-            }
-        }
-    }
-
-    fun getSnackList(appointmentId: String) {
-        viewModelScope.launch {
-            runCatching {
-                snackService.getSnackList(appointmentId)
-            }.onSuccess { response ->
-                if (response.isSuccessful) {
-                    _snackList.value = response.body()?.data!!.snacks
-                } else {
-                    val errorBody = response.errorBody()?.string()
-                    val errorResponse = errorBody?.let {
-                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
-                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
-                    }
-                    Log.d(TAG, "getSnackList failed(): ${errorResponse?.data?.errorMessage}")
-                }
-            }.onFailure { e ->
-                Log.e(TAG, "deleteAppointment() Exception: ${e.message}", e)
             }
         }
     }

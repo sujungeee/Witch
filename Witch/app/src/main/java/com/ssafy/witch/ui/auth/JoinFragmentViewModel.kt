@@ -6,37 +6,37 @@ import androidx.lifecycle.viewModelScope
 import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.Join
 import com.ssafy.witch.data.remote.RetrofitUtil
+import com.ssafy.witch.data.remote.RetrofitUtil.Companion.authService
 import kotlinx.coroutines.launch
 import retrofit2.Response
 
 
 class JoinFragmentViewModel(application: Application): AndroidViewModel(application) {
 
-    private val AuthService = RetrofitUtil.authService
 
     //이메일 중복 확인
     fun checkEmailUnique(email: String, onResult: (Boolean, String?) -> Unit) {
-        executeRequest({ AuthService.checkEmailUnique(email) }, onResult)
+        executeRequest({ authService.checkEmailUnique(email) }, onResult)
     }
 
     //닉네임 중복 확인
     fun checkNicknameUnique(nickname: String, onResult: (Boolean, String?) -> Unit) {
-        executeRequest({ AuthService.checkNicknameUnique(nickname) }, onResult)
+        executeRequest({ authService.checkNicknameUnique(nickname) }, onResult)
     }
 
     //이메일 인증 코드 요청
     fun requestEmailVerification(email: String, onResult: (Boolean, String?) -> Unit) {
-        executeRequest({ AuthService.requestEmailVerification(mapOf("email" to email)) }, onResult)
+        executeRequest({ authService.requestEmailVerification(mapOf("email" to email)) }, onResult)
     }
 
     //이메일 인증 코드 확인
     fun confirmEmailVerification(email: String, code: String, onResult: (Boolean, String?) -> Unit) {
-        executeRequest({ AuthService.confirmEmailVerification(mapOf("email" to email, "emailVerificationCode" to code)) }, onResult)
+        executeRequest({ authService.confirmEmailVerification(mapOf("email" to email, "emailVerificationCode" to code)) }, onResult)
     }
 
     //회원가입 요청
     fun registerUser(request: Join, onResult: (Boolean, String?) -> Unit) {
-        executeRequest({ AuthService.registerUser(request) }, onResult)
+        executeRequest({ authService.registerUser(request) }, onResult)
     }
 
     //공통 API 요청 처리 함수

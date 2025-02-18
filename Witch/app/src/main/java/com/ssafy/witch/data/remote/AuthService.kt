@@ -20,14 +20,6 @@ interface AuthService {
     @POST("auth/login")
     suspend fun login(@Body request: Login): BaseResponse<LoginResponse>
 
-    //액세스 토큰 재발급 API
-    @POST("auth/token/reissue")
-    suspend fun reissueAccessToken(@Body request: RefreshToken): Response<BaseResponse<AccessTokenResponse>>
-
-    //리프레시 토큰 재발급 API
-    @POST("auth/token/renew")
-    suspend fun renewRefreshToken(@Body request: RefreshToken): Response<BaseResponse<RefreshTokenResponse>>
-
     // 회원가입 API
     // 서버 오류 -parameter 발생
     //이메일 중복 검증 (GET 요청, URL 파라미터)

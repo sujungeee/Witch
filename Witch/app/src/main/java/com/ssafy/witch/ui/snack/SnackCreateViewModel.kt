@@ -122,7 +122,7 @@ class SnackCreateViewModel : ViewModel() {
     }
 
     suspend fun uploadSnack(context: ContentActivity,appointmentId: String, location: LatLng, image: Uri, audio: Uri?) {
-        var audioPresignedUrl = PresignedUrl("", "")
+        var audioPresignedUrl = PresignedUrl("", null)
         runCatching {
             val imagePresignedUrl = getPresignedUrl("image")
             if (_audioFile.value != null && _audioFile.value != Uri.EMPTY) {
@@ -224,7 +224,7 @@ class SnackCreateViewModel : ViewModel() {
                 snackService.createSnack(appointmentId,snack)
             }.onSuccess {
                 if (it.isSuccessful) {
-                    context.finish()
+                    context.onBackPressed()
                     Toast.makeText(context, "스낵이 생성되었습니다.", Toast.LENGTH_SHORT).show()
                     Log.d("createSnack", "스낵 생성 성공")
                 } else {

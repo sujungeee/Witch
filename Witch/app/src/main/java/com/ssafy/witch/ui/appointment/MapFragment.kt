@@ -37,7 +37,6 @@ import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
-import com.ssafy.witch.data.model.response.SnackResponse
 import com.ssafy.witch.databinding.BottomSheetLayoutBinding
 import com.ssafy.witch.databinding.FragmentMapBinding
 import com.ssafy.witch.ui.ContentActivity
@@ -124,9 +123,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 //                participantsAdapter.updateList(lateParticipants)
             }
 
-            binding.mapAcTv2.setOnClickListener {
-                setDialog()
-            }
         }
 
         private fun createMarkerBitmap(context: Context, imageUrl: String): Bitmap {
@@ -288,14 +284,14 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         private fun initSnackObserver() {
             mapViewModel.getSnackList(appointmentId)
             mapViewModel.snackList.observe(viewLifecycleOwner) {
-                bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(mapViewModel.snackList.value!!) {
+                bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(it) {
                     goToSnackFragment(4, it)
                 }
             }
         }
 
         private fun setDialog() {
-            val dialogView= when (1) { //mapViewModel.userStatus.value
+            val dialogView= when (mapViewModel.userStatus.value) {
                 1 -> layoutInflater.inflate(R.layout.dialog_appointment_delete, null)
                 2 -> layoutInflater.inflate(R.layout.dialog_appointment_join, null)
                 3 -> layoutInflater.inflate(R.layout.dialog_appointment_leave, null)
@@ -311,7 +307,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             val appointmentChangeDlBtnNo = dialogView.findViewById<Button>(R.id.dl_btn_no)
 
             appointmentChangeDlBtnYes.setOnClickListener {
-                when(1) {
+                when(mapViewModel.userStatus.value) {
                     1 -> appointmentViewModel.deleteAppointment(appointmentId)
                     2 -> appointmentViewModel.participateAppointment(appointmentId)
                     3 -> appointmentViewModel.leaveAppointment(appointmentId)
@@ -349,7 +345,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         }
 
 
+    lateinit var mylocation: Location
         private fun startLocationUpdates(latitude: Double?, longitude: Double?) {
+            Log.d(TAG, "startLocationUpdates: latitude: ${latitude}, longitude: ${longitude}")
             if (ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
                 appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner){

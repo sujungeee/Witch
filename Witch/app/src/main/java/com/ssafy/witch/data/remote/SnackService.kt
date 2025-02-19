@@ -15,7 +15,7 @@ import retrofit2.http.Path
 
 interface SnackService {
 
-    @DELETE("/snacks/{snackId}")
+    @DELETE("/snack/{snackId}")
     suspend fun deleteSnack(
         @Path("snackId") snackId: String
     ) : Response<BaseResponse<String>>
@@ -43,9 +43,9 @@ interface SnackService {
     ) : Response<BaseResponse<Snack>>
 
 
-    @GET("/appointment/{appointmentid}/snacks")
+    @GET("/appointments/{appointmentId}/snacks")
     suspend fun getSnackList(
-        @Path("appointmentid") appointmentId: String
+        @Path("appointmentId") appointmentId: String
     ) : Response<BaseResponse<SnackResponse>>
 
 }

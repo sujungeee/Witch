@@ -55,7 +55,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         private val appointmentViewModel: AppointmentViewModel by activityViewModels()
         private val mapViewModel: MapViewModel by activityViewModels()
 
-        private lateinit var snackList: List<SnackResponse.SnackInfo>
 
         private lateinit var timer: TimerHandler
         private lateinit var map: GoogleMap
@@ -278,7 +277,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         private fun initSnackObserver() {
             mapViewModel.getSnackList(appointmentId)
             mapViewModel.snackList.observe(viewLifecycleOwner) {
-                bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(snackList) {
+                bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(it) {
                     (requireActivity() as ContentActivity).openFragment(4, it)
                 }
             }

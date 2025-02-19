@@ -44,7 +44,6 @@ class PwdEditFragment : BaseFragment<FragmentPwdEditBinding>(FragmentPwdEditBind
                 return@setOnClickListener
             }
             viewModel.editPassword(password, passwordCheck, requireActivity() as ContentActivity)
-
         }
 
         // 기존 비밀번호와 새로운 비밀번호 비교

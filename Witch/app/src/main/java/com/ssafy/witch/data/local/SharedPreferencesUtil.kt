@@ -67,7 +67,7 @@ class SharedPreferencesUtil (context : Context) {
         // Refresh Token 저장
         editor.putString(KEY_REFRESH_TOKEN, refreshToken)
         editor.putLong(KEY_REFRESH_TOKEN_EXPIRES_AT, currentTime + refreshTokenExpiresIn)
-        editor.putLong(KEY_REFRESH_TOKEN_RENEW_AVAILABLE_SECONDS, currentTime + refreshTokenExpiresIn - refreshTokenRenewAvailableSeconds)
+        editor.putLong(KEY_REFRESH_TOKEN_RENEW_AVAILABLE_SECONDS, currentTime + refreshTokenRenewAvailableSeconds)
 
         // ✅ 동기적으로 즉시 반영
         val isSuccess = editor.commit()

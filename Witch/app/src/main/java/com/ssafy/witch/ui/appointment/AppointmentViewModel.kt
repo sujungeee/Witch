@@ -76,6 +76,10 @@ class AppointmentViewModel: ViewModel() {
     val participants : LiveData<MutableList<Participants>>
         get() = _participants
 
+    private val _leader= MutableLiveData<MutableList<Participants>>()
+    val leader : LiveData<MutableList<Participants>>
+        get() = _leader
+
     fun appointmentClear() {
         _name.value = ""
         _summary.value = ""
@@ -160,6 +164,9 @@ class AppointmentViewModel: ViewModel() {
                         _appointmentStatus.value = appointmentInfo.value?.appointmentStatus
                         _participants.value = appointmentInfo.value?.participants
                             ?.filter { it.isLeader != true }
+                            ?.toMutableList()
+                        _leader.value = appointmentInfo.value?.participants
+                            ?.filter { it.isLeader == true }
                             ?.toMutableList()
                     }
                 } else {

@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import com.ssafy.witch.R
+import com.ssafy.witch.base.ApplicationClass.Companion.sharedPreferencesUtil
 import com.ssafy.witch.base.BaseActivity
 import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.databinding.ActivityLoginBinding
@@ -28,11 +29,12 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
         id = intent.getIntExtra("state", 0)
-        checkTokenValidity()
+//        checkTokenValidity()
     }
 
     private fun checkTokenValidity() {
         val sharedPref = SharedPreferencesUtil(application.applicationContext)
+        val storedAccessToken = sharedPref.getAccessToken()
         val accessTokenExpiresAt = sharedPref.getAccessTokenExpiresAt()
         val refreshTokenExpiresAt = sharedPref.getRefreshTokenExpiresAt()
         val storedRefreshToken = sharedPref.getRefreshToken()
@@ -77,6 +79,22 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
             }
         } else {
             Log.d(TAG, "Refresh Token 갱신 조건 미충족 (5일 미만)")
+            //액세스토큰 시간 만료시 갱신 여기서 하기.
+            if (currentTime > accessTokenExpiresAt) {
+                loginViewModel.reissueAccessToken { success ->
+                    if (success) {
+                        Log.d(TAG, "✅ 액세스 토큰 재갱신 성공 → 최신 토큰 반영 후 API 재시도")
+
+                        // 최신 토큰 반영
+                        val newAccessToken = sharedPreferencesUtil.getAccessToken()
+                        Log.d(TAG, "🔹 최신 액세스 토큰 확인: $newAccessToken")
+
+                    } else {
+                        Log.d(TAG, "❌ 액세스 토큰 재갱신 실패 → 강제 로그아웃")
+                        clearTokenLogin()
+                    }
+                }
+            }
         }
 
         openFragment(1, id)

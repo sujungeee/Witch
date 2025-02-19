@@ -13,6 +13,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkManager
 import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
+import com.ssafy.witch.base.ApplicationClass.Companion.sharedPreferencesUtil
 import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.data.remote.LocationWorker
 import com.ssafy.witch.databinding.ActivityMainBinding
@@ -170,7 +171,24 @@ class MainActivity : AppCompatActivity() {
             }
         } else {
             Log.d(TAG, "Refresh Token 갱신 조건 미충족 (5일 미만)")
+            //액세스토큰 시간 만료시 갱신 여기서 하기.
+            if (currentTime > accessTokenExpiresAt) {
+                loginViewModel.reissueAccessToken { success ->
+                    if (success) {
+                        Log.d(TAG, "✅ 액세스 토큰 재갱신 성공 → 최신 토큰 반영 후 API 재시도")
+
+                        // 최신 토큰 반영
+                        val newAccessToken = sharedPreferencesUtil.getAccessToken()
+                        Log.d(TAG, "🔹 최신 액세스 토큰 확인: $newAccessToken")
+
+                    } else {
+                        Log.d(TAG, "❌ 액세스 토큰 재갱신 실패 → 강제 로그아웃")
+                        navigateToLogin()
+                    }
+                }
+            }
         }
+
     }
 
     //로그인 액티비티 이동 함수

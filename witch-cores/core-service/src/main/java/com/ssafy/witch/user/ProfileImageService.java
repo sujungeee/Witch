@@ -12,6 +12,7 @@ import java.time.Duration;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @RequiredArgsConstructor
 @Service
@@ -44,6 +45,13 @@ public class ProfileImageService implements ProfileImageUseCase {
     String userId = command.getUserId();
     String objectKey = command.getObjectKey();
 
+    User user = userPort.findById(userId).orElseThrow(UserNotFoundException::new);
+    if (objectKey == null || objectKey.isBlank()) {
+      user.changeProfileImage(presignedUrlPort.getAccessUrl(objectKey));
+      userPort.save(user);
+      return;
+    }
+
     String ownerId = fileOwnerCachePort.getOwnerId(objectKey);
     fileOwnerCachePort.delete(objectKey);
 
@@ -51,7 +59,6 @@ public class ProfileImageService implements ProfileImageUseCase {
       throw new InvalidFileOwnerException();
     }
 
-    User user = userPort.findById(userId).orElseThrow(UserNotFoundException::new);
     user.changeProfileImage(presignedUrlPort.getAccessUrl(objectKey));
     userPort.save(user);
   }

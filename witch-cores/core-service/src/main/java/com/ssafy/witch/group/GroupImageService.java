@@ -58,23 +58,30 @@ public class GroupImageService implements GroupImageUseCase {
     String groupId = command.getGroupId();
     String objectKey = command.getObjectKey();
 
-    String ownerId= fileOwnerCachePort.getOwnerId(objectKey);
-    fileOwnerCachePort.delete(objectKey);
-
-    if(!userId.equals(ownerId)) {
-      throw new InvalidFileOwnerException();
-    }
-
     // 모임 존재 확인
     Group group = groupPort.findById(groupId).orElseThrow(GroupNotFoundException::new);
+
+    //이미지 삭제하는 경우
+    if (objectKey == null || objectKey.isBlank()) {
+      // 저장
+      group.changeGroupImage(presignedUrlPort.getAccessUrl(objectKey));
+      groupPort.save(group);
+      return;
+    }
+
+    String ownerId= fileOwnerCachePort.getOwnerId(objectKey);
+    fileOwnerCachePort.delete(objectKey);
 
     // 권한 있는지 확인
     validateLeaderAuthorization(userId, groupId);
 
-    // 저장
+    //파일 소유자 확인
+    if(!userId.equals(ownerId)) {
+      throw new InvalidFileOwnerException();
+    }
+
     group.changeGroupImage(presignedUrlPort.getAccessUrl(objectKey));
     groupPort.save(group);
-
   }
 
 

@@ -10,6 +10,7 @@ import com.ssafy.witch.data.local.SharedPreferencesUtil
 import com.ssafy.witch.data.model.dto.RefreshToken
 import com.ssafy.witch.data.model.response.ErrorResponse
 import com.ssafy.witch.data.remote.AuthService
+import com.ssafy.witch.data.remote.RetrofitUtil.Companion.tokenService
 import com.ssafy.witch.ui.LoginActivity
 import com.ssafy.witch.ui.MainActivity
 import kotlinx.coroutines.runBlocking
@@ -57,8 +58,7 @@ class TokenAuthenticator(
         // 동기적으로 새 Access Token 재발급 요청, 액세스 토큰 재갱신은 중앙집중으로 처리
         val accessTokenResponseBaseResponse = runBlocking {
             try {
-                val authService = ApplicationClass.retrofit.create(AuthService::class.java)
-                val tokenResponse = authService.reissueAccessToken(RefreshToken("Bearer $storedRefreshToken"))
+                val tokenResponse = tokenService.reissueAccessToken(RefreshToken("Bearer $storedRefreshToken"))
                 if (tokenResponse.isSuccessful) tokenResponse.body() else null
             } catch (e: Exception) {
                 Log.e(TAG, "❌ Access Token 갱신 중 오류 발생", e)

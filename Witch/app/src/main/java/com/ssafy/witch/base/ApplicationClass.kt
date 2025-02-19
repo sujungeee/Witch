@@ -56,9 +56,10 @@ class ApplicationClass : Application() {
 
         //로그인 시만 작업하는 레트로핏
         // 1) 로그인 전용 (토큰 필요 없음)
+        // 타임아웃 3초 로그인 전 사용 레트로핏
         val loginClient: OkHttpClient = OkHttpClient.Builder()
-            .readTimeout(5000, TimeUnit.MILLISECONDS)
-            .connectTimeout(5000, TimeUnit.MILLISECONDS)
+            .readTimeout(3000, TimeUnit.MILLISECONDS)
+            .connectTimeout(3000, TimeUnit.MILLISECONDS)
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
             .build()
 
@@ -114,14 +115,14 @@ class ApplicationClass : Application() {
                     Log.d("AccessTokenInterceptor", "✅ 인터셉터 실행! 저장된 Access Token: $jwtToken")
                     builder.addHeader("Authorization", "Bearer $jwtToken")
                 } else {
-                    Log.e("AccessTokenInterceptor", "❌ Access Token 없음! Authorization 헤더 추가 안됨!")
+                    Log.d("AccessTokenInterceptor", "❌ Access Token 없음! Authorization 헤더 추가 안됨!")
                 }
 
                 val response = chain.proceed(builder.build())
 
                 // 401 응답을 받으면 TokenAuthenticator 실행
                 if (response.code == 401) {
-                    Log.e("AccessTokenInterceptor", "🚨 401 응답 받음! TokenAuthenticator에서 처리 필요!")
+                    Log.d("AccessTokenInterceptor", "🚨 401 응답 받음! TokenAuthenticator에서 처리 필요!")
                 }
 
                 return response

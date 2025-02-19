@@ -47,6 +47,13 @@ class SnackViewModel : ViewModel() {
     val snack: LiveData<Snack>
         get() = _snack
 
+    val _distance = MutableLiveData<Double>()
+    val distance: LiveData<Double>
+        get() = _distance
+
+    fun setDistance(distance: Double) {
+        _distance.value = distance
+    }
 
     fun getSnack(appointmentId: String) {
         viewModelScope.launch {

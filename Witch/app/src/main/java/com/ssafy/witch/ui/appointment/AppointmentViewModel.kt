@@ -117,8 +117,6 @@ class AppointmentViewModel: ViewModel() {
         _address.value = address
     }
 
-
-
     fun registerAppointment() {
         viewModelScope.launch {
             runCatching {

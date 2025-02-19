@@ -112,7 +112,7 @@ class EditViewModel : ViewModel() {
 
                             continuation.resume(presignedUrl)
                         }
-                    } else {
+                    } else if(it.code() == 400) {
                         Log.d(TAG, "getPresignedUrl: ${it.errorBody()?.string()}")
 
                         val data = Gson().fromJson(it.errorBody()?.string(), ErrorResponse::class.java)
@@ -161,7 +161,7 @@ class EditViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     context.finish()
-                }else{
+                }else if(it.code() == 400){
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -181,7 +181,7 @@ class EditViewModel : ViewModel() {
                 if (it.isSuccessful) {
                     Log.d(TAG, "editGroupImage: 성공><")
                     context.finish()
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -202,7 +202,7 @@ class EditViewModel : ViewModel() {
                 if (it.isSuccessful) {
                     context.finish()
                     Log.d(TAG, "editGroupName: 성공><")
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -225,7 +225,7 @@ class EditViewModel : ViewModel() {
                     ApplicationClass.sharedPreferencesUtil.addUser(User(user.userId,user.email,user.nickname,presignedUrl.presignedUrl))
 
                     context.finish()
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -247,7 +247,7 @@ class EditViewModel : ViewModel() {
                     ApplicationClass.sharedPreferencesUtil.addUser(User(user.userId,user.email,name,user.profileImageUrl))
                     context.finish()
                     Log.d(TAG, "editProfileName: 성공><")
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -283,7 +283,7 @@ class EditViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     Toast.makeText(context, "사용 가능한 이름입니다.", Toast.LENGTH_SHORT).show()
-                }else{
+                }else if(it.code() == 400){
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage

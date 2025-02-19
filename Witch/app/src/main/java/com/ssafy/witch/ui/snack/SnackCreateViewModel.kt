@@ -157,7 +157,7 @@ class SnackCreateViewModel : ViewModel() {
                     if (it.isSuccessful) {
                         val presignedUrl = it.body()?.data!!
                         continuation.resume(presignedUrl)
-                    } else {
+                    } else if(it.code() == 400) {
                         continuation.resumeWithException(Exception(it.errorBody().toString()))
                     }
                 }.onFailure {
@@ -227,7 +227,7 @@ class SnackCreateViewModel : ViewModel() {
                     context.onBackPressed()
                     Toast.makeText(context, "스낵이 생성되었습니다.", Toast.LENGTH_SHORT).show()
                     Log.d("createSnack", "스낵 생성 성공")
-                } else {
+                } else if(it.code() == 400) {
                     val data = Gson().fromJson(it.errorBody()?.string(), BaseResponse::class.java)
                     _errorMessage.value = data.error.errorMessage
                 }

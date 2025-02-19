@@ -55,7 +55,7 @@ class SnackViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     _snack.value = it.body()?.data!!
-                } else {
+                } else if(it.code() == 400) {
                     val data = Gson().fromJson(it.errorBody()?.string(), BaseResponse::class.java)
                     _errorMessage.value = data.error.errorMessage
                 }
@@ -74,7 +74,7 @@ class SnackViewModel : ViewModel() {
                 if (it.isSuccessful) {
                     _errorMessage.value = "삭제되었습니다."
                     context.onBackPressed()
-                } else {
+                } else if(it.code() == 400) {
                     val data = Gson().fromJson(it.errorBody()?.string(), BaseResponse::class.java)
                     _errorMessage.value = data.error.errorMessage
 

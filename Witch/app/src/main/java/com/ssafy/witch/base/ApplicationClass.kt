@@ -33,8 +33,8 @@ class ApplicationClass : Application() {
     // 코틀린의 전역변수 문법
     companion object {
         //ends with '/'
-//        val API_URL = "http://i12d211.p.ssafy.io:30080/"
-        val API_URL = "http://dukcode.iptime.org/"
+        val API_URL = "http://i12d211.p.ssafy.io:30080/"
+//        val API_URL = "http://dukcode.iptime.org/"
 
         lateinit var sharedPreferencesUtil: SharedPreferencesUtil
         lateinit var retrofitLogin: Retrofit
@@ -61,6 +61,7 @@ class ApplicationClass : Application() {
             .readTimeout(3000, TimeUnit.MILLISECONDS)
             .connectTimeout(3000, TimeUnit.MILLISECONDS)
             .addInterceptor(HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY))
+            .authenticator(TokenAuthenticator(sharedPreferencesUtil))
             .build()
 
         retrofitLogin = Retrofit.Builder()
@@ -113,6 +114,11 @@ class ApplicationClass : Application() {
 
                 if (!jwtToken.isNullOrEmpty()) {
                     Log.d("AccessTokenInterceptor", "✅ 인터셉터 실행! 저장된 Access Token: $jwtToken")
+//                    return chain.proceed(
+//                        chain.request().newBuilder()
+//                            .header("Authorization", "Bearer $jwtToken")
+//                            .build()
+//                    )
                     builder.addHeader("Authorization", "Bearer $jwtToken")
                 } else {
                     Log.d("AccessTokenInterceptor", "❌ Access Token 없음! Authorization 헤더 추가 안됨!")

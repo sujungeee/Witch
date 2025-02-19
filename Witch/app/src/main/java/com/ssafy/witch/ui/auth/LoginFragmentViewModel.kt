@@ -97,7 +97,7 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
             Log.d(TAG, "reissueAccessToken_refreshToken: $refreshToken")
 
             runCatching {
-                tokenService.reissueAccessToken(RefreshToken(refreshToken))
+                tokenService.reissueAccessToken(RefreshToken("Bearer $refreshToken"))
             }.onSuccess { response ->
                 if (response.isSuccessful) {
                     val data = response.body()?.data

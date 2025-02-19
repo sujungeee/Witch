@@ -1,5 +1,6 @@
 package com.ssafy.witch.ui.mypage
 
+import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -46,6 +47,7 @@ class MyPageViewModel : ViewModel() {
                 userService.editPassword(EditPwd(password, newPassword))
             }.onSuccess {
                 if (it.isSuccessful) {
+                    Toast.makeText(context, "비밀번호를 변경했습니다.", Toast.LENGTH_SHORT).show()
                     context.finish()
                 } else if(it.code() == 400) {
                     // 실패

@@ -68,7 +68,7 @@ class MapViewModel : ViewModel(){
                     Log.d(TAG, "getSnackList failed(): ${errorResponse?.data?.errorMessage}")
                 }
             }.onFailure { e ->
-                Log.e(TAG, "deleteAppointment() Exception: ${e.message}", e)
+                Log.e(TAG, "getSnackList() Exception: ${e.message}", e)
             }
         }
     }

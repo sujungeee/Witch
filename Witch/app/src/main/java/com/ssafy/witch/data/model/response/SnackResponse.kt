@@ -12,7 +12,7 @@ data class SnackResponse(
         val snackImageUrl: String,
         val snackSoundUrl: String,
         val createdAt: String,
-        @SerializedName("user") var user: List<UserInfo>
+        @SerializedName("user") var user: UserInfo
     ) {
         data class UserInfo(
             val userId: String,

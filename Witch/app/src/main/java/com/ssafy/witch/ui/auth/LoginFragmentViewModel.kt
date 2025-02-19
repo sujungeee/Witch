@@ -19,12 +19,6 @@ import kotlinx.coroutines.launch
 private const val TAG = "LoginFragmentViewModel"
 class LoginFragmentViewModel(application: Application): AndroidViewModel(application) {
 
-//    //뷰모델에서만 쓰는 것
-//    private val _joinUser = MutableLiveData<User>()
-//    //뷰모델 외 사용 가능한 public 선언
-//    val joinUser:LiveData<User>
-//        get() = _joinUser
-
     val sharedPreferencesUtil = SharedPreferencesUtil(application.applicationContext)
 
     // 이메일, 닉네임, JWT 토큰 로그인 처리
@@ -68,9 +62,6 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
                                     Log.d(TAG, "login_avail: ${data.refreshTokenRenewAvailableSeconds}")
                                     onResult(true, data.accessToken)
 
-                                    // LiveData 업데이트 -> 기본이미지 링크 업로드 필요
-//                                  _joinUser.postValue(User(response.data.accessToken, response.data.refreshToken, email, ""))
-
                                 } ?: run {
                                     onResult(false, "알 수 없는 오류 발생")
                                 }
@@ -88,74 +79,4 @@ class LoginFragmentViewModel(application: Application): AndroidViewModel(applica
             }
         }
     }
-
-    //액세스 토큰 재발급 (`/auth/token/reissue`)
-    fun reissueAccessToken(onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val refreshToken = sharedPreferencesUtil.getRefreshToken() ?: return@launch onResult(false)
-
-            Log.d(TAG, "reissueAccessToken_refreshToken: $refreshToken")
-
-            runCatching {
-                tokenService.reissueAccessToken(RefreshToken("Bearer $refreshToken"))
-            }.onSuccess { response ->
-                if (response.isSuccessful) {
-                    val data = response.body()?.data
-                    if (data != null) {
-                        //새 액세스 토큰 저장
-                        sharedPreferencesUtil.saveAccessToken(data.accessToken, data.accessTokenExpiresIn)
-                        onResult(true)
-                    } else {
-                        onResult(false)
-                    }
-                } else {
-                    onResult(false)
-                }
-            }.onFailure {
-                onResult(false)
-            }
-        }
-    }
-
-    //리프레시 토큰 재발급 (`/auth/token/renew`)
-    fun renewRefreshToken(onResult: (Boolean) -> Unit) {
-        viewModelScope.launch {
-            val refreshToken = sharedPreferencesUtil.getRefreshToken() ?: return@launch onResult(false)
-
-            runCatching {
-                tokenService.renewRefreshToken(RefreshToken("Bearer $refreshToken"))
-            }.onSuccess { response ->
-                if (response.isSuccessful) {
-                    val baseResponse = response.body()
-                    if (baseResponse != null && baseResponse.success && baseResponse.data != null) {
-                        val data = baseResponse.data
-                        // 새 액세스 & 리프레시 토큰 저장
-                        sharedPreferencesUtil.saveTokens(
-                            data.accessToken,
-                            data.accessTokenExpiresIn,
-                            data.refreshToken,
-                            data.refreshTokenExpiresIn,
-                            data.refreshTokenRenewAvailableSeconds
-                        )
-                        onResult(true)
-                    } else {
-                        // 서버 응답에 error 필드가 없으면 기본 객체 생성
-                        val errorResponse = baseResponse?.error ?: ErrorResponse(
-                            errorCode = "NO_ERROR_CODE",
-                            errorMessage = "No error details provided."
-                        )
-                        Log.e(TAG, "❌ Refresh Token 갱신 실패, error: $errorResponse")
-                        Log.d(TAG, "erorrRenewRefreshToken_refreshToken: $refreshToken")
-                        onResult(false)
-                    }
-                } else {
-                    onResult(false)
-                }
-            }.onFailure {
-                onResult(false)
-            }
-        }
-    }
-
-
 }

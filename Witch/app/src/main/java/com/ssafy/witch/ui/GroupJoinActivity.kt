@@ -50,21 +50,18 @@ class GroupJoinActivity : BaseActivity<FragmentGroupApprovalBinding>(FragmentGro
 
 
         binding.groupApprovalFgBtnRequest.setOnClickListener {
-            checkTokenValidity()
-
             val groupId = data?.getQueryParameter("groupId")
-            if (groupId != null) {
+
+            if(ApplicationClass.sharedPreferencesUtil.getAccessToken() == null){
+                val intent = Intent(this, LoginActivity::class.java)
+                intent.putExtra("state", 1)
+                startActivity(intent)
+            } else if (groupId != null) {
                 viewModel.requestJoinGroup(groupId)
             }
         }
 
         initObserver()
-
-
-        // ATTENTION: This was auto-generated to handle app links.
-        val appLinkIntent: Intent = intent
-        val appLinkAction: String? = appLinkIntent.action
-        val appLinkData: Uri? = appLinkIntent.data
     }
 
     fun initObserver() {
@@ -75,40 +72,12 @@ class GroupJoinActivity : BaseActivity<FragmentGroupApprovalBinding>(FragmentGro
                 .into(binding.groupApprovalFgIvGroupImage)
                 .onLoadFailed(resources.getDrawable(R.drawable.pot_icon))
         }
-    }
 
-    /**
-     * 토큰 유효성을 확인하여, 액세스 토큰이 만료된 경우 리프레시 토큰으로 재발급 시도,
-     * 리프레시 토큰도 만료된 경우 로그인 화면으로 전환.
-     */
-    private fun checkTokenValidity() {
-        val sharedPref = ApplicationClass.sharedPreferencesUtil
-        val accessTokenExpiresAt = sharedPref.getAccessTokenExpiresAt() ?: 0L
-        val refreshTokenExpiresAt = sharedPref.getRefreshTokenExpiresAt() ?: 0L
-        val currentTime = System.currentTimeMillis() / 1000
-
-        when {
-            // 액세스 토큰이 유효한 경우: 아무런 조치 없이 진행
-            accessTokenExpiresAt > currentTime -> {
-                // 토큰이 유효합니다.
-            }
-
-            // 두 토큰 모두 만료된 경우
-            else -> {
-                // 바로 로그인 화면으로 이동
-                navigateToLogin()
+        viewModel.errorMessage.observe(this) {
+            if (!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
             }
         }
-    }
-
-    //로그인 액티비티 이동 함수
-    private fun navigateToLogin() {
-        val intent = Intent(this, LoginActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        intent.putExtra("approval", 1)
-        startActivity(intent)
-        finish()
     }
 
 }

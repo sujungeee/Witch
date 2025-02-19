@@ -10,6 +10,7 @@ import com.ssafy.witch.R
 import com.ssafy.witch.base.ApplicationClass
 import com.ssafy.witch.base.BaseFragment
 import com.ssafy.witch.databinding.FragmentSnackBinding
+import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.util.TimeConverter
 
 
@@ -25,16 +26,23 @@ class SnackFragment : BaseFragment<FragmentSnackBinding>(FragmentSnackBinding::b
         super.onViewCreated(view, savedInstanceState)
 
         initObserver()
+
+        initView()
+
+    }
+
+    fun initView(){
+
         binding.snackFgIvAudio.setOnClickListener {
             if(!viewModel.snack.value?.snackSoundUrl.isNullOrBlank() && !mediaPlayer.isPlaying){
-            try {
-                mediaPlayer.setDataSource(viewModel.snack.value?.snackSoundUrl)
-                mediaPlayer.prepare()
-                mediaPlayer.start()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+                try {
+                    mediaPlayer.setDataSource(viewModel.snack.value?.snackSoundUrl)
+                    mediaPlayer.prepare()
+                    mediaPlayer.start()
+                } catch (e: Exception) {
+                    e.printStackTrace()
                 }
+            }
         }
     }
 
@@ -48,6 +56,12 @@ class SnackFragment : BaseFragment<FragmentSnackBinding>(FragmentSnackBinding::b
 
 
     fun initObserver(){
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
+
         viewModel.snack.observe(viewLifecycleOwner, {
             val time = TimeConverter().convertToLocalDateTime(it.createdAt)
 
@@ -55,7 +69,7 @@ class SnackFragment : BaseFragment<FragmentSnackBinding>(FragmentSnackBinding::b
                 binding.snackFgIbDelete.visibility = View.VISIBLE
                 binding.snackFgIbDelete.setOnClickListener {
                     //Todo 백엔드 api 완료 시 삭제 구현
-//                    viewModel.deleteSnack(snackId)
+                    viewModel.deleteSnack(snackId, requireContext() as ContentActivity)
                 }
             }else{
                 binding.snackFgIbDelete.visibility = View.GONE

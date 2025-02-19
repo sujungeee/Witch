@@ -4,7 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
 import com.ssafy.witch.base.ApplicationClass
+import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.data.model.response.MyAppointmentResponse
 import com.ssafy.witch.data.remote.RetrofitUtil
@@ -13,6 +15,10 @@ import com.ssafy.witch.data.remote.RetrofitUtil.Companion.userService
 import kotlinx.coroutines.launch
 
 class HomeViewModel : ViewModel() {
+    val _errorMessage = MutableLiveData<String>("")
+    val errorMessage: LiveData<String>
+        get() = _errorMessage
+
     private val _name = MutableLiveData<String>()
     val name: LiveData<String>
         get() = _name
@@ -44,6 +50,10 @@ class HomeViewModel : ViewModel() {
                     }
                 } else {
                     // 실패
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                 }
             }.onFailure {
 
@@ -68,6 +78,10 @@ class HomeViewModel : ViewModel() {
                     }
                 } else {
                     // 실패
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
                 }
             }.onFailure {
             }

@@ -5,6 +5,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.dto.MyAppointment
 import com.ssafy.witch.data.model.dto.User
 import com.ssafy.witch.data.model.response.GroupJoinListResponse.JoinRequest
@@ -14,8 +16,11 @@ import com.ssafy.witch.data.remote.RetrofitUtil.Companion.appointmentService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.groupService
 import com.ssafy.witch.ui.MainActivity
 import kotlinx.coroutines.launch
-
 class GroupViewModel : ViewModel() {
+    val _errorMessage = MutableLiveData<String>("")
+    val errorMessage: LiveData<String>
+        get() = _errorMessage
+
     private val _tabState = MutableLiveData<String>("MEMBER")
     val tabState: LiveData<String>
         get() = _tabState
@@ -62,7 +67,14 @@ class GroupViewModel : ViewModel() {
             runCatching {
                 groupService.getGroup(groupId)
             }.onSuccess {
-                _group.value = it.body()?.data ?: GroupResponse(0, "", "", false, "")
+                if(it.isSuccessful) {
+                    _group.value = it.body()?.data ?: GroupResponse(0, "", "", false, "")
+                }else{
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -74,7 +86,14 @@ class GroupViewModel : ViewModel() {
             runCatching {
                 groupService.leaveGroup(groupId)
             }.onSuccess {
-                context.openFragment(2)
+                if (it.isSuccessful) {
+                    context.openFragment(2)
+                } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -100,8 +119,15 @@ class GroupViewModel : ViewModel() {
             runCatching {
                 groupService.getGroupMembers(groupId)
             }.onSuccess {
-                // 멤버 리스트 받아오기
-                _groupMember.value = it.body()?.data?.members
+                if (it.isSuccessful) {
+                    // 멤버 리스트 받아오기
+                    _groupMember.value = it.body()?.data?.members
+                } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -114,8 +140,15 @@ class GroupViewModel : ViewModel() {
             runCatching {
                 groupService.getJoinRequests(groupId)
             }.onSuccess {
-                // 가입 신청자 리스트 받아오기
-                _groupJoinList.value = it.body()?.data?.joinRequests
+                if (it.isSuccessful) {
+                    // 가입 신청자 리스트 받아오기
+                    _groupJoinList.value = it.body()?.data?.joinRequests
+                } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -129,7 +162,14 @@ class GroupViewModel : ViewModel() {
                 groupService.approveJoinRequest(joinRequestId)
             }.onSuccess {
                 // 가입 신청자 수락 성공
-                _groupJoinList.value = _groupJoinList.value?.filter { it.joinRequestId != joinRequestId }
+                if (it.isSuccessful) {
+                    _groupJoinList.value = _groupJoinList.value?.filter { it.joinRequestId != joinRequestId }
+                } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -143,7 +183,14 @@ class GroupViewModel : ViewModel() {
                 groupService.rejectJoinRequest(joinRequestId)
             }.onSuccess {
                 // 가입 신청자 거절 성공
-                _groupJoinList.value = _groupJoinList.value?.filter { it.joinRequestId != joinRequestId }
+                if (it.isSuccessful) {
+                    _groupJoinList.value = _groupJoinList.value?.filter { it.joinRequestId != joinRequestId }
+                } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -157,7 +204,14 @@ class GroupViewModel : ViewModel() {
                 appointmentService.getGroupAppointments(groupId)
             }.onSuccess {
                 // 일정 리스트 받아오기
-                _groupAppointments.value = it.body()?.data?.appointments
+                if (it.isSuccessful) {
+                    _groupAppointments.value = it.body()?.data?.appointments
+                }else{
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }

@@ -30,6 +30,7 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(FragmentMyPageBinding
         super.onViewCreated(view, savedInstanceState)
 
         initView()
+        initObserver()
 
     }
 
@@ -37,9 +38,15 @@ class MyPageFragment : BaseFragment<FragmentMyPageBinding>(FragmentMyPageBinding
         super.onCreate(savedInstanceState)
     }
 
+    fun initObserver(){
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
+    }
+
     fun initView(){
-
-
         binding.mypageFgBtnProfileEdit.setOnClickListener {
             val contentActivity = Intent(requireContext(), ContentActivity::class.java)
             contentActivity.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)

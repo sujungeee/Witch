@@ -8,11 +8,17 @@ import com.ssafy.witch.data.model.response.PresignedUrl
 import retrofit2.Response
 import com.ssafy.witch.data.model.response.SnackResponse
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Path
 
 interface SnackService {
+
+    @DELETE("/snacks/{snackId}")
+    suspend fun deleteSnack(
+        @Path("snackId") snackId: String
+    ) : Response<BaseResponse<String>>
 
     @POST("/snacks/snack-image/presigned-url")
     suspend fun getImagePresignedUrl(

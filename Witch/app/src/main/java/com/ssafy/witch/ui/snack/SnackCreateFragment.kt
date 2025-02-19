@@ -2,6 +2,7 @@ package com.ssafy.witch.ui.snack
 
 import android.Manifest
 import android.app.Dialog
+import android.content.ContentValues
 import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.Canvas
@@ -10,6 +11,7 @@ import android.graphics.drawable.ColorDrawable
 import android.location.Location
 import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
 import android.view.Gravity
@@ -111,6 +113,12 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
     }
 
     private fun initObserver() {
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
+
         viewModel.snackText.observe(viewLifecycleOwner, {
             val isSnackTextEmpty = it.isNullOrEmpty()
             binding.snackCreateFgLlTvTextCreate.isGone = !isSnackTextEmpty
@@ -293,12 +301,6 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
     }
 
     fun initPhotoView() {
-//        binding.snackCreateFgLlLlCamera.setOnClickListener {
-//            bi
-//            binding.snackCreateFgLlLlCamera.isGone = true
-//            binding.snackCreateFgLlTvCameraDelete.isGone = false
-//        }
-//
 
         binding.snackCreateFgLlTvCameraDelete.setOnClickListener {
             Log.d(TAG, "initPhotoView: 지웠나요? ${viewModel.photoFile.value}")
@@ -379,7 +381,9 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
 
 
                 lifecycleScope.launch {
-                    viewModel.uploadSnack(contentActivity, appointmentId, userLocation!!, imgUri, viewModel.audioFile.value)
+                    if (imgUri != null) {
+                        viewModel.uploadSnack(contentActivity, appointmentId, userLocation!!, imgUri , viewModel.audioFile.value)
+                    }
                 }
             }
         }
@@ -395,12 +399,25 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
         return bitmap
     }
 
-    fun bitmapToUri(bitmap: Bitmap): Uri {
-        val bytes = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
-        val path = MediaStore.Images.Media.insertImage(requireContext().contentResolver, bitmap, "Title", null)
-        return Uri.parse(path)
+    private fun bitmapToUri(bitmap: Bitmap): Uri? {
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Images.Media.DISPLAY_NAME, "IMG_${System.currentTimeMillis()}.jpg")
+            put(MediaStore.Images.Media.MIME_TYPE, "image/jpeg")
+            put(MediaStore.Images.Media.RELATIVE_PATH, Environment.DIRECTORY_PICTURES)
+        }
+
+        val resolver = requireContext().contentResolver
+        val imageUri: Uri? = resolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+
+        imageUri?.let { uri ->
+            resolver.openOutputStream(uri)?.use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+            }
+        }
+
+        return imageUri
     }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

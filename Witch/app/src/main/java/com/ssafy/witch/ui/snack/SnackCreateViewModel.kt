@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.net.Uri
 import android.util.Log
 import android.view.Gravity
+import android.widget.Toast
 import androidx.core.net.toUri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -28,6 +29,7 @@ import com.ssafy.witch.data.remote.RetrofitUtil.Companion.s3Service
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.snackService
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.userService
 import com.ssafy.witch.data.remote.S3Service
+import com.ssafy.witch.ui.ContentActivity
 import kotlinx.coroutines.launch
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody
@@ -40,6 +42,12 @@ import kotlin.math.log
 
 private const val TAG = "SnackCreateViewModel_Witch"
 class SnackCreateViewModel : ViewModel() {
+    val _errorMessage = MutableLiveData<String>("")
+    val errorMessage: LiveData<String>
+        get() = _errorMessage
+
+
+
     private val _selectedButton = MutableLiveData<Int>(1)
     val selectedButton: LiveData<Int>
         get() = _selectedButton
@@ -113,7 +121,7 @@ class SnackCreateViewModel : ViewModel() {
         _textAlign.value = align
     }
 
-    suspend fun uploadSnack(context: Context,appointmentId: String, location: LatLng, image: Uri, audio: Uri?) {
+    suspend fun uploadSnack(context: ContentActivity,appointmentId: String, location: LatLng, image: Uri, audio: Uri?) {
         var audioPresignedUrl = PresignedUrl("", "")
         runCatching {
             val imagePresignedUrl = getPresignedUrl("image")
@@ -124,7 +132,7 @@ class SnackCreateViewModel : ViewModel() {
             val response= uploadSnackToS3(imagePresignedUrl, audioPresignedUrl, image, audio, context)
 
             if (response) {
-                createSnack(appointmentId, Snack(location.latitude, location.longitude, imagePresignedUrl.objectKey, audioPresignedUrl.objectKey))
+                createSnack(appointmentId, Snack(location.latitude, location.longitude, imagePresignedUrl.objectKey, audioPresignedUrl.objectKey), context)
                 Log.d("uploadSnack", "업로드 성공")
             } else {
                 throw Exception("업로드 실패")
@@ -210,16 +218,20 @@ class SnackCreateViewModel : ViewModel() {
 
 
 
-    fun createSnack(appointmentId:String, snack: Snack){
+    fun createSnack(appointmentId:String, snack: Snack, context: ContentActivity){
         viewModelScope.launch {
             runCatching {
                 snackService.createSnack(appointmentId,snack)
             }.onSuccess {
                 if (it.isSuccessful) {
+                    context.finish()
+                    Toast.makeText(context, "스낵이 생성되었습니다.", Toast.LENGTH_SHORT).show()
                     Log.d("createSnack", "스낵 생성 성공")
                 } else {
-                    Log.d("createSnack", "스낵 생성 실패")
+                    val data = Gson().fromJson(it.errorBody()?.string(), BaseResponse::class.java)
+                    _errorMessage.value = data.error.errorMessage
                 }
+
             }.onFailure {
                 it.printStackTrace()
             }

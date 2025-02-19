@@ -79,15 +79,15 @@
         app:layout_constraintStart_toEndOf="@+id/group_fg_tv_total_appointment"
         app:layout_constraintTop_toTopOf="@+id/group_fg_tv_total_appointment" />
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
+        app:shapeAppearanceOverlay="@style/Circle"
         android:id="@+id/group_fg_iv_group_img"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginEnd="30dp"
-        android:background="@drawable/circle_shape"
+        android:scaleType="centerCrop"
+        android:background="@drawable/pot_icon"
         android:clipToOutline="true"
-        android:backgroundTint="@color/witch_white"
-        android:src="@drawable/pot_icon"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/group_fg_tv_name" />
 

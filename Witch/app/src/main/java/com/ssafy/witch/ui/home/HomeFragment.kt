@@ -54,11 +54,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
         super.onViewCreated(view, savedInstanceState)
         initAdapter()
         initView()
+        initObserver()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun initView() {
-
 
         viewModel.getProfile()
 
@@ -68,30 +68,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
         mainActivity= requireActivity() as MainActivity
 
-        binding.homeFgTvUsername.setOnClickListener {
-            val intent = Intent(mainActivity, ContentActivity::class.java)
-            intent.putExtra("openFragment", 4)
-            intent.putExtra("id", "15e37865-c0e1-42b3-9213-bfde7849f8c1")
-            startActivity(intent)
-        }
-        binding.textView2.setOnClickListener {
-            val intent = Intent(mainActivity, ContentActivity::class.java)
-            intent.putExtra("openFragment", 5)
-            intent.putExtra("id", "69ec8f37-efe7-4cd3-b4c6-000240c8ebc7")
-
-            startActivity(intent)
-        }
-
         calendarView = binding.homeFgCvCalendar
-
 
         calendarView.selectedDate = CalendarDay.from(Date(System.currentTimeMillis()))
 
-        getAppointmentList(CalendarDay.today())
-
         viewModel.getAllAppointments(calendarView.selectedDate.year, calendarView.selectedDate.month + 1)
-
-
 
         calendarView.setOnMonthChangedListener { widget, date ->
             viewModel.getAllAppointments(date.year, date.month + 1)
@@ -100,15 +81,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
         calendarView.setOnDateChangedListener { widget, date, selected ->
             getAppointmentList(date)
         }
-
         dotSchedule()
     }
 
     @RequiresApi(Build.VERSION_CODES.O)
     fun initAdapter(){
-
         viewModel.appointmentList.observe(viewLifecycleOwner,{
             dotSchedule()
+            getAppointmentList(calendarView.selectedDate)
         })
 
     }
@@ -129,6 +109,17 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
 
                     }
                 }
+    }
+
+    fun initObserver(){
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
+
+
+
     }
 
 

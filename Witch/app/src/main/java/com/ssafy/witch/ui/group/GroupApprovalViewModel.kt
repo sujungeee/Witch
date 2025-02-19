@@ -4,12 +4,18 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.gson.Gson
+import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.response.GroupListResponse
 import com.ssafy.witch.data.model.response.GroupResponse
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.groupService
 import kotlinx.coroutines.launch
 
 class GroupApprovalViewModel : ViewModel() {
+    val _errorMessage = MutableLiveData<String>("")
+    val errorMessage: LiveData<String>
+        get() = _errorMessage
+
     private val _group = MutableLiveData<GroupResponse>()
     val group: LiveData<GroupResponse>
         get() = _group
@@ -20,7 +26,14 @@ class GroupApprovalViewModel : ViewModel() {
             runCatching {
                 groupService.getGroupPreview(groupId)
             }.onSuccess {
-                _group.value = it.body()?.data ?: GroupResponse("","","")
+                if (it.isSuccessful) {
+                    _group.value = it.body()?.data ?: GroupResponse("","","")
+                } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
             }.onFailure {
                 it.printStackTrace()
             }
@@ -29,10 +42,19 @@ class GroupApprovalViewModel : ViewModel() {
 
     fun requestJoinGroup(groupId: String) {
         viewModelScope.launch {
-            try {
+            runCatching {
                 groupService.requestJoinGroup(groupId)
-            } catch (e: Exception) {
-                e.printStackTrace()
+            }.onSuccess {
+                if (it.isSuccessful) {
+                    _errorMessage.value = "그룹 가입 신청이 완료되었습니다."
+                } else {
+                    it.errorBody()?.let { body ->
+                        val data = Gson().fromJson(body.string(), BaseResponse::class.java)
+                        _errorMessage.value = data.error.errorMessage
+                    }
+                }
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }

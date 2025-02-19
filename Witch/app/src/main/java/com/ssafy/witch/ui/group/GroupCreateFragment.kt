@@ -2,6 +2,7 @@ package com.ssafy.witch.ui.group
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
@@ -22,6 +23,13 @@ class GroupCreateFragment : BaseFragment<FragmentGroupCreateBinding>(FragmentGro
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        initView()
+        initObserver()
+
+    }
+
+    fun initView(){
         binding.groupCreateFgBtnPhotoChange.setOnClickListener {
             lifecycleScope.launch {
                 // 이미지 업로드
@@ -46,15 +54,25 @@ class GroupCreateFragment : BaseFragment<FragmentGroupCreateBinding>(FragmentGro
         }
 
         binding.groupCreateFgBtnDuplCheck.setOnClickListener {
-            viewModel.checkDupl(binding.groupCreateFgEtGroupName.text.toString(), "group", requireContext() as ContentActivity).apply {
-                binding.groupCreateFgBtnPhotoChange.isEnabled = true
+            val newName = binding.groupCreateFgEtGroupName.text.toString()
+            if(newName.isBlank()){
+                Toast.makeText(requireContext(), "그룹 이름을 입력해주세요.", Toast.LENGTH_SHORT).show()
+            } else {
+                viewModel.checkDupl(binding.groupCreateFgEtGroupName.text.toString(), "group", requireContext() as ContentActivity).apply {
+                    binding.groupCreateFgBtnPhotoChange.isEnabled = true
+                }
             }
+
+
         }
     }
 
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    fun initObserver(){
+        viewModel.errorMessage.observe(viewLifecycleOwner, {
+            if(!it.isNullOrBlank()){
+                showCustomToast(viewModel.errorMessage.value.toString())
+            }
+        })
     }
 
 }

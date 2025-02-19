@@ -19,12 +19,15 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
     private lateinit var sharedPreferences: SharedPreferencesUtil
     private lateinit var loginViewModel: LoginFragmentViewModel
 
+    private var id: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d(TAG, "onCreate: 불림")
+        setTheme(R.style.Theme_Witch)
         sharedPreferences = SharedPreferencesUtil(applicationContext)
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
+        id = intent.getIntExtra("state", 0)
         checkTokenValidity()
     }
 
@@ -76,7 +79,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
             Log.d(TAG, "Refresh Token 갱신 조건 미충족 (5일 미만)")
         }
 
-        openFragment(1)
+        openFragment(1, id)
 
     }
 
@@ -90,7 +93,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
             showToast("로그인 정보가 만료되었습니다.")
         }
         sharedPref.clearToken()
-        openFragment(3)
+        openFragment(3,id)
     }
 
     //토스트 메시지 출력 함수
@@ -99,7 +102,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
     }
 
     // 로그인 시 해당하는 번호의 프래그먼트 지정
-    fun openFragment(int: Int) {
+    fun openFragment(int: Int, id: Int = 0) {
         val transaction = supportFragmentManager.beginTransaction()
         when(int) {
             1 -> {
@@ -114,7 +117,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
                 // 회원가입한 뒤 돌아오면, 2번에서 addToBackStack해 놓은게 남아 있어서,
                 // stack을 날려 줘야 한다. stack날리기.
                 supportFragmentManager.popBackStack()
-                transaction.replace(R.id.login_a_fl, LoginFragment())
+                transaction.replace(R.id.login_a_fl, LoginFragment.newInstance("state",id))
             }
         }
         transaction.commit()

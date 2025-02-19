@@ -7,13 +7,13 @@
     android:layout_margin="10dp">
 
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
+        app:shapeAppearanceOverlay="@style/Circle"
         android:id="@+id/group_approval_member_item_iv_profile_image"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:background="@drawable/circle_shape"
-        android:backgroundTint="@color/witch_white"
-        android:src="@drawable/pot_icon"
+        android:scaleType="centerCrop"
+        android:background="@drawable/circle_profile"
         android:clipToOutline="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

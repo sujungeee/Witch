@@ -29,7 +29,7 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
         loginViewModel = ViewModelProvider(this).get(LoginFragmentViewModel::class.java)
 
         id = intent.getIntExtra("state", 0)
-//        checkTokenValidity()
+        checkTokenValidity()
     }
 
     private fun checkTokenValidity() {

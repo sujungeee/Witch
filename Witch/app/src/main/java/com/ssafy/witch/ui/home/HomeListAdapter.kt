@@ -32,9 +32,9 @@ class HomeListAdapter(val appointmentList: List<MyAppointment>,val itemClickList
         @SuppressLint("NewApi")
         fun bind(position: Int) {
             val time= TimeConverter().convertToLocalDateTime(appointmentList[position].appointmentTime)
-            binding.homeLiTvAppointmentGroup.text=appointmentList[position].group.name
+            binding.homeLiTvAppointmentGroup.text=appointmentList[position].name
             binding.homeLiTvAppointmentTime.text= time.hour.toString()+"시 "+ time.minute.toString() + "분"
-            binding.homeLiTvAppointmentName.text=appointmentList[position].name
+            binding.homeLiTvAppointmentName.text=appointmentList[position].group.name
             binding.homeLiTvAppointmentActive.isGone = appointmentList[position].status != "ONGOING"
 
             binding.homeAppointmentListItem.setOnClickListener {

@@ -11,8 +11,8 @@ data class AppointmentDetailItem(
     var summary: String,
     var appointmentTime: String,
     var address: String,
-    var latitude: BigDecimal,
-    var longitude: BigDecimal,
+    var latitude: Double,
+    var longitude: Double,
     @SerializedName("members") var participants: List<Participants>
 ) {
     data class Participants (

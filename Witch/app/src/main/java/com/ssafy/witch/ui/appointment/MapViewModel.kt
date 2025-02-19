@@ -32,16 +32,8 @@ class MapViewModel : ViewModel(){
     val remainderTime: LiveData<Long?>
         get() = _remainderTime
 
-    private val _latitude = MutableLiveData<Double>()
-    val latitude: LiveData<Double>
-        get() = _latitude
-
-    private val _longitude = MutableLiveData<Double>()
-    val longitude: LiveData<Double>
-        get() = _longitude
-
-    private val _snackList = MutableLiveData<List<SnackResponse.SnackInfo>>()
-    val snackList: LiveData<List<SnackResponse.SnackInfo>>
+    private val _snackList = MutableLiveData<List<SnackResponse.SnackInfo>?>()
+    val snackList: LiveData<List<SnackResponse.SnackInfo>?>
         get() = _snackList
 
     fun setRemainderTime(time: Long?) {

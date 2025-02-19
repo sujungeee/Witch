@@ -41,6 +41,8 @@ import com.ssafy.witch.databinding.BottomSheetLayoutBinding
 import com.ssafy.witch.databinding.FragmentMapBinding
 import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
+import com.ssafy.witch.ui.snack.SnackViewModel
+import com.ssafy.witch.util.Distance
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -53,7 +55,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
         private val appointmentViewModel: AppointmentViewModel by activityViewModels()
         private val mapViewModel: MapViewModel by activityViewModels()
-
+        private val snackViewModel: SnackViewModel by activityViewModels()
 
         private var timer: TimerHandler? = null
         private lateinit var map: GoogleMap
@@ -88,7 +90,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             initUserObserver()
             initLocationObserver()
             initAppointmentObserver()
-            initSnackObserver()
 
             binding.mapAcTvAppointmentName.isSelected = true
             bottomSheetBinding.mapFgTvBottomAppointmentSummary.isSelected= true
@@ -123,6 +124,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 //                participantsAdapter.updateList(lateParticipants)
             }
 
+            binding.mapAcTv2.setOnClickListener {
+                setDialog()
+            }
         }
 
         private fun createMarkerBitmap(context: Context, imageUrl: String): Bitmap {
@@ -169,6 +173,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         }
 
         private fun initLocationObserver() {
+            Log.d(TAG, "initLocationObserver: ")
             MyLocationForegroundService.locationData.observe(viewLifecycleOwner) {
                 appointmentViewModel.getAppointmentInfo(appointmentId)
 
@@ -211,7 +216,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
 
             appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
-                startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
+                appointmentViewModel.setLatitude(it.latitude)
+                appointmentViewModel.setLongitude(it.longitude)
+                initSnackObserver()
+                startLocationUpdates(it.latitude, it.longitude)
 
                 binding.mapAcTvAppointmentName.text = it.name
                 bottomSheetBinding.mapFgTvBottomAppointmentSummary.text = it.summary
@@ -284,14 +292,32 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
         private fun initSnackObserver() {
             mapViewModel.getSnackList(appointmentId)
             mapViewModel.snackList.observe(viewLifecycleOwner) {
-                bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(it) {
-                    goToSnackFragment(4, it)
+                bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(
+                    it!!,
+                    appointmentViewModel.latitude.value!!,
+                    appointmentViewModel.longitude.value!!
+                ) { snackid, distance ->
+                    snackViewModel.setDistance(distance)
+                    Log.d(TAG, "initSnackObserver: distance: ${snackViewModel.distance.value}")
+                    if (isDistance() == true) {
+                        goToSnackFragment(4, snackid)
+                    }
                 }
             }
         }
 
+        private fun isDistance(): Boolean {
+            val myDistance: Double = Distance().calculateDistance(mylocation.latitude, mylocation.longitude,
+                appointmentViewModel.appointmentInfo.value!!.latitude, appointmentViewModel.appointmentInfo.value!!.longitude)
+            if (Math.abs(myDistance - snackViewModel.distance.value!!) <= 0.3) {
+                return true
+            }
+            showCustomToast("거리 내에 위치하지 않습니다.")
+            return false
+        }
+
         private fun setDialog() {
-            val dialogView= when (mapViewModel.userStatus.value) {
+            val dialogView= when (1) { // mapViewModel.userStatus.value
                 1 -> layoutInflater.inflate(R.layout.dialog_appointment_delete, null)
                 2 -> layoutInflater.inflate(R.layout.dialog_appointment_join, null)
                 3 -> layoutInflater.inflate(R.layout.dialog_appointment_leave, null)
@@ -307,7 +333,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             val appointmentChangeDlBtnNo = dialogView.findViewById<Button>(R.id.dl_btn_no)
 
             appointmentChangeDlBtnYes.setOnClickListener {
-                when(mapViewModel.userStatus.value) {
+                when(1) { // mapViewModel.userStatus.value
                     1 -> appointmentViewModel.deleteAppointment(appointmentId)
                     2 -> appointmentViewModel.participateAppointment(appointmentId)
                     3 -> appointmentViewModel.leaveAppointment(appointmentId)
@@ -344,22 +370,36 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             return bitmap
         }
 
-
-    lateinit var mylocation: Location
+        lateinit var mylocation: Location
         private fun startLocationUpdates(latitude: Double?, longitude: Double?) {
             Log.d(TAG, "startLocationUpdates: latitude: ${latitude}, longitude: ${longitude}")
             if (ContextCompat.checkSelfPermission(requireContext(),
                 Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner){
-                    val placeLocation = LatLng(latitude!!, longitude!!)
-                    val bitmap = getBitmapFromVectorDrawable(requireContext(), R.drawable.balloon)
-                    val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(placeLocation, 15f))
-                    map.addMarker(
-                        MarkerOptions()
-                            .position(placeLocation)
-                            .icon(markerIcon)
-                    )
+                fusedLocationClient.lastLocation.addOnSuccessListener { location: Location? ->
+                        mylocation = Location("")
+                        if (location != null) {
+                            mylocation.latitude = location.latitude
+                            mylocation.longitude = location.longitude
+                        }
+                        appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
+                            val placeLocation = LatLng(latitude!!, longitude!!)
+                            val bitmap = getBitmapFromVectorDrawable(
+                                requireContext(),
+                                R.drawable.balloon
+                            )
+                            val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
+                            map.moveCamera(
+                                CameraUpdateFactory.newLatLngZoom(
+                                    placeLocation,
+                                    15f
+                                )
+                            )
+                            map.addMarker(
+                                MarkerOptions()
+                                    .position(placeLocation)
+                                    .icon(markerIcon)
+                            )
+                        }
                 }
             }
         }
@@ -369,7 +409,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                 if (isGranted) {
                     appointmentViewModel.getAppointmentInfo(appointmentId)
                     appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
-                        startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
+                        startLocationUpdates(it.latitude, it.longitude)
                     }
                 } else {
                     Toast.makeText(requireContext(), "위치 권한이 필요합니다.", Toast.LENGTH_SHORT).show()
@@ -384,7 +424,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             } else {
                 appointmentViewModel.getAppointmentInfo(appointmentId)
                 appointmentViewModel.appointmentInfo.observe(viewLifecycleOwner) {
-                    startLocationUpdates(it.latitude.toDouble(), it.longitude.toDouble())
+                    startLocationUpdates(it.latitude, it.longitude)
                 }
             }
         }
@@ -489,5 +529,9 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                         putString(key, value)
                     }
                 }
+        }
+
+        override fun onResume() {
+            super.onResume()
         }
 }

@@ -59,6 +59,10 @@ class SharedPreferencesUtil (context : Context) {
         // 기존 Access Token 및 만료 시간 삭제
         editor.remove(KEY_ACCESS_TOKEN)
         editor.remove(KEY_ACCESS_TOKEN_EXPIRES_AT)
+        editor.remove(KEY_REFRESH_TOKEN)
+        editor.remove(KEY_REFRESH_TOKEN_EXPIRES_AT)
+        editor.remove(KEY_REFRESH_TOKEN_RENEW_AVAILABLE_SECONDS)
+
 
         // 새로운 Access Token 및 만료 시간 저장
         editor.putString(KEY_ACCESS_TOKEN, accessToken)
@@ -67,7 +71,7 @@ class SharedPreferencesUtil (context : Context) {
         // Refresh Token 저장
         editor.putString(KEY_REFRESH_TOKEN, refreshToken)
         editor.putLong(KEY_REFRESH_TOKEN_EXPIRES_AT, currentTime + refreshTokenExpiresIn)
-        editor.putLong(KEY_REFRESH_TOKEN_RENEW_AVAILABLE_SECONDS, currentTime + refreshTokenRenewAvailableSeconds)
+        editor.putLong(KEY_REFRESH_TOKEN_RENEW_AVAILABLE_SECONDS, currentTime + refreshTokenExpiresIn - refreshTokenRenewAvailableSeconds)
 
         // ✅ 동기적으로 즉시 반영
         val isSuccess = editor.commit()

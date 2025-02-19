@@ -23,6 +23,11 @@ class PwdEditFragment : BaseFragment<FragmentPwdEditBinding>(FragmentPwdEditBind
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // 에러 메시지 관찰 → 에러 발생 시 토스트 띄우기
+        viewModel.errorMessage.observe(viewLifecycleOwner) { message ->
+            Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+        }
+
         // editText 전부 비어있으면 처음부터 버튼 비활성화
         // 초기 버튼 상태 업데이트 (비밀번호 입력 전)
         updateJoinButtonState()

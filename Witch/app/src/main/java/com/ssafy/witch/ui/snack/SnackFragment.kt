@@ -63,12 +63,11 @@ class SnackFragment : BaseFragment<FragmentSnackBinding>(FragmentSnackBinding::b
         })
 
         viewModel.snack.observe(viewLifecycleOwner, {
-            val time = TimeConverter().convertToLocalDateTime(it.createdAt)
+//            val time = TimeConverter().convertToLocalDateTime(it.createdAt)
 
             if( it.user.userId== ApplicationClass.sharedPreferencesUtil.getUser().userId) {
                 binding.snackFgIbDelete.visibility = View.VISIBLE
                 binding.snackFgIbDelete.setOnClickListener {
-                    //Todo 백엔드 api 완료 시 삭제 구현
                     viewModel.deleteSnack(snackId, requireContext() as ContentActivity)
                 }
             }else{
@@ -76,7 +75,7 @@ class SnackFragment : BaseFragment<FragmentSnackBinding>(FragmentSnackBinding::b
             }
 
             binding.snackFgTvUsername.text = it.user.nickname
-            binding.snackFgTvCreatedAt.text = (time.monthValue-1).toString()+ "월 " + time.dayOfMonth.toString() +"일 "+ time.hour.toString() + "시 " + time.minute.toString() + "분"
+//            binding.snackFgTvCreatedAt.text = (time.monthValue-1).toString()+ "월 " + time.dayOfMonth.toString() +"일 "+ time.hour.toString() + "시 " + time.minute.toString() + "분"
             Glide.with(requireContext())
                 .load(it.snackImageUrl)
                 .into(binding.snackFgIvSnackImage)

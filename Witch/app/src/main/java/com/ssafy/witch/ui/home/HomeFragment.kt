@@ -101,12 +101,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>(FragmentHomeBinding::bind
                 viewModel.appointmentList.value?.let {
                     HomeListAdapter(it.appointments.filter {
                         val time=TimeConverter().convertToLocalDateTime(it.appointmentTime)
-                        time.dayOfMonth == date.day && time.monthValue-1==date.month }) { id ->
+                        time.dayOfMonth == date.day && time.monthValue-1==date.month }.sortedBy {
+                            it.appointmentTime
+                    }) { id ->
                         val intent = Intent(mainActivity, ContentActivity::class.java)
                         intent.putExtra("openFragment", 9)
                         intent.putExtra("id", id)
                         startActivity(intent)
-
                     }
                 }
     }

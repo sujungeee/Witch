@@ -27,7 +27,7 @@ class GroupListViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     _groupList.value = it.body()?.data?.groups
-                }else{
+                }else if(it.code() == 400){
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage

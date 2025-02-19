@@ -47,7 +47,7 @@ class MyPageViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     context.finish()
-                } else {
+                } else if(it.code() == 400) {
                     // 실패
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
@@ -72,7 +72,7 @@ class MyPageViewModel : ViewModel() {
                             e.printStackTrace()
                         }
                     }
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage

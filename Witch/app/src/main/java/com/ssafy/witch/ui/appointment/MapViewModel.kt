@@ -52,7 +52,7 @@ class MapViewModel : ViewModel(){
                 if (response.isSuccessful) {
                     Log.d(TAG, "getSnackList: ${response.body()?.data!!.snacks}")
                     _snackList.value = response.body()?.data!!.snacks
-                } else {
+                } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody?.let {
                         val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type

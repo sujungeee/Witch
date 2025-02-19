@@ -137,7 +137,7 @@ class AppointmentViewModel: ViewModel() {
                         _toastMsg.value = "약속이 생성되었어요!"
                         appointmentClear()
                     }
-                } else {
+                } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody?.let {
                         val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
@@ -167,7 +167,7 @@ class AppointmentViewModel: ViewModel() {
                             ?.filter { it.isLeader == true }
                             ?.toMutableList()
                     }
-                } else {
+                } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody?.let {
                         val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
@@ -213,7 +213,7 @@ class AppointmentViewModel: ViewModel() {
                         _toastMsg.value = "약속을 삭제하였습니다!"
                         _fragmentIdx.value = 5
                     }
-                } else {
+                } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody?.let {
                         val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
@@ -236,7 +236,7 @@ class AppointmentViewModel: ViewModel() {
                     if (response.body()?.success == true) {
                         _toastMsg.value = "약속에 참여했습니다!"
                     }
-                } else {
+                } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody?.let {
                         val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
@@ -259,7 +259,7 @@ class AppointmentViewModel: ViewModel() {
                     if (response.body()?.success == true) {
                         _toastMsg.value = "약속을 탈퇴했습니다!"
                     }
-                } else {
+                } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody?.let {
                         val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
@@ -280,7 +280,7 @@ class AppointmentViewModel: ViewModel() {
             }.onSuccess { response ->
                 if (response.isSuccessful) {
                      _locationList.value = response.body()?.data?.positions!!
-                } else {
+                } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
                     val errorResponse = errorBody?.let {
                         val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type

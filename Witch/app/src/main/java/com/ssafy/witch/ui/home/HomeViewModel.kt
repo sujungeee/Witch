@@ -48,7 +48,7 @@ class HomeViewModel : ViewModel() {
                             e.printStackTrace()
                         }
                     }
-                } else {
+                } else if(it.code() == 400){
                     // 실패
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
@@ -76,7 +76,7 @@ class HomeViewModel : ViewModel() {
                             e.printStackTrace()
                         }
                     }
-                } else {
+                } else if(it.code() == 400) {
                     // 실패
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)

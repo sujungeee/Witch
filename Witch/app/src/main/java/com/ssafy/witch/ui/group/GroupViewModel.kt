@@ -69,7 +69,7 @@ class GroupViewModel : ViewModel() {
             }.onSuccess {
                 if(it.isSuccessful) {
                     _group.value = it.body()?.data ?: GroupResponse(0, "", "", false, "")
-                }else{
+                }else if(it.code() == 400){
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -88,7 +88,7 @@ class GroupViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     context.openFragment(2)
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -122,7 +122,7 @@ class GroupViewModel : ViewModel() {
                 if (it.isSuccessful) {
                     // 멤버 리스트 받아오기
                     _groupMember.value = it.body()?.data?.members
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -143,7 +143,7 @@ class GroupViewModel : ViewModel() {
                 if (it.isSuccessful) {
                     // 가입 신청자 리스트 받아오기
                     _groupJoinList.value = it.body()?.data?.joinRequests
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -164,7 +164,7 @@ class GroupViewModel : ViewModel() {
                 // 가입 신청자 수락 성공
                 if (it.isSuccessful) {
                     _groupJoinList.value = _groupJoinList.value?.filter { it.joinRequestId != joinRequestId }
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -185,7 +185,7 @@ class GroupViewModel : ViewModel() {
                 // 가입 신청자 거절 성공
                 if (it.isSuccessful) {
                     _groupJoinList.value = _groupJoinList.value?.filter { it.joinRequestId != joinRequestId }
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -205,8 +205,8 @@ class GroupViewModel : ViewModel() {
             }.onSuccess {
                 // 일정 리스트 받아오기
                 if (it.isSuccessful) {
-                    _groupAppointments.value = it.body()?.data?.appointments
-                }else{
+                    _groupAppointments.value = it.body()?.data?.appointments?.sortedWith(compareBy({map[it.status]},{ it.appointmentTime }))
+                }else if(it.code() == 400){
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -216,6 +216,19 @@ class GroupViewModel : ViewModel() {
                 it.printStackTrace()
             }
         }
+    }
+
+    companion object {
+        private const val TAG = "GroupViewModel_Witch"
+
+        val map : Map<String, Int> = mapOf(
+            "ONGOING" to 0,
+            "SCHEDULED" to 1,
+            "FINISHED" to 2
+        )
+
+
+
     }
 
 

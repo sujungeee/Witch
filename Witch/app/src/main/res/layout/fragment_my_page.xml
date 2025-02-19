@@ -120,67 +120,67 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mypage_fg_ll_private_setting" />
 
-    <LinearLayout
-        android:id="@+id/mypage_fg_ll_noti_setting"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/view5"
-        >
+<!--    <LinearLayout-->
+<!--        android:id="@+id/mypage_fg_ll_noti_setting"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/view5"-->
+<!--        >-->
+<!---->
+<!--        <LinearLayout-->
+<!--            android:layout_margin="20dp"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
 
-        <LinearLayout
-            android:layout_margin="20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+<!--        <TextView-->
+<!--            android:id="@+id/textView11"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="알림설정"-->
+<!--            android:textColor="@color/witch_white"-->
+<!--            android:textSize="18dp" />-->
 
-        <TextView
-            android:id="@+id/textView11"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="알림설정"
-            android:textColor="@color/witch_white"
-            android:textSize="18dp" />
-
-            <TextView
-                android:id="@+id/textView12"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="알림이 오지 않는다면 휴대폰에서\n알림 설정을 허용해주세요!"
-                android:textColor="@color/witch_gray"
-                android:textSize="14dp" />
-
-
-        </LinearLayout>
-        <Space
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"/>
+<!--            <TextView-->
+<!--                android:id="@+id/textView12"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="알림이 오지 않는다면 휴대폰에서\n알림 설정을 허용해주세요!"-->
+<!--                android:textColor="@color/witch_gray"-->
+<!--                android:textSize="14dp" />-->
 
 
-        <androidx.appcompat.widget.SwitchCompat
-            android:id="@+id/textView10"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            app:thumbTint="@color/switch_color_selector"
-            app:trackTint="@color/switch_color_selector"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:layout_margin="20dp"
-            app:layout_constraintBottom_toTopOf="@+id/view6"
-            app:layout_constraintTop_toBottomOf="@+id/view5" />
-    </LinearLayout>
+<!--        </LinearLayout>-->
+<!--        <Space-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="match_parent"-->
+<!--            android:layout_weight="1"/>-->
 
 
-    <View
-        android:id="@+id/view6"
-        android:layout_width="0dp"
-        android:layout_height="1dp"
-        android:background="@color/witch_dark_gray"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/mypage_fg_ll_noti_setting" />
+<!--        <androidx.appcompat.widget.SwitchCompat-->
+<!--            android:id="@+id/textView10"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center_vertical"-->
+<!--            app:thumbTint="@color/switch_color_selector"-->
+<!--            app:trackTint="@color/switch_color_selector"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            android:layout_margin="20dp"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/view6"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/view5" />-->
+<!--    </LinearLayout>-->
+
+
+<!--    <View-->
+<!--        android:id="@+id/view6"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="1dp"-->
+<!--        android:background="@color/witch_dark_gray"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/mypage_fg_ll_noti_setting" />-->
 
 
 

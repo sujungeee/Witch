@@ -28,7 +28,7 @@ class GroupApprovalViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     _group.value = it.body()?.data ?: GroupResponse("","","")
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage
@@ -47,7 +47,7 @@ class GroupApprovalViewModel : ViewModel() {
             }.onSuccess {
                 if (it.isSuccessful) {
                     _errorMessage.value = "그룹 가입 신청이 완료되었습니다."
-                } else {
+                } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)
                         _errorMessage.value = data.error.errorMessage

@@ -1,22 +1,27 @@
 package com.ssafy.witch.ui.appointment
 
 import android.app.Dialog
-import android.content.Intent
+import android.app.TimePickerDialog
+import android.app.TimePickerDialog.OnTimeSetListener
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
+import android.widget.NumberPicker
 import androidx.fragment.app.activityViewModels
+import com.google.android.material.datepicker.DateValidatorPointForward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.timepicker.MaterialTimePicker
 import com.ssafy.witch.R
 import com.ssafy.witch.base.BaseFragment
+import com.ssafy.witch.databinding.DialogSnackTextBinding
+import com.ssafy.witch.databinding.DialogTimePickerBinding
 import com.ssafy.witch.databinding.FragmentAppointmentCreate3Binding
-import com.ssafy.witch.ui.MainActivity
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+
 
 private const val TAG = "AppointmentCreate3Fragment_Witch"
 class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Binding>(
@@ -68,14 +73,27 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
     }
 
     private fun showTimePickerDialog() {
-        val builder= MaterialTimePicker.Builder()
-        builder.setTheme(R.style.CustomTimePickerDialog)
-        builder.setInputMode(MaterialTimePicker.INPUT_MODE_KEYBOARD)
-        val picker= builder.build()
 
-        picker.addOnPositiveButtonClickListener {
-            hour= String.format("%02d", picker.hour)
-            minute= String.format("%02d", picker.minute)
+        val dialogBinding= DialogTimePickerBinding.inflate(layoutInflater)
+
+
+        dialogBinding.timePicker.run {
+            val minutePicker =
+                findViewById<NumberPicker>(resources.getIdentifier("minute", "id", "android"))
+
+            val minuteValues = Array(6) { (it * 10).toString().padStart(2, '0') }
+            minutePicker.minValue = 0
+            minutePicker.maxValue = 5
+            minutePicker.displayedValues = minuteValues
+        }
+
+        val dialog = Dialog(requireContext())
+        dialog.setContentView(dialogBinding.root)
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialogBinding.groupOutDlBtnYes.setOnClickListener{
+            hour= String.format("%02d", dialogBinding.timePicker.hour)
+            minute= String.format("%02d", dialogBinding.timePicker.minute*10)
             var state= "오전/오후"
             if (hour.toInt() >= 12) {
                 state= "오후"
@@ -84,18 +102,30 @@ class AppointmentCreate3Fragment : BaseFragment<FragmentAppointmentCreate3Bindin
                 state= "오전"
                 binding.appointmentFgTvTimeChoice.text = state + " " + hour + "시 " + minute + "분"
             }
-        }
-        picker.addOnNegativeButtonClickListener {
 
+            dialog.dismiss()
         }
 
-        picker.show(childFragmentManager, picker.toString())
+        dialogBinding.groupOutDlBtnNo.setOnClickListener{
+            dialog.dismiss()
+        }
+
+        dialog.show()
     }
 
     private fun showDatePickerDialog() {
         val builder= MaterialDatePicker.Builder.datePicker()
         builder.setTheme(R.style.CustomDatePickerDialog)
+            .setSelection(today)
+            .setCalendarConstraints(
+                com.google.android.material.datepicker.CalendarConstraints.Builder()
+                    .setValidator(DateValidatorPointForward.now())
+                    .build()
+            )
+
         val picker = builder.build()
+
+
 
         picker.addOnPositiveButtonClickListener { datepicker ->
             localDateTime = Instant.ofEpochMilli(datepicker)

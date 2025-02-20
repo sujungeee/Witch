@@ -10,7 +10,7 @@ class RetrofitUtil {
 
         val authService = ApplicationClass.retrofitLogin.create(AuthService::class.java)
 
-        val tokenService = ApplicationClass.retrofit.create(TokenService::class.java)
+        val tokenService = ApplicationClass.retrofitLogin.create(TokenService::class.java)
 
         val groupService = ApplicationClass.retrofit.create(GroupService::class.java)
 

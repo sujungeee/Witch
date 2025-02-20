@@ -10,6 +10,7 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.Drawable
 import android.graphics.drawable.GradientDrawable
 import android.location.Location
 import android.os.Bundle
@@ -25,6 +26,8 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
@@ -43,15 +46,11 @@ import com.ssafy.witch.ui.ContentActivity
 import com.ssafy.witch.ui.MainActivity
 import com.ssafy.witch.ui.snack.SnackViewModel
 import com.ssafy.witch.util.Distance
+import kotlinx.coroutines.runBlocking
 import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
-import android.graphics.drawable.Drawable
-import com.bumptech.glide.request.target.CustomTarget
-import com.bumptech.glide.request.transition.Transition
-import kotlinx.coroutines.Dispatchers
-import java.util.concurrent.TimeUnit
 
 private const val TAG = "MapFragment_Witch"
 class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),
@@ -159,20 +158,25 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
-        private fun createMarkerBitmap(userId: String, latlng: LatLng, imageUrl: String): Bitmap {
+        private fun createMarker(userId: String, latlng: LatLng, imageUrl: String) {
             val markerView = LayoutInflater.from(context).inflate(R.layout.appointment_member_item, null)
             val profileImage = markerView.findViewById<ImageView>(R.id.appointment_member_profile_image)
 
             Glide.with(requireContext())
+                .asBitmap()
                 .load(imageUrl)
                 .circleCrop()
-                .into(profileImage)
-                .apply{
-                    markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-                    markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
-                    val bitmap = Bitmap.createBitmap(markerView.measuredWidth, markerView.measuredHeight, Bitmap.Config.ARGB_8888)
-                    val canvas = Canvas(bitmap)
-                    markerView.draw(canvas).apply {
+                .into(object : CustomTarget<Bitmap>() {
+                    override fun onResourceReady(resource: Bitmap, transition: Transition<in Bitmap>?) {
+                        profileImage.setImageBitmap(resource)
+
+                        markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                        markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
+
+                        val bitmap = Bitmap.createBitmap(markerView.measuredWidth, markerView.measuredHeight, Bitmap.Config.ARGB_8888)
+                        val canvas = Canvas(bitmap)
+                        markerView.draw(canvas)
+
                         if (userMarkers.containsKey(userId)) {
                             userMarkers[userId]?.position = latlng
                         } else {
@@ -181,16 +185,18 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                                     .position(latlng)
                                     .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                             )
-                            if (marker != null) {
-                                userMarkers[userId] = marker
-                            }
+                            marker?.let { userMarkers[userId] = it }
                         }
                     }
-                    return bitmap
-                }
+
+                    override fun onLoadCleared(placeholder: Drawable?) {
+                        Log.d("Glide", "이미지 로드가 취소되었거나 뷰가 재사용됨")
+                    }
+                })
         }
 
-        private fun initLocationObserver() {
+
+    private fun initLocationObserver() {
             Log.d(TAG, "initLocationObserver: ")
             MyLocationForegroundService.locationData.observe(viewLifecycleOwner) {
                 appointmentViewModel.getAppointmentInfo(appointmentId)
@@ -202,19 +208,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                         val userId = locationInfo.userId
                         val latlng = LatLng(locationInfo.latitude, locationInfo.longitude)
                         val profileImageUrl = locationInfo.profileImageUrl
-                        val bitmap = createMarkerBitmap(userId, latlng, profileImageUrl)
-                        if (userMarkers.containsKey(userId)) {
-                            userMarkers[userId]?.position = latlng
-                        } else {
-                            val marker = map.addMarker(
-                                MarkerOptions()
-                                    .position(latlng)
-                                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
-                            )
-                            if (marker != null) {
-                                userMarkers[userId] = marker
-                            }
-                        }
+                        createMarker(userId, latlng, profileImageUrl)
                     }
                 }
             }

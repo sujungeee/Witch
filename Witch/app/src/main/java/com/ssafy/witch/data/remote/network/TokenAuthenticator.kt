@@ -33,10 +33,17 @@ class TokenAuthenticator(
 
         Log.d(TAG, "🚨 401 발생 → 요청 URL: ${response.request.url}")
 
-        // 마지막으로 한 번 더 시도
+        // 이미 갱신 중이면 대기
+        synchronized(this) {
+            if (TokenManager.isRefreshing) {
+                Log.d(TAG, "⏳ 이미 토큰 갱신 중이므로 대기")
+                return null
+            }
+        }
+
+        // 토큰 갱신 시도
         val isOk = TokenManager.ensureValidToken()
         return if (isOk) {
-            // 새로 갱신된 AccessToken 얻어와 재시도
             val newAccess = sharedPreferencesUtil.getAccessToken() ?: ""
             response.request.newBuilder()
                 .header("Authorization", "Bearer $newAccess")
@@ -51,12 +58,13 @@ class TokenAuthenticator(
      * 이전에 재시도한 횟수를 반환합니다.
      */
     private fun getRetryCount(response: Response): Int {
-        var count = 1
+        var count = 0
         var priorResponse = response.priorResponse
         while (priorResponse != null) {
             count++
             priorResponse = priorResponse.priorResponse
         }
+        Log.d(TAG, "현재 재시도 횟수: $count")
         return count
     }
 

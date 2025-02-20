@@ -31,14 +31,21 @@ class LoginActivity : BaseActivity<ActivityLoginBinding>(ActivityLoginBinding::i
 
         id = intent.getIntExtra("state", 0)
 
-        // 1) 이미 토큰이 유효하다면 → 바로 MainActivity 이동
-        //    (토큰 만료 or 없으면 → LoginFragment 보여주기)
-        if (TokenManager.ensureValidToken()) {
-            // 토큰 유효 또는 갱신 성공
-            openFragment(1)
-        } else {
-            // 토큰 불가 → 로그인 화면
-            clearTokenLogin()
+        // 최초 실행인 경우에만 토큰 검증 로직 실행
+        if (savedInstanceState == null) {
+            val accessToken = sharedPreferences.getAccessToken()
+            val refreshToken = sharedPreferences.getRefreshToken()
+
+            // AccessToken이 없는 경우 (최초 로그인 화면)
+            if (accessToken.isNullOrEmpty() || refreshToken.isNullOrEmpty()) {
+                openFragment(3) // LoginFragment 호출
+            } else if (TokenManager.ensureValidToken()) {
+                // 토큰이 유효하면 메인 화면으로 이동
+                openFragment(1)
+            } else {
+                // 토큰이 유효하지 않으면 로그인 화면으로
+                clearTokenLogin()
+            }
         }
 
     }

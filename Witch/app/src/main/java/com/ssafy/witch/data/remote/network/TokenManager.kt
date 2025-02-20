@@ -24,7 +24,7 @@ object TokenManager {
 
     // 동시 접근 방지용 Lock
     private val lock = ReentrantLock()
-    private var isRefreshing = false  // 현재 갱신 중 여부
+    var isRefreshing = false  // 현재 갱신 중 여부
 
     /**
      * - 메인 액티비티 onResume 등에서 호출
@@ -35,26 +35,23 @@ object TokenManager {
     fun ensureValidToken(): Boolean {
         // 이미 다른 스레드에서 갱신 중이면, 잠깐 기다렸다가(또는 바로) 처리
         lock.withLock {
-            if (isRefreshing) {
-                // 이미 갱신 중이면 여기서 한번 더 기다려볼 수도 있고,
-                // 혹은 그냥 “신뢰하고 true 반환” 할 수도 있음(옵션)
-                Log.d(TAG, "➡ 이미 토큰 갱신 중이므로, 바로 반환")
-                return true
+            lock.withLock {
+                if (isRefreshing) {
+                    Log.d(TAG, "⏳ 이미 토큰 갱신 중이므로 바로 반환")
+                    return true
+                }
+                isRefreshing = true
             }
-            // 이제부터 갱신 시작
-            isRefreshing = true
+
+            return try {
+                checkAndRefreshLogic()
+            } finally {
+                lock.withLock {
+                    isRefreshing = false
+                }
+            }
         }
 
-        return try {
-            // 갱신 로직을 실행
-            val result = checkAndRefreshLogic()
-            result
-        } finally {
-            // 갱신 종료
-            lock.withLock {
-                isRefreshing = false
-            }
-        }
     }
 
     /**
@@ -103,7 +100,7 @@ object TokenManager {
     /**
      * 리프레시 토큰 재갱신(동기) → 성공시 true, 실패시 false
      */
-    private fun renewRefreshTokenSync(): Boolean {
+    fun renewRefreshTokenSync(): Boolean {
         val storedRefresh = sharedPref.getRefreshToken() ?: return false
 
         val response = runBlocking {
@@ -138,7 +135,7 @@ object TokenManager {
     /**
      * 액세스 토큰 재갱신(동기) → 성공시 true, 실패시 false
      */
-    private fun reissueAccessTokenSync(): Boolean {
+    fun reissueAccessTokenSync(): Boolean {
         val storedRefresh = sharedPref.getRefreshToken() ?: return false
 
         val response = runBlocking {

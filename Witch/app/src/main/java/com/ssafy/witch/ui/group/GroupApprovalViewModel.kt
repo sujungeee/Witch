@@ -9,6 +9,7 @@ import com.ssafy.witch.base.BaseResponse
 import com.ssafy.witch.data.model.response.GroupListResponse
 import com.ssafy.witch.data.model.response.GroupResponse
 import com.ssafy.witch.data.remote.RetrofitUtil.Companion.groupService
+import com.ssafy.witch.ui.GroupJoinActivity
 import kotlinx.coroutines.launch
 
 class GroupApprovalViewModel : ViewModel() {
@@ -40,13 +41,14 @@ class GroupApprovalViewModel : ViewModel() {
         }
     }
 
-    fun requestJoinGroup(groupId: String) {
+    fun requestJoinGroup(groupId: String, context: GroupJoinActivity) {
         viewModelScope.launch {
             runCatching {
                 groupService.requestJoinGroup(groupId)
             }.onSuccess {
                 if (it.isSuccessful) {
                     _errorMessage.value = "그룹 가입 신청이 완료되었습니다."
+                    context.finish()
                 } else if(it.code() == 400) {
                     it.errorBody()?.let { body ->
                         val data = Gson().fromJson(body.string(), BaseResponse::class.java)

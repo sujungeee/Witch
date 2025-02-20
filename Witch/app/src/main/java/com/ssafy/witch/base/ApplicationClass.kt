@@ -40,6 +40,7 @@ class ApplicationClass : Application() {
         lateinit var retrofitLogin: Retrofit
         lateinit var retrofit: Retrofit
 
+        var isLogoutToastShown = false
         // JWT Token Header 키 값
         const val ACCESS_TOKEN = "ACCESS-TOKEN"
 
@@ -53,6 +54,8 @@ class ApplicationClass : Application() {
         instance = this
 
         sharedPreferencesUtil = SharedPreferencesUtil(applicationContext)
+
+        isLogoutToastShown = false
 
         //로그인 시만 작업하는 레트로핏
         // 1) 로그인 전용 (토큰 필요 없음)

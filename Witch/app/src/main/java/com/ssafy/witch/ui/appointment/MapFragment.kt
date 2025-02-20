@@ -47,10 +47,16 @@ import java.time.Duration
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
+import android.graphics.drawable.Drawable
+import com.bumptech.glide.request.target.CustomTarget
+import com.bumptech.glide.request.transition.Transition
+import kotlinx.coroutines.Dispatchers
+import java.util.concurrent.TimeUnit
 
 private const val TAG = "MapFragment_Witch"
 class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R.layout.fragment_map),
     OnMapReadyCallback {
+        var destFlag = false
         private var appointmentId = ""
 
         private val appointmentViewModel: AppointmentViewModel by activityViewModels()
@@ -123,25 +129,10 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
 
 //                participantsAdapter.updateList(lateParticipants)
             }
-        }
 
-        private fun createMarkerBitmap(context: Context, imageUrl: String): Bitmap {
-            val markerView = LayoutInflater.from(context).inflate(R.layout.appointment_member_item, null)
-
-            val profileImage = markerView.findViewById<ImageView>(R.id.appointment_member_profile_image)
-
-            Glide.with(context)
-                .load(imageUrl)
-                .circleCrop()
-                .into(profileImage)
-
-            markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
-            markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
-            val bitmap = Bitmap.createBitmap(markerView.measuredWidth, markerView.measuredHeight, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            markerView.draw(canvas)
-
-            return bitmap
+            binding.mapAcTv2.setOnClickListener {
+                setDialog()
+            }
         }
 
         private fun initUserObserver() {
@@ -168,6 +159,37 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
         }
 
+        private fun createMarkerBitmap(userId: String, latlng: LatLng, imageUrl: String): Bitmap {
+            val markerView = LayoutInflater.from(context).inflate(R.layout.appointment_member_item, null)
+            val profileImage = markerView.findViewById<ImageView>(R.id.appointment_member_profile_image)
+
+            Glide.with(requireContext())
+                .load(imageUrl)
+                .circleCrop()
+                .into(profileImage)
+                .apply{
+                    markerView.measure(View.MeasureSpec.UNSPECIFIED, View.MeasureSpec.UNSPECIFIED)
+                    markerView.layout(0, 0, markerView.measuredWidth, markerView.measuredHeight)
+                    val bitmap = Bitmap.createBitmap(markerView.measuredWidth, markerView.measuredHeight, Bitmap.Config.ARGB_8888)
+                    val canvas = Canvas(bitmap)
+                    markerView.draw(canvas).apply {
+                        if (userMarkers.containsKey(userId)) {
+                            userMarkers[userId]?.position = latlng
+                        } else {
+                            val marker = map.addMarker(
+                                MarkerOptions()
+                                    .position(latlng)
+                                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
+                            )
+                            if (marker != null) {
+                                userMarkers[userId] = marker
+                            }
+                        }
+                    }
+                    return bitmap
+                }
+        }
+
         private fun initLocationObserver() {
             Log.d(TAG, "initLocationObserver: ")
             MyLocationForegroundService.locationData.observe(viewLifecycleOwner) {
@@ -180,15 +202,14 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                         val userId = locationInfo.userId
                         val latlng = LatLng(locationInfo.latitude, locationInfo.longitude)
                         val profileImageUrl = locationInfo.profileImageUrl
-                        val markerBitmap = createMarkerBitmap(requireContext(), profileImageUrl)
-
+                        val bitmap = createMarkerBitmap(userId, latlng, profileImageUrl)
                         if (userMarkers.containsKey(userId)) {
                             userMarkers[userId]?.position = latlng
                         } else {
                             val marker = map.addMarker(
                                 MarkerOptions()
                                     .position(latlng)
-                                    .icon(BitmapDescriptorFactory.fromBitmap(markerBitmap))
+                                    .icon(BitmapDescriptorFactory.fromBitmap(bitmap))
                             )
                             if (marker != null) {
                                 userMarkers[userId] = marker
@@ -208,6 +229,13 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                 setTimer(LocalDateTime.parse(appointmentViewModel.appointmentInfo.value?.appointmentTime))
                 if (appointmentViewModel.appointmentStatus.value != "SCHEDULED") {
                     binding.mapAcTvAppointmentStatus.visibility = View.GONE
+                }
+                when (appointmentViewModel.appointmentStatus.value) {
+                    "FINISHED" -> {
+                        binding.mapAcTv1.text = "약속은"
+                        binding.mapAcTvRemainderTime.text = "이미 종료되었어요!"
+                        binding.mapAcTv2.visibility = View.GONE
+                    }
                 }
             }
 
@@ -241,7 +269,6 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                             mapViewModel.setUserStatus(1)
                         }
                     } else { // 모임원인 경우
-
                         if (participant.userId == appointmentViewModel.userId.value) {
                             flag = true
                             mapViewModel.setUserStatus(3)
@@ -266,6 +293,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             }
 
             appointmentViewModel.participants.observe(viewLifecycleOwner) {
+                Log.d(TAG, "initAppointmentObserver: participants: ${appointmentViewModel.participants.value}")
                 bottomSheetBinding.mapFgRvBottomMembers.adapter = AppointmentDetailParticipantsAdapter(appointmentViewModel.participants.value ?: mutableListOf())
 
                 if (appointmentViewModel.participants.value != null) {
@@ -290,22 +318,26 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             mapViewModel.snackList.observe(viewLifecycleOwner) {
                 bottomSheetBinding.mapFgRvBottomSnack.adapter= AppointmentSnackAdatper(
                     it!!,
-                    appointmentViewModel.latitude.value!!,
-                    appointmentViewModel.longitude.value!!
-                ) { snackid, distance ->
+                    mylocation.latitude,
+                    mylocation.longitude
+                ) { snackid, distance, snackLatitude, snackLongitude ->
                     snackViewModel.setDistance(distance)
                     Log.d(TAG, "initSnackObserver: distance: ${snackViewModel.distance.value}")
-                    if (isDistance() == true) {
+                    if (isDistance(snackLatitude, snackLongitude) == true) {
                         goToSnackFragment(4, snackid)
                     }
                 }
             }
         }
 
-        private fun isDistance(): Boolean {
-            val myDistance: Double = Distance().calculateDistance(mylocation.latitude, mylocation.longitude,
+        private fun isDistance(snackLatitude: Double, snackLongitude: Double): Boolean {
+            val s2aDistance: Double = Distance().calculateDistance(snackLatitude, snackLongitude,
                 appointmentViewModel.appointmentInfo.value!!.latitude, appointmentViewModel.appointmentInfo.value!!.longitude)
-            if (Math.abs(myDistance - snackViewModel.distance.value!!) <= 0.3) {
+
+            val m2aDistance = Distance().calculateDistance(mylocation.latitude, mylocation.longitude,
+                appointmentViewModel.appointmentInfo.value!!.latitude, appointmentViewModel.appointmentInfo.value!!.longitude)
+
+            if (m2aDistance - s2aDistance <= 0.1) {
                 return true
             }
             showCustomToast("거리 내에 위치하지 않습니다.")
@@ -331,14 +363,16 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
             appointmentChangeDlBtnYes.setOnClickListener {
                 when(mapViewModel.userStatus.value) {
                     1 -> appointmentViewModel.deleteAppointment(appointmentId)
-                    2 -> appointmentViewModel.participateAppointment(appointmentId)
-                    3 -> appointmentViewModel.leaveAppointment(appointmentId)
+                    2 -> {
+                        appointmentViewModel.participateAppointment(appointmentId)
+                        mapViewModel.setUserStatus(3)
+                    }
+                    3 -> {
+                        appointmentViewModel.leaveAppointment(appointmentId)
+                        mapViewModel.setUserStatus(2)
+                    }
                 }
-                when(mapViewModel.userStatus.value) {
-                    2 -> mapViewModel.setUserStatus(3)
-                    3 -> mapViewModel.setUserStatus(2)
-                }
-                mapViewModel.getSnackList(appointmentId)
+                appointmentViewModel.updateParticipantsInfo(appointmentId)
                 dialogBuilder.dismiss()
             }
 
@@ -389,12 +423,16 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                                 R.drawable.balloon
                             )
                             val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
-                            map.moveCamera(
-                                CameraUpdateFactory.newLatLngZoom(
-                                    placeLocation,
-                                    15f
+                            if (destFlag == false) {
+                                map.moveCamera(
+                                    CameraUpdateFactory.newLatLngZoom(
+                                        placeLocation,
+                                        15f
+                                    )
                                 )
-                            )
+                                destFlag = true
+                            }
+
                             map.addMarker(
                                 MarkerOptions()
                                     .position(placeLocation)
@@ -530,9 +568,5 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                         putString(key, value)
                     }
                 }
-        }
-
-        override fun onResume() {
-            super.onResume()
         }
 }

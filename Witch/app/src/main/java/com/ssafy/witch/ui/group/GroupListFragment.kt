@@ -45,6 +45,11 @@ class GroupListFragment : BaseFragment<FragmentGroupListBinding>(FragmentGroupLi
             contentActivity.putExtra("openFragment", 1)
             startActivity(contentActivity)
         }
+
+        binding.groupListFgSrlGroupList.setOnRefreshListener {
+            viewModel.getGroupList()
+            binding.groupListFgSrlGroupList.isRefreshing = false
+        }
     }
 
     override fun onResume() {

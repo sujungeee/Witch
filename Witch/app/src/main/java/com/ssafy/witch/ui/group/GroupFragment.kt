@@ -95,6 +95,12 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
             startActivity(contentActivity)
         }
 
+
+        binding.groupFgSrlAppointmentList.setOnRefreshListener {
+            viewModel.getGroupAppointments(groupId)
+            binding.groupFgSrlAppointmentList.isRefreshing = false
+        }
+
     }
 
 
@@ -282,6 +288,8 @@ class GroupFragment : BaseFragment<FragmentGroupBinding>(FragmentGroupBinding::b
 
         Toast.makeText(requireContext(), "모임 초대 링크가 클립보드에 복사되었습니다.", Toast.LENGTH_SHORT).show()
     }
+
+
 
 
 

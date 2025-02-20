@@ -8,6 +8,7 @@ import android.media.MediaPlayer
 import android.media.MediaRecorder
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.core.app.ActivityCompat
 import androidx.core.net.toUri
@@ -27,7 +28,7 @@ class SnackRecord(private val fragment: Fragment,
 
     private  var mediaRecorder: MediaRecorder = MediaRecorder()
 
-    private lateinit var mediaPlayer: MediaPlayer
+    private var mediaPlayer= MediaPlayer()
 
     private var path: String? = null
 
@@ -61,6 +62,7 @@ class SnackRecord(private val fragment: Fragment,
 
         dialogBinding.snackRecordDlIvRecord.setOnClickListener {
             initRecord(dialogBinding)
+
             if (audioName.isNotEmpty() && viewModel.recordState.value == false) {
                 dialogBinding.snackRecordDlTvFilePlay.isGone = false
                 dialogBinding.snackRecordDlTvFilePlay.setOnClickListener {
@@ -69,21 +71,23 @@ class SnackRecord(private val fragment: Fragment,
             }else{
                 dialogBinding.snackRecordDlTvFilePlay.isGone = true
             }
+
         }
         dialog.show()
     }
 
     fun initRecord(dialogBinding: DialogSnackRecordBinding) {
         if (viewModel.recordState.value == false) {
-            viewModel.setRecordState(true)
-            dialogBinding.snackRecordDlTvFileText.text = "녹음중"
-            dialogBinding.snackRecordDlIvRecord.setImageResource(R.drawable.record_stop)
+
 
             if (ActivityCompat.checkSelfPermission(fragment.requireContext(), android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
-
-                startRecord()
+                startRecord(dialogBinding)
             } else {
-                requestPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO)
+                requestPermissionLauncher.launch(android.Manifest.permission.RECORD_AUDIO).apply {
+                    if (ActivityCompat.checkSelfPermission(fragment.requireContext(), android.Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED) {
+                        startRecord(dialogBinding)
+                    }
+                }
             }
 
 
@@ -96,7 +100,11 @@ class SnackRecord(private val fragment: Fragment,
 
     }
 
-    fun startRecord() {
+    fun startRecord(dialogBinding: DialogSnackRecordBinding) {
+        mediaRecorder = MediaRecorder()
+        viewModel.setRecordState(true)
+        dialogBinding.snackRecordDlTvFileText.text = "녹음중"
+        dialogBinding.snackRecordDlIvRecord.setImageResource(R.drawable.record_stop)
         path = fragment.requireContext().getExternalFilesDir("/")?.absolutePath // 🔥 path 설정
 
         audioName = "$path/${System.currentTimeMillis()}.mp3" // 🔥 path 활용
@@ -126,7 +134,12 @@ class SnackRecord(private val fragment: Fragment,
 
         if(viewModel.recordState.value == true ){
             if(mediaRecorder != null) {
-                mediaRecorder.stop()
+                try {
+                    mediaRecorder.stop()
+                } catch (e: Exception) {
+                    Toast.makeText(fragment.requireContext(), "녹음에 실패했습니다. 한번 더 시도해주세요.", Toast.LENGTH_SHORT).show()
+                    Log.e(TAG, "stopRecord: 녹음 중지 실패", e)
+                }
             }
         }
 
@@ -139,16 +152,26 @@ class SnackRecord(private val fragment: Fragment,
 
 
     fun playRecord() {
+        mediaPlayer?.release()
         mediaPlayer = MediaPlayer()
 
         try {
-            mediaPlayer.setDataSource(audioName)
-            mediaPlayer.prepare()
-            mediaPlayer.start()
-            Log.d(TAG, "playRecord: ")
+            val file = File(audioName)
+            if (!file.exists() || file.length() == 0L) {
+                Log.d(TAG, "파일이 존재하지 않거나 크기가 0입니다.")
+                return
+            }
+
+            mediaPlayer?.apply {
+                setDataSource(file.absolutePath)
+                prepare()
+                start()
+            }
+
         } catch (e: Exception) {
-            Log.d(TAG, "playRecord: $e")
+            Log.d(TAG, "playRecord 오류: $e")
             e.printStackTrace()
         }
     }
+
 }

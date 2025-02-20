@@ -57,7 +57,7 @@ class GroupJoinActivity : BaseActivity<FragmentGroupApprovalBinding>(FragmentGro
                 intent.putExtra("state", 1)
                 startActivity(intent)
             } else if (groupId != null) {
-                viewModel.requestJoinGroup(groupId)
+                viewModel.requestJoinGroup(groupId, this)
             }
         }
 

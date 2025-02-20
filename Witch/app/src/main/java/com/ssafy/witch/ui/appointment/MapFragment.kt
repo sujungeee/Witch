@@ -420,7 +420,7 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                             val placeLocation = LatLng(latitude!!, longitude!!)
                             val bitmap = getBitmapFromVectorDrawable(
                                 requireContext(),
-                                R.drawable.balloon
+                                R.drawable.place
                             )
                             val markerIcon = BitmapDescriptorFactory.fromBitmap(bitmap)
                             if (destFlag == false) {

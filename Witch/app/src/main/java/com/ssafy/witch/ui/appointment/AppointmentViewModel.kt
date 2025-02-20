@@ -160,12 +160,11 @@ class AppointmentViewModel: ViewModel() {
                     if (response.body()?.success == true) {
                         _appointmentInfo.value = response.body()?.data!!
                         _appointmentStatus.value = appointmentInfo.value?.appointmentStatus
-                        _participants.value = appointmentInfo.value?.participants
-                            ?.filter { it.isLeader != true }
-                            ?.toMutableList()
-                        _leader.value = appointmentInfo.value?.participants
-                            ?.filter { it.isLeader == true }
-                            ?.toMutableList()
+
+                        val (leader, participants) = appointmentInfo.value?.participants
+                            ?.partition { it.isLeader == true } ?: Pair(emptyList(), emptyList())
+                        _leader.value = leader.toMutableList()
+                        _participants.value = participants.toMutableList()
                     }
                 } else if(response.code() == 400) {
                     val errorBody = response.errorBody()?.string()
@@ -177,6 +176,33 @@ class AppointmentViewModel: ViewModel() {
                 }
             }.onFailure { e ->
                 Log.e(TAG, "getAppointmentInfo() Exception: ${e.message}", e)
+            }
+        }
+    }
+
+    fun updateParticipantsInfo(appointmentId: String) {
+        viewModelScope.launch {
+            runCatching {
+                appointmentService.getAppointmentInfo(appointmentId)
+            }.onSuccess { response ->
+                if (response.isSuccessful) {
+                    if (response.body()?.success == true) {
+                        val (leader, participants) = response.body()?.data?.participants
+                            ?.partition { it.isLeader == true } ?: Pair(emptyList(), emptyList())
+                        _leader.value = leader.toMutableList()
+                        _participants.value = participants.toMutableList()
+                        Log.d(TAG, "updateParticipantsInfo: ${_participants.value}")
+                    }
+                } else if(response.code() == 400) {
+                    val errorBody = response.errorBody()?.string()
+                    val errorResponse = errorBody?.let {
+                        val type = object : TypeToken<BaseResponse<ErrorResponse>>() {}.type
+                        Gson().fromJson<BaseResponse<ErrorResponse>>(it, type)
+                    }
+                    _toastMsg.value = errorResponse?.error?.errorMessage
+                }
+            }.onFailure { e ->
+                Log.e(TAG, "getParticipantsInfo() Exception: ${e.message}", e)
             }
         }
     }

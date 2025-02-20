@@ -19,7 +19,9 @@ class MyFirebaseMessageService :  FirebaseMessagingService() {
         var title = message.data["title"].toString()
         var content = message.data["content"].toString()
 
-        sendToForegroundService(type, parameter, title, content)
+        if (title != "null") {
+            sendToForegroundService(type, parameter, title, content)
+        }
     }
 
     private fun sendToForegroundService(type: String, parameter: String, title: String, content: String) {

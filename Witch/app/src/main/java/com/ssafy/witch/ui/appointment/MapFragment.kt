@@ -334,6 +334,11 @@ class MapFragment : BaseFragment<FragmentMapBinding>(FragmentMapBinding::bind, R
                     2 -> appointmentViewModel.participateAppointment(appointmentId)
                     3 -> appointmentViewModel.leaveAppointment(appointmentId)
                 }
+                when(mapViewModel.userStatus.value) {
+                    2 -> mapViewModel.setUserStatus(3)
+                    3 -> mapViewModel.setUserStatus(2)
+                }
+                mapViewModel.getSnackList(appointmentId)
                 dialogBuilder.dismiss()
             }
 

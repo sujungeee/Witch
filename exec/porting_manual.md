@@ -17,7 +17,7 @@ nohup env AWS_ACCESS_KEY=test \
           GMAIL_PASSWORD=${GMAIL_PASSWORD} \
           GMAIL_USERNAME=${GMAIL_USERNAME} \
           JWT_SECRET=0c5eab3e8f3c226f2446c598b79845879a6d368bffc66e1cb6ad8d70829448ee \
-     java -Daws.s3.endpoint="${SERVER_URL}$:4566" \
+     java -Daws.s3.endpoint="${SERVER_URL}:4566" \
           -jar ./S12P11D211/witch-apps/app-api/build/libs/app-api-1.0-SNAPSHOT-boot.jar \
      > nohup.out 2>&1 &
 ```

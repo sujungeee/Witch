@@ -85,7 +85,7 @@ public class ReadSnackService implements ReadSnackUseCase {
       double targetDist = DistanceUtils.getDistance(appointmentPosition, snackPosition);
       double currentDist = DistanceUtils.getDistance(appointmentPosition, viewerPosition);
 
-      if (currentDist > targetDist - 10) {
+      if (currentDist > targetDist + 10) {
         throw new SnackViewNotAvailableException();
       }
     }

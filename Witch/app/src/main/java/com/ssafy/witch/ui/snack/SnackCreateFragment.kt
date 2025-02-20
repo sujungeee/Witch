@@ -55,12 +55,11 @@ class SnackCreateFragment : BaseFragment<FragmentSnackCreateBinding>(FragmentSna
 
     private lateinit var loadingDialog: LoadingDialog
 
-
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
-            snackRecord?.startRecord()
+            Log.d(TAG, "requestPermissionLauncher: 권한 허용 $snackRecord")
         } else {
             Toast.makeText(requireContext(), "녹음 권한을 허용해주세요.", Toast.LENGTH_SHORT).show()
         }

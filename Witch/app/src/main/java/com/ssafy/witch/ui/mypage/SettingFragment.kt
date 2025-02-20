@@ -69,9 +69,12 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>(FragmentSettingBind
             }
 
             dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-            startActivity(intent)
             dialog.dismiss()
+            startActivity(intent)
+            // 현재 액티비티 종료 (무한 반복 방지)
+            requireActivity().finish()
         }
         dialog.show()
+
     }
 }

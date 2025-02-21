@@ -13,6 +13,11 @@
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION" />
+
     <uses-permission
         android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
         tools:node="remove" />
@@ -35,12 +40,10 @@
         <service
             android:name=".ui.appointment.MyLocationForegroundService"
             android:foregroundServiceType="location"
-            android:permission="android.permission.FOREGROUND_SERVICE"
             android:exported="false" />
 
         <service
             android:name=".ui.ForegroundService"
-            android:permission="android.permission.FOREGROUND_SERVICE"
             android:exported="false"/>
 
         <service

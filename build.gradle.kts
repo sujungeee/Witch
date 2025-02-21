@@ -12,7 +12,6 @@ plugins {
     id("io.freefair.lombok") version Versions.lombokPlugin apply false
     id("com.coditory.integration-test") version Versions.integrationTestPlugin apply false
     id("org.asciidoctor.jvm.convert") version Versions.asciidoctorPlugin apply false
-    id ("org.sonarqube") version "4.4.0.3356"
 }
 
 allprojects {

@@ -30,4 +30,10 @@ class TimeConverter {
         val formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME
         return LocalDateTime.parse(time, formatter)
     }
+
+    fun parseSeconds(seconds: Long): String {
+        val minutes = (seconds % 3600) / 60
+        val remainingSeconds = seconds % 60
+        return "${minutes}분 ${remainingSeconds}초"
+    }
 }

@@ -1,7 +1,9 @@
 # 🧙WITCH
 
 <img width="100%" alt="썸네일" src="https://github.com/user-attachments/assets/63168c57-07bd-4d9b-8331-2660a88aac88" />
+
 <div align=center>
+
 
 #### WITCH는 약속 시작 1시간 전부터 친구들의 위치를 실시간으로 공유하는 서비스입니다.<br> 함께하는 만남을 간편하게 관리하고, 스낵을 공유하며 즐거운 하루를 만들어보세요!
 
@@ -31,36 +33,23 @@
 
 ### Back-End
 
-<img src="https://img.shields.io/badge/spring-%236DB33F.svg?&style=for-the-badge&logo=spring&logoColor=white" />
-<img src="https://img.shields.io/badge/Spring boot-%236DB33F.svg?&style=for-the-badge&logo=spring boot&logoColor=white" />
-<img src="https://img.shields.io/badge/Spring security-%236DB33F.svg?&style=for-the-badge&logo=spring security&logoColor=white" />
-<img src="https://img.shields.io/badge/mysql-%234479A1.svg?&style=for-the-badge&logo=mysql&logoColor=white" />
-<img src="https://img.shields.io/badge/redis-%23DC382D.svg?&style=for-the-badge&logo=redis&logoColor=white" />
-<img src="https://img.shields.io/badge/apache%20kafka-%23231F20.svg?&style=for-the-badge&logo=apache%20kafka&logoColor=white" />
-<img src="https://img.shields.io/badge/firebase-%23FFCA28.svg?&style=for-the-badge&logo=firebase&logoColor=black" />
-<img src="https://img.shields.io/badge/Amazon S3-569A31?&style=for-the-badge&logo=amazons3&logoColor=white" />
-<img src="https://img.shields.io/badge/Amazon EC2-FF9900?&style=for-the-badge&logo=amazonec2&logoColor=black" />
+<img src="https://img.shields.io/badge/spring-%236DB33F.svg?&style=for-the-badge&logo=spring&logoColor=white" /><img src="https://img.shields.io/badge/Spring boot-%236DB33F.svg?&style=for-the-badge&logo=spring boot&logoColor=white" /><img src="https://img.shields.io/badge/Spring security-%236DB33F.svg?&style=for-the-badge&logo=spring security&logoColor=white" /><img src="https://img.shields.io/badge/mysql-%234479A1.svg?&style=for-the-badge&logo=mysql&logoColor=white" /><img src="https://img.shields.io/badge/redis-%23DC382D.svg?&style=for-the-badge&logo=redis&logoColor=white" /><img src="https://img.shields.io/badge/apache%20kafka-%23231F20.svg?&style=for-the-badge&logo=apache%20kafka&logoColor=white" /><img src="https://img.shields.io/badge/firebase-%23FFCA28.svg?&style=for-the-badge&logo=firebase&logoColor=black" />
+
+<img src="https://img.shields.io/badge/Amazon S3-569A31?&style=for-the-badge&logo=amazons3&logoColor=white" /><img src="https://img.shields.io/badge/Amazon EC2-FF9900?&style=for-the-badge&logo=amazonec2&logoColor=black" />
 
 ### Android
 
-<img src="https://img.shields.io/badge/android%20studio-%233DDC84.svg?&style=for-the-badge&logo=android%20studio&logoColor=white" />
-<img src="https://img.shields.io/badge/google%20maps-%234285F4.svg?&style=for-the-badge&logo=google%20maps&logoColor=white" />
+<img src="https://img.shields.io/badge/android%20studio-%233DDC84.svg?&style=for-the-badge&logo=android%20studio&logoColor=white" /><img src="https://img.shields.io/badge/google%20maps-%234285F4.svg?&style=for-the-badge&logo=google%20maps&logoColor=white" />
 
 ### CI/CD
 
-<img src="https://img.shields.io/badge/docker-%232496ED.svg?&style=for-the-badge&logo=docker&logoColor=white" />
-<img src="https://img.shields.io/badge/kubernetes-%23326CE5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white" />
-<img src="https://img.shields.io/badge/helm-%230F1689.svg?&style=for-the-badge&logo=helm&logoColor=white" />
-<img src="https://img.shields.io/badge/jenkins-%23D24939.svg?&style=for-the-badge&logo=jenkins&logoColor=white" />
-<img src="https://img.shields.io/badge/Argo-EF7B4D?style=for-the-badge&logo=argo&logoColor=white"/>
+<img src="https://img.shields.io/badge/docker-%232496ED.svg?&style=for-the-badge&logo=docker&logoColor=white" /><img src="https://img.shields.io/badge/kubernetes-%23326CE5.svg?&style=for-the-badge&logo=kubernetes&logoColor=white" /><img src="https://img.shields.io/badge/helm-%230F1689.svg?&style=for-the-badge&logo=helm&logoColor=white" /><img src="https://img.shields.io/badge/jenkins-%23D24939.svg?&style=for-the-badge&logo=jenkins&logoColor=white" /><img src="https://img.shields.io/badge/Argo-EF7B4D?style=for-the-badge&logo=argo&logoColor=white"/>
 
 ### Co-Work
 
-<img src="https://img.shields.io/badge/gitlab-%23FCA121.svg?&style=for-the-badge&logo=gitlab&logoColor=orange" />
-<img src="https://img.shields.io/badge/jira-%230052CC.svg?&style=for-the-badge&logo=jira&logoColor=white" />
-<img src="https://img.shields.io/badge/notion-%23000000.svg?&style=for-the-badge&logo=notion&logoColor=white" />
-<img src="https://img.shields.io/badge/mattermost-%230072C6.svg?&style=for-the-badge&logo=mattermost&logoColor=white" />
-<img src="https://img.shields.io/badge/figma-%23F24E1E.svg?&style=for-the-badge&logo=figma&logoColor=white" />
+<img src="https://img.shields.io/badge/gitlab-%23FCA121.svg?&style=for-the-badge&logo=gitlab&logoColor=orange" /><img src="https://img.shields.io/badge/jira-%230052CC.svg?&style=for-the-badge&logo=jira&logoColor=white" /><img src="https://img.shields.io/badge/notion-%23000000.svg?&style=for-the-badge&logo=notion&logoColor=white" /><img src="https://img.shields.io/badge/mattermost-%230072C6.svg?&style=for-the-badge&logo=mattermost&logoColor=white" /><img src="https://img.shields.io/badge/figma-%23F24E1E.svg?&style=for-the-badge&logo=figma&logoColor=white" />
+
+
 
 ## 🧙디렉토리 구조
 
@@ -118,35 +107,35 @@ witch
 
 #### 📌회원가입
 
-![회원가입](https://github.com/user-attachments/assets/e95f137b-09e6-478d-b3ab-a48e02e3c018)
+<img src="https://github.com/user-attachments/assets/e95f137b-09e6-478d-b3ab-a48e02e3c018" alt="회원가입" style="zoom:50%;" />
 
 #### 📌로그인 및 로그아웃
 
-![로그인/로그아웃](https://github.com/user-attachments/assets/f4805372-e532-4bb4-bfbf-08907854c696)
+<img src="https://github.com/user-attachments/assets/f4805372-e532-4bb4-bfbf-08907854c696" alt="로그인/로그아웃" style="zoom:50%;" />
 
 #### 📌모임 생성
 
-![모임 생성](https://github.com/user-attachments/assets/3248c209-5511-4996-ad8a-69aaa58742c8)
+<img src="https://github.com/user-attachments/assets/3248c209-5511-4996-ad8a-69aaa58742c8" alt="모임 생성" style="zoom:50%;" />
 
 #### 📌약속 생성
 
-![약속 생성](https://github.com/user-attachments/assets/96740155-7f60-47de-b214-678376db28b1)
+<img src="https://github.com/user-attachments/assets/96740155-7f60-47de-b214-678376db28b1" alt="약속 생성" style="zoom:50%;" />
 
 #### 📌약속 조회
 
-![약속 조회](https://github.com/user-attachments/assets/07459542-2397-495e-b1c9-91647bc604ad)
+<img src="https://github.com/user-attachments/assets/07459542-2397-495e-b1c9-91647bc604ad" alt="약속 조회" style="zoom:50%;" />
 
 #### 📌실시간 위치 조회
 
-![실시간 위치 조회](https://github.com/user-attachments/assets/351e5a9b-30e4-464f-ac43-627188893d80)
+<img src="https://github.com/user-attachments/assets/351e5a9b-30e4-464f-ac43-627188893d80" alt="실시간 위치 조회" style="zoom:50%;" />
 
 #### 📌스낵 생성
 
-![스낵 생성](https://github.com/user-attachments/assets/3178c2fb-7897-40cd-b8e6-807813b77906)
+<img src="https://github.com/user-attachments/assets/3178c2fb-7897-40cd-b8e6-807813b77906" alt="스낵 생성" style="zoom:50%;" />
 
 #### 📌스낵 조회
 
-![스낵 조회](https://github.com/user-attachments/assets/faa8f223-28fb-44d7-b26c-dbb12b123edf)
+<img src="https://github.com/user-attachments/assets/faa8f223-28fb-44d7-b26c-dbb12b123edf" alt="스낵 조회" style="zoom:50%;" />
 
 ## 🧙팀원 소개
 
